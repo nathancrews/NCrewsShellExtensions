@@ -1,14 +1,8 @@
 #include "NCraftImageGen.h"
+#include "NCraftImageGenDll.h"
 #include "NCraftImageGenMenuGUID.h"
 #include "NCraftClassFactory.h"
-#include <filesystem>
-
-long g_DllModuleRefCount = 0;
-TCHAR g_DllModelName[MAX_PATH] = { 0 };
-std::filesystem::path G_AppPath;
-
-// Handle the the DLL's module
-HINSTANCE g_hinst = NULL;
+#include "Renderers/RenderToImage.h"
 
 // Standard DLL functions
 BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
@@ -20,6 +14,11 @@ BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
 
         DWORD strSize = MAX_PATH;
         GetModuleFileNameW(hInstance, g_DllModelName, strSize);
+
+        std::filesystem::path appPath = g_DllModelName;
+        g_AppPath = appPath.remove_filename();
+
+        open3d::utility::Logger::GetInstance().SetPrintFunction(print_fcn);
     }
     return TRUE;
 }

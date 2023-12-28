@@ -1,7 +1,7 @@
+#include "NCraftImageGen.h"
 #include "NCraftClassFactory.h"
 #include "NCraftImageGenMenu.h"
 
-extern long g_DllModuleRefCount;
 
 NCraftClassFactory::NCraftClassFactory() : m_ObjRefCount(1)
 {

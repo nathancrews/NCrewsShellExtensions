@@ -179,6 +179,8 @@
       <OpenMPSupport>true</OpenMPSupport>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <ProgramDataBaseFileName>$(OutDIr)$(TargetName).pdb</ProgramDataBaseFileName>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -208,6 +210,7 @@
       <OpenMPSupport>true</OpenMPSupport>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <ProgramDataBaseFileName>$(OutDIr)$(TargetName).pdb</ProgramDataBaseFileName>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -232,6 +235,7 @@
   <ItemGroup>
     <ClInclude Include="..\inc\NCraftClassFactory.h" />
     <ClInclude Include="..\inc\NCraftImageGen.h" />
+    <ClInclude Include="..\inc\NCraftImageGenDll.h" />
     <ClInclude Include="..\inc\NCraftImageGenMenu.h" />
     <ClInclude Include="..\inc\NCraftImageGenMenuGUID.h" />
     <ClInclude Include="..\inc\Priv.h" />

@@ -23,10 +23,6 @@
 #include <pcl/octree/octree_pointcloud.h>
 #include <pcl/octree/octree_search.h>
 
-#include <tbb/tbb.h>
-#include "tbb/concurrent_vector.h"
-#include "tbb/concurrent_unordered_map.h"
-
 using namespace pdal;
 using namespace pdal::las;
 
@@ -45,7 +41,7 @@ std::vector<std::string> PointcloudFileExtensions{ ".las",
 ".XYZ",
 ".PTS" };
 
-int RenderToImages(std::filesystem::path& appPath, std::vector<std::filesystem::path>& filePaths)
+UINT RenderToImages(std::filesystem::path& appPath, std::vector<std::filesystem::path>& filePaths)
 {
     const int width = 2048;
     const int height = 1640;
@@ -93,107 +89,33 @@ int RenderToImages(std::filesystem::path& appPath, std::vector<std::filesystem::
         }
     }
 
-#define DIV 1048576
-// Use to convert bytes to MB
-//#define DIV 1024
-
-#define WIDTH 7
-
-    MEMORYSTATUSEX statex;
-    statex.dwLength = sizeof(statex);
-    GlobalMemoryStatusEx(&statex);
-    utility::LogInfo("There is  {} percent of memory in use.\n", statex.dwMemoryLoad);
-    utility::LogInfo("There are {} free Mbytes of physical memory.\n", statex.ullAvailPhys / DIV);
-    utility::LogInfo("There are {} free Mbytes of virtual memory.\n", statex.ullAvailVirtual / DIV);
-
-    //_tprintf(TEXT("There is  %*ld percent of memory in use.\n"), WIDTH, statex.dwMemoryLoad);
-    //_tprintf(TEXT("There are %*I64d total Mbytes of physical memory.\n"), WIDTH, statex.ullTotalPhys / DIV);
-    //_tprintf(TEXT("There are %*I64d free Mbytes of physical memory.\n"), WIDTH, statex.ullAvailPhys / DIV);
-    //_tprintf(TEXT("There are %*I64d total Mbytes of paging file.\n"), WIDTH, statex.ullTotalPageFile / DIV);
-    //_tprintf(TEXT("There are %*I64d free Mbytes of paging file.\n"), WIDTH, statex.ullAvailPageFile / DIV);
-    //_tprintf(TEXT("There are %*I64d total Mbytes of virtual memory.\n"), WIDTH, statex.ullTotalVirtual / DIV);
-    //_tprintf(TEXT("There are %*I64d free Mbytes of virtual memory.\n"), WIDTH, statex.ullAvailVirtual / DIV);
-    //_tprintf(TEXT("There are %*I64d free Mbytes of extended memory.\n"), WIDTH, statex.ullAvailExtendedVirtual / DIV);
-
+    utility::LogInfo("processing {} files....\n", batchModeFilenames.size());
 
     utility::Timer timer;
-    int pointCount = 0;
     int pointCountTotal = 0;
-    double execExecTotal = 0.0;
-    double exeTime = 0.0;
+    double exeTime = 0.0, execExecTotal = 0.0;
+
     tbb::concurrent_vector<std::shared_ptr<geometry::PointCloud>> cloudPtrs;
-    omp_lock_t writelock;
-    omp_init_lock(&writelock);
 
     timer.Start();
 
-#pragma omp parallel for
-    for (int sz = 0; sz < batchModeFilenames.size(); ++sz)
+    if (batchModeFilenames.size() > 2)
     {
-        MEMORYSTATUSEX statex;
-        statex.dwLength = sizeof(statex);
-        GlobalMemoryStatusEx(&statex);
-        utility::LogInfo("There is  {} percent of memory in use.\n", statex.dwMemoryLoad);
-        utility::LogInfo("There are {} free Mbytes of physical memory.\n", statex.ullAvailPhys / DIV);
-        utility::LogInfo("There are {} free Mbytes of virtual memory.\n", statex.ullAvailVirtual / DIV);
-
-        utility::Timer timer2;
-        timer2.Start();
-
-        if (!batchModeFilenames[sz].extension().compare(".las") ||
-            !batchModeFilenames[sz].extension().compare(".laz") ||
-            !batchModeFilenames[sz].extension().compare(".LAS") ||
-            !batchModeFilenames[sz].extension().compare(".LAZ"))
-        {
-            std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
-            if (new_cloud_ptr)
-            {
-                pointCount = LoadLASorLAZToO3DCloud(batchModeFilenames[sz], *new_cloud_ptr);
-                if (pointCount > 0)
-                {
-                    new_cloud_ptr->SetName(batchModeFilenames[sz].string());
-                    cloudPtrs.push_back(new_cloud_ptr);
-                }
-            }
-        }
-        else if (!batchModeFilenames[sz].extension().compare(".pcd") ||
-                 !batchModeFilenames[sz].extension().compare(".xyz") ||
-                 !batchModeFilenames[sz].extension().compare(".pts"))
-        {
-            std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
-
-            if (new_cloud_ptr)
-            {
-                io::ReadPointCloud(batchModeFilenames[sz].string(), *new_cloud_ptr);
-                pointCount = new_cloud_ptr->points_.size();
-                if (pointCount > 0)
-                {
-                    new_cloud_ptr->SetName(batchModeFilenames[sz].string());
-                    cloudPtrs.push_back(new_cloud_ptr);
-                }
-            }
-        }
-
-        timer2.Stop();
-        double exeTime = timer2.GetDurationInSecond();
-
-        MEMORYSTATUSEX pStatex;
-        pStatex.dwLength = sizeof(pStatex);
-        GlobalMemoryStatusEx(&pStatex);
-
-        utility::LogInfo("{} percent increase memory in use: {}\n", pStatex.dwMemoryLoad - statex.dwMemoryLoad, batchModeFilenames[sz].filename().string());
-        utility::LogInfo("Loading used {} Mbytes of physical memory.\n", (statex.ullAvailPhys / DIV) - (pStatex.ullAvailPhys / DIV));
-
-        if (pointCount > 0)
-        {
-            utility::LogInfo("Point cloud {}, points:{}, Threaded Load Duration: {} seconds\n", batchModeFilenames[sz].filename().string(), pointCount, exeTime);
-        }
-
-        omp_set_lock(&writelock);
-        pointCountTotal += pointCount;
-        omp_unset_lock(&writelock);
+        pointCountTotal = LoadPointCloudFilesParallel(batchModeFilenames, cloudPtrs);
     }
-    omp_destroy_lock(&writelock);
+    else
+    {
+        std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
+        if (new_cloud_ptr)
+        {
+            pointCountTotal = LoadLASorLAZToO3DCloud(batchModeFilenames[0], *new_cloud_ptr);
+            if (pointCountTotal > 0)
+            {
+                new_cloud_ptr->SetName(batchModeFilenames[0].string());
+                cloudPtrs.push_back(new_cloud_ptr);
+            }
+        }
+    }
 
     timer.Stop();
     exeTime = timer.GetDurationInSecond();
@@ -225,8 +147,11 @@ int RenderToImages(std::filesystem::path& appPath, std::vector<std::filesystem::
     {
         timer.Start();
 
+        UINT pointCount = cloudPtr->points_.size();
+
         std::filesystem::path cNamePath = cloudPtr->GetName();
         RenderPointcloudToImage(renderer, cNamePath, cloudPtr);
+        cloudPtr->Clear();
 
         timer.Stop();
 
@@ -239,7 +164,11 @@ int RenderToImages(std::filesystem::path& appPath, std::vector<std::filesystem::
         }
     }
 
-    utility::LogInfo("==>Total Load/Render for {} files, Duration: {} seconds\n", batchModeFilenames.size(), execExecTotal);
+    if (pointCountTotal > 0)
+    {
+        int pntsPerSec = (int)(pointCountTotal / exeTime);
+        utility::LogInfo("Finished Loading {} Total Points, Total Loading Process Duration: {} seconds, pnts/sec = {}\n", pointCountTotal, execExecTotal, pntsPerSec);
+    }
 
     delete renderer;
 
@@ -247,7 +176,7 @@ int RenderToImages(std::filesystem::path& appPath, std::vector<std::filesystem::
 }
 
 
-int RenderToImage(std::filesystem::path& appPath, std::filesystem::path& filePath)
+UINT RenderToImage(std::filesystem::path& appPath, std::filesystem::path& filePath)
 {
     const int width = 2048;
     const int height = 1640;
@@ -320,70 +249,32 @@ int RenderToImage(std::filesystem::path& appPath, std::filesystem::path& filePat
         }
     }
 
+    utility::LogInfo("processing {} files....\n", batchModeFilenames.size());
+
     utility::Timer timer;
-    int pointCount = 0;
     int pointCountTotal = 0;
-    double execExecTotal = 0.0;
-    double exeTime = 0.0;
+    double exeTime = 0.0, execExecTotal = 0.0;
     tbb::concurrent_vector<std::shared_ptr<geometry::PointCloud>> cloudPtrs;
-    omp_lock_t writelock;
-    omp_init_lock(&writelock);
 
     timer.Start();
 
-#pragma omp parallel for
-    for (int sz = 0; sz < batchModeFilenames.size(); ++sz)
+    if (batchModeFilenames.size() > 2)
     {
-        utility::Timer timer2;
-        timer2.Start();
-
-        if (!batchModeFilenames[sz].extension().compare(".las") ||
-            !batchModeFilenames[sz].extension().compare(".laz") ||
-            !batchModeFilenames[sz].extension().compare(".LAS") ||
-            !batchModeFilenames[sz].extension().compare(".LAZ"))
-        {
-            std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
-            if (new_cloud_ptr)
-            {
-                pointCount = LoadLASorLAZToO3DCloud(batchModeFilenames[sz], *new_cloud_ptr);
-                if (pointCount > 0)
-                {
-                    new_cloud_ptr->SetName(batchModeFilenames[sz].string());
-                    cloudPtrs.push_back(new_cloud_ptr);
-                }
-            }
-        }
-        else if (!batchModeFilenames[sz].extension().compare(".pcd") ||
-                 !batchModeFilenames[sz].extension().compare(".xyz") ||
-                 !batchModeFilenames[sz].extension().compare(".pts"))
-        {
-            std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
-
-            if (new_cloud_ptr)
-            {
-                io::ReadPointCloud(batchModeFilenames[sz].string(), *new_cloud_ptr);
-                pointCount = new_cloud_ptr->points_.size();
-                if (pointCount > 0)
-                {
-                    new_cloud_ptr->SetName(batchModeFilenames[sz].string());
-                    cloudPtrs.push_back(new_cloud_ptr);
-                }
-            }
-        }
-
-        timer2.Stop();
-        double exeTime = timer2.GetDurationInSecond();
-
-        if (pointCount > 0)
-        {
-            utility::LogInfo("Point cloud {}, points:{}, Threaded Load Duration: {} seconds\n", batchModeFilenames[sz].filename().string(), pointCount, exeTime);
-        }
-
-        omp_set_lock(&writelock);
-        pointCountTotal += pointCount;
-        omp_unset_lock(&writelock);
+        pointCountTotal = LoadPointCloudFilesParallel(batchModeFilenames, cloudPtrs);
     }
-    omp_destroy_lock(&writelock);
+    else
+    {
+        std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
+        if (new_cloud_ptr)
+        {
+            pointCountTotal = LoadLASorLAZToO3DCloud(batchModeFilenames[0], *new_cloud_ptr);
+            if (pointCountTotal > 0)
+            {
+                new_cloud_ptr->SetName(batchModeFilenames[0].string());
+                cloudPtrs.push_back(new_cloud_ptr);
+            }
+        }
+     }
 
     timer.Stop();
     exeTime = timer.GetDurationInSecond();
@@ -392,7 +283,7 @@ int RenderToImage(std::filesystem::path& appPath, std::filesystem::path& filePat
     if (pointCountTotal > 0)
     {
         int pntsPerSec = (int)(pointCountTotal / exeTime);
-        utility::LogInfo("==>Loaded {} Total Points, Total Loading Process Duration: {} seconds, pnts/sec = {}\n", pointCountTotal, exeTime, pntsPerSec);
+        utility::LogInfo("Finished Loading {} Total Points, Total Loading Process Duration: {} seconds, pnts/sec = {}\n", pointCountTotal, exeTime, pntsPerSec);
     }
 
     for (int sz = 0; sz < batchModeFilenames.size(); ++sz)
@@ -418,25 +309,32 @@ int RenderToImage(std::filesystem::path& appPath, std::filesystem::path& filePat
         std::filesystem::path cNamePath = cloudPtr->GetName();
         RenderPointcloudToImage(renderer, cNamePath, cloudPtr);
 
+        cloudPtr->Clear();
+
         timer.Stop();
 
         exeTime = timer.GetDurationInSecond();
         execExecTotal += exeTime;
 
-        if (pointCount > 0 && exeTime > 0.0)
-        {
-            utility::LogInfo("Pointcloud Render Duration: {} seconds\n", exeTime);
-        }
+        utility::LogInfo("Pointcloud Render Duration: {} seconds\n", exeTime);
     }
 
-    utility::LogInfo("==>Total Load/Render for {} files, Duration: {} seconds\n", batchModeFilenames.size(), execExecTotal);
+    if (pointCountTotal > 0)
+    {
+        utility::LogInfo("==>Total Load/Render for {} files, total points: {}, Duration: {} seconds\n", batchModeFilenames.size(), pointCountTotal, execExecTotal);
+    }
+    else 
+    {
+        utility::LogInfo("==>Total Load/Render for {} files, Duration: {} seconds\n", batchModeFilenames.size(), execExecTotal);
+    }
+
 
     delete renderer;
 
     return 1;
 }
 
-int RenderModelToImage(FilamentRenderer* modelRenderer, std::filesystem::path& filePath)
+UINT RenderModelToImage(FilamentRenderer* modelRenderer, std::filesystem::path& filePath)
 {
     const int width = 1024;
     const int height = 768;
@@ -509,7 +407,83 @@ int RenderModelToImage(FilamentRenderer* modelRenderer, std::filesystem::path& f
     return 1;
 }
 
-int RenderPointcloudToImage(FilamentRenderer* modelRenderer, std::filesystem::path& filePath, std::shared_ptr<geometry::PointCloud> new_cloud_ptr)
+UINT LoadPointCloudFilesParallel(std::vector<std::filesystem::path>& batchModeFilenames, 
+                                 tbb::concurrent_vector<std::shared_ptr<geometry::PointCloud>>& cloudPtrs)
+{
+    UINT div = 1048576;
+    int pointCount = 0;
+    int pointCountTotal = 0;
+    double execExecTotal = 0.0;
+    double exeTime = 0.0;
+
+    utility::Timer timer;
+    omp_lock_t writelock;
+    omp_init_lock(&writelock);
+
+    timer.Start();
+
+#pragma omp parallel for
+    for (int sz = 0; sz < batchModeFilenames.size(); ++sz)
+    {
+        MEMORYSTATUSEX statex;
+        statex.dwLength = sizeof(statex);
+        GlobalMemoryStatusEx(&statex);
+
+        utility::Timer timer2;
+        timer2.Start();
+
+        if (!batchModeFilenames[sz].extension().compare(".las") ||
+            !batchModeFilenames[sz].extension().compare(".laz") ||
+            !batchModeFilenames[sz].extension().compare(".LAS") ||
+            !batchModeFilenames[sz].extension().compare(".LAZ"))
+        {
+            std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
+            if (new_cloud_ptr)
+            {
+                pointCount = LoadLASorLAZToO3DCloud(batchModeFilenames[sz], *new_cloud_ptr);
+                if (pointCount > 0)
+                {
+                    new_cloud_ptr->SetName(batchModeFilenames[sz].string());
+                    cloudPtrs.push_back(new_cloud_ptr);
+                }
+            }
+        }
+        else if (!batchModeFilenames[sz].extension().compare(".pcd") ||
+                 !batchModeFilenames[sz].extension().compare(".xyz") ||
+                 !batchModeFilenames[sz].extension().compare(".pts"))
+        {
+            std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
+
+            if (new_cloud_ptr)
+            {
+                io::ReadPointCloud(batchModeFilenames[sz].string(), *new_cloud_ptr);
+                pointCount = new_cloud_ptr->points_.size();
+                if (pointCount > 0)
+                {
+                    new_cloud_ptr->SetName(batchModeFilenames[sz].string());
+                    cloudPtrs.push_back(new_cloud_ptr);
+                }
+            }
+        }
+
+        timer2.Stop();
+        double exeTimeInner = timer2.GetDurationInSecond();
+
+        if (pointCount > 0)
+        {
+            omp_set_lock(&writelock);
+            pointCountTotal += pointCount;
+            utility::LogInfo("=====>Point cloud {}, points:{}, Threaded Load Duration: {} seconds\n",
+                             batchModeFilenames[sz].filename().string(), pointCount, exeTimeInner);
+            omp_unset_lock(&writelock);
+        }
+    }
+    omp_destroy_lock(&writelock);
+
+    return pointCountTotal;
+}
+
+UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, std::filesystem::path& filePath, std::shared_ptr<geometry::PointCloud> new_cloud_ptr)
 {
     const int width = 2048;
     const int height = 1640;
@@ -581,7 +555,7 @@ int RenderPointcloudToImage(FilamentRenderer* modelRenderer, std::filesystem::pa
     return pointCount;
 }
 
-int LoadLASorLAZToO3DCloud(std::filesystem::path& fileName, geometry::PointCloud& pointcloud)
+UINT LoadLASorLAZToO3DCloud(std::filesystem::path& fileName, geometry::PointCloud& pointcloud)
 {
     bool baseSet = false;
     double px = 0.0, py = 0.0, pz = 0.0;
@@ -612,6 +586,8 @@ int LoadLASorLAZToO3DCloud(std::filesystem::path& fileName, geometry::PointCloud
     {
         pointStep = lsHeader.pointCount() / pointToPixel;
     }
+
+//    utility::LogInfo("LAS...Point cloud points {}, thinning factor: {}, \n", lsHeader.pointCount(), pointStep);
 
     for (PointViewPtr point_view : point_views)
     {
