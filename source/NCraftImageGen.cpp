@@ -31,15 +31,27 @@ BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
         {
             utility::LogInfo("WinToast Error, your system in not compatible!");
         }
+
+        GdiplusStartupInput gpStartupInput;
+        Gdiplus::Status mstat = GdiplusStartup(&g_gpToken, &gpStartupInput, NULL);
+        if (mstat != Gdiplus::Status::Ok)
+        {
+            utility::LogInfo("Error: GdiplusStartup");
+        }
+
     }
     return TRUE;
 }
 
 HRESULT DllCanUnloadNow(void)
 {
-    // Only allow the DLL to be unloaded after all outstanding references have been released
-    return (g_DllModuleRefCount == 0) ? S_OK : S_FALSE;
+ 
+    if (g_DllModuleRefCount == 0)
+    {
+        GdiplusShutdown(g_gpToken);
+    }
 
+    return (g_DllModuleRefCount == 0) ? S_OK : S_FALSE;
 }
 
 void DllAddRef(void)

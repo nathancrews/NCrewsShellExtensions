@@ -265,12 +265,12 @@ UINT RenderModelToImage(FilamentRenderer* modelRenderer, NCraftImageGen::ImageGe
                 scene->GetCamera()->CalcFarPlane(*scene->GetCamera(), bounds);
                 scene->GetCamera()->CalcNearPlane();
 
-                float max_dim = float(1.25 * bounds.GetMaxExtent());
+                float max_dim = float(0.75 * bounds.GetMaxExtent());
                 Eigen::Vector3f center = bounds.GetCenter().cast<float>();
                 Eigen::Vector3f eye, up;
 
-                eye = Eigen::Vector3f(center.x() + (max_dim / 2),
-                                      center.y() + (max_dim / 2),
+                eye = Eigen::Vector3f(center.x() + (max_dim / 3.5),
+                                      center.y() + (max_dim / 1),
                                       center.z() + (max_dim / 2));
                 up = Eigen::Vector3f(0, 1, 0);
 
@@ -291,6 +291,44 @@ UINT RenderModelToImage(FilamentRenderer* modelRenderer, NCraftImageGen::ImageGe
                 io::WriteImage(imagePath.string(), *img);
 
                 utility::LogInfo("Writing image file: {}\n", imagePath.string());
+
+//**************************************************
+
+                HBITMAP result = NULL;
+                Gdiplus::Bitmap* bitmap = Gdiplus::Bitmap::FromFile(imagePath.c_str(), true);
+                if (bitmap)
+                {
+                    utility::LogInfo("Bitmap load image file: {}\n", imagePath.string());
+
+                    Image* newImg = bitmap->GetThumbnailImage(255, 255, NULL, NULL);
+                    if (newImg)
+                    {
+                        utility::LogInfo("get thumbnail ok");
+
+                        std::filesystem::path bmpPath = imagePath;
+
+                        bmpPath = bmpPath.replace_extension(".bmp");
+
+                        HBITMAP* hBitmap = nullptr;
+
+                        Gdiplus::Status status = bitmap->GetHBITMAP(NULL, hBitmap);
+                        if (hBitmap)
+                        {
+                            utility::LogInfo("got HBITMAP ok");
+                        }
+
+                        CLSID pngClsid;
+                        GetEncoderClsid(L"image/bmp", &pngClsid);
+                        newImg->Save(bmpPath.c_str(), &pngClsid, NULL);
+
+                        delete newImg;
+                    }
+                    delete bitmap;
+
+                }
+
+//**************************************************
+
             }
 
             delete scene;
@@ -436,8 +474,8 @@ UINT LoadPointCloudFilesParallel(tbb::concurrent_vector<NCraftImageGen::ImageGen
 
 UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::ImageGenResult& fileInfo)
 {
-    const int width = 2048;
-    const int height = 1640;
+    const int width = 1440;
+    const int height = 1080;
     int pointCount = 0;
 
     std::filesystem::path imagePath = fileInfo.m_FileName;
@@ -463,7 +501,7 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
             scene->SetLighting(Open3DScene::LightingProfile::NO_SHADOWS, { 0.5f, -0.5f, -0.5f });
             scene->GetScene()->EnableSunLight(true);
             scene->GetScene()->SetSunLightIntensity(35000);
-            Eigen::Vector4f color = { 0.0, 0.0, 0.0, 1.0 };
+            Eigen::Vector4f color = { 0.6, 0.6, 0.7, 1.0 };
             scene->SetBackground(color);
             scene->ShowAxes(false);
 
@@ -473,13 +511,13 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
 
             if (bounds.GetMaxExtent() > 0.0f)
             {
-                float max_dim = float(1.25 * bounds.GetMaxExtent());
+                float max_dim = float(0.3 * bounds.GetMaxExtent());
                 Eigen::Vector3f center = bounds.GetCenter().cast<float>();
                 Eigen::Vector3f eye, up;
 
-                eye = Eigen::Vector3f(center.x() + (max_dim / 3),
-                                      center.y() + (max_dim / 3),
-                                      center.z() + (max_dim / 4));
+                eye = Eigen::Vector3f(center.x() + (max_dim / 1.2),
+                                      center.y() + (max_dim / 1.2),
+                                      center.z() + (max_dim / 1));
                 up = Eigen::Vector3f(0, 0, 1);
 
                 scene->GetCamera()->LookAt(center, eye, up);
@@ -507,6 +545,7 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
 
     return pointCount;
 }
+
 
 UINT LoadLASorLAZToO3DCloud(std::filesystem::path& fileName, geometry::PointCloud& pointcloud)
 {
@@ -599,6 +638,38 @@ UINT LoadLASorLAZToO3DCloud(std::filesystem::path& fileName, geometry::PointClou
 
     return pointsInFile;
 }
+
+int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
+{
+    UINT  num = 0;          // number of image encoders
+    UINT  size = 0;         // size of the image encoder array in bytes
+
+    ImageCodecInfo* pImageCodecInfo = NULL;
+
+    GetImageEncodersSize(&num, &size);
+    if (size == 0)
+        return -1;  // Failure
+
+    pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
+    if (pImageCodecInfo == NULL)
+        return -1;  // Failure
+
+    GetImageEncoders(num, size, pImageCodecInfo);
+
+    for (UINT j = 0; j < num; ++j)
+    {
+        if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0)
+        {
+            *pClsid = pImageCodecInfo[j].Clsid;
+            free(pImageCodecInfo);
+            return j;  // Success
+        }
+    }
+
+    free(pImageCodecInfo);
+    return -1;  // Failure
+}
+
 
 }
 

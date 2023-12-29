@@ -1,6 +1,10 @@
 #pragma once
 #include "framework.h"
 #include <filesystem>
+#include <objidl.h>
+#include <gdiplus.h>
+using namespace Gdiplus;
+#pragma comment (lib,"Gdiplus.lib")
 
 #ifdef NCRAFTIMAGEGENAPI_EXPORT
 #define NCRAFTIMAGEGENAPI __declspec(dllexport)
@@ -50,6 +54,7 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
 UINT LoadLASorLAZToO3DCloud(std::filesystem::path& fileName, geometry::PointCloud& pointcloud);
 UINT LoadPointCloudFilesParallel(tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& outLoadResults);
 UINT GetFileNamesFromDirectory(std::filesystem::path& filePath, std::vector<std::filesystem::path>& outDirectoryFilenames);
+NCRAFTIMAGEGENAPI int GetEncoderClsid(const WCHAR* format, CLSID* pClsid);
 
 NCRAFTIMAGEGENAPI extern std::vector<std::string> ModelFileExtensions;
 NCRAFTIMAGEGENAPI extern std::vector<std::string> PointcloudFileExtensions;
