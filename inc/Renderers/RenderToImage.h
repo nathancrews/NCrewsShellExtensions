@@ -28,15 +28,33 @@ using namespace open3d::visualization::rendering;
 namespace NCraftImageGen
 {
 
-NCRAFTIMAGEGENAPI UINT RenderToImages(std::filesystem::path& appPath, std::vector<std::filesystem::path>& filePaths);
-NCRAFTIMAGEGENAPI UINT RenderToImage(std::filesystem::path& appPath, std::filesystem::path& filePath);
-UINT RenderModelToImage(FilamentRenderer* modelRenderer, std::filesystem::path& filePath);
-UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, std::filesystem::path& filePath, std::shared_ptr<geometry::PointCloud> new_cloud_ptr);
+struct ImageGenResult
+{
+    ImageGenResult() {};
+    ImageGenResult(std::filesystem::path& filePath) { m_FileName = filePath; };
+
+    UINT m_modelType = 0; // 0 = point cloud, 1 = gltf
+    std::filesystem::path  m_FileName;
+    std::filesystem::path m_ImageName;
+    UINT m_fileSize = 0;
+    UINT m_pointCount = 0;
+    double m_processTimeSeconds = 0.0;
+    std::shared_ptr<geometry::PointCloud> m_cloudPtr;
+};
+
+
+NCRAFTIMAGEGENAPI UINT RenderToImages(std::filesystem::path& appPath, std::vector<std::filesystem::path>& filePaths, 
+                                      tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& outRenderResults);
+UINT RenderModelToImage(FilamentRenderer* modelRenderer, NCraftImageGen::ImageGenResult& fileInfo);
+UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::ImageGenResult& fileInfo);
 UINT LoadLASorLAZToO3DCloud(std::filesystem::path& fileName, geometry::PointCloud& pointcloud);
-UINT LoadPointCloudFilesParallel(std::vector<std::filesystem::path>& batchModeFilenames, tbb::concurrent_vector<std::shared_ptr<geometry::PointCloud>>& cloudPtrs);
+UINT LoadPointCloudFilesParallel(tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& outLoadResults);
+UINT GetFileNamesFromDirectory(std::filesystem::path& filePath, std::vector<std::filesystem::path>& outDirectoryFilenames);
 
 NCRAFTIMAGEGENAPI extern std::vector<std::string> ModelFileExtensions;
 NCRAFTIMAGEGENAPI extern std::vector<std::string> PointcloudFileExtensions;
+
+// NCRAFTIMAGEGENAPI UINT RenderToImage(std::filesystem::path& appPath, std::filesystem::path& filePath);
 }
 
 #pragma warning(pop)

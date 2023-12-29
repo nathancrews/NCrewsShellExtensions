@@ -231,6 +231,7 @@
     <ClCompile Include="..\source\NCraftImageGen.cpp" />
     <ClCompile Include="..\source\NCraftImageGenMenu.cpp" />
     <ClCompile Include="..\source\Renderers\RenderToImage.cpp" />
+    <ClCompile Include="..\source\wintoastlib.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\inc\NCraftClassFactory.h" />

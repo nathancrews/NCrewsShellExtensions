@@ -41,7 +41,8 @@ std::vector<std::string> PointcloudFileExtensions{ ".las",
 ".XYZ",
 ".PTS" };
 
-UINT RenderToImages(std::filesystem::path& appPath, std::vector<std::filesystem::path>& filePaths)
+UINT RenderToImages(std::filesystem::path& appPath, std::vector<std::filesystem::path>& filePaths,
+                    tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& outRenderResults)
 {
     const int width = 2048;
     const int height = 1640;
@@ -65,7 +66,7 @@ UINT RenderToImages(std::filesystem::path& appPath, std::vector<std::filesystem:
     {
         if (std::filesystem::is_directory(testPath))
         {
-            return RenderToImage(appPath, testPath);
+            GetFileNamesFromDirectory(testPath, batchModeFilenames);
         }
         else
         {
@@ -89,6 +90,34 @@ UINT RenderToImages(std::filesystem::path& appPath, std::vector<std::filesystem:
         }
     }
 
+    if (batchModeFilenames.size() > 5)
+    {
+        int retval = MessageBox(nullptr, L"    Proceed to Generate Images?", L"Info: Many files selected", MB_YESNO);
+
+        if (retval != 6)
+        {
+            return 0;
+        }
+    }
+
+    for (std::filesystem::path reqPath : batchModeFilenames)
+    {
+        NCraftImageGen::ImageGenResult toAddResult(reqPath);
+
+        uintmax_t fsize = 0;
+        __std_win_error wep = std::filesystem::_File_size(reqPath, fsize);
+
+        toAddResult.m_fileSize = fsize;
+
+        if (!reqPath.extension().compare(".gltf") ||
+            !reqPath.extension().compare(".glb"))
+        {
+            toAddResult.m_modelType = 1;
+        }
+
+        outRenderResults.push_back(toAddResult);
+    }
+
     utility::LogInfo("processing {} files....\n", batchModeFilenames.size());
 
     utility::Timer timer;
@@ -99,23 +128,7 @@ UINT RenderToImages(std::filesystem::path& appPath, std::vector<std::filesystem:
 
     timer.Start();
 
-    if (batchModeFilenames.size() > 2)
-    {
-        pointCountTotal = LoadPointCloudFilesParallel(batchModeFilenames, cloudPtrs);
-    }
-    else
-    {
-        std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
-        if (new_cloud_ptr)
-        {
-            pointCountTotal = LoadLASorLAZToO3DCloud(batchModeFilenames[0], *new_cloud_ptr);
-            if (pointCountTotal > 0)
-            {
-                new_cloud_ptr->SetName(batchModeFilenames[0].string());
-                cloudPtrs.push_back(new_cloud_ptr);
-            }
-        }
-    }
+    pointCountTotal = LoadPointCloudFilesParallel(outRenderResults);
 
     timer.Stop();
     exeTime = timer.GetDurationInSecond();
@@ -127,46 +140,45 @@ UINT RenderToImages(std::filesystem::path& appPath, std::vector<std::filesystem:
         utility::LogInfo("==>Loaded {} Total Points, Total Loading Process Duration: {} seconds, pnts/sec = {}\n", pointCountTotal, exeTime, pntsPerSec);
     }
 
-    for (int sz = 0; sz < batchModeFilenames.size(); ++sz)
+    for (int sz = 0; sz < outRenderResults.size(); ++sz)
     {
-        if (!batchModeFilenames[sz].extension().compare(".gltf") ||
-            !batchModeFilenames[sz].extension().compare(".glb"))
+        if (outRenderResults[sz].m_modelType == 1)
         {
             timer.Start();
-            RenderModelToImage(renderer, batchModeFilenames[sz]);
+            RenderModelToImage(renderer, outRenderResults[sz]);
             timer.Stop();
 
             exeTime = timer.GetDurationInSecond();
             execExecTotal += exeTime;
 
+            outRenderResults[sz].m_processTimeSeconds = exeTime;
+
             utility::LogInfo("Model Load/Render Process Duration: {} seconds\n", exeTime);
         }
-    }
-
-    for (std::shared_ptr<geometry::PointCloud> cloudPtr : cloudPtrs)
-    {
-        timer.Start();
-
-        UINT pointCount = cloudPtr->points_.size();
-
-        std::filesystem::path cNamePath = cloudPtr->GetName();
-        RenderPointcloudToImage(renderer, cNamePath, cloudPtr);
-        cloudPtr->Clear();
-
-        timer.Stop();
-
-        exeTime = timer.GetDurationInSecond();
-        execExecTotal += exeTime;
-
-        if (pointCount > 0 && exeTime > 0.0)
+        else
         {
-            utility::LogInfo("Pointcloud Render Duration: {} seconds\n", exeTime);
+            timer.Start();
+
+            UINT pointCount = outRenderResults[sz].m_cloudPtr->points_.size();
+
+            RenderPointcloudToImage(renderer, outRenderResults[sz]);
+            outRenderResults[sz].m_cloudPtr->Clear();
+
+            timer.Stop();
+
+            exeTime = timer.GetDurationInSecond();
+            execExecTotal += exeTime;
+
+            if (pointCount > 0 && exeTime > 0.0)
+            {
+                utility::LogInfo("Pointcloud Render Duration: {} seconds\n", exeTime);
+            }
         }
     }
 
     if (pointCountTotal > 0)
     {
-        int pntsPerSec = (int)(pointCountTotal / exeTime);
+        int pntsPerSec = (int)(pointCountTotal / execExecTotal);
         utility::LogInfo("Finished Loading {} Total Points, Total Loading Process Duration: {} seconds, pnts/sec = {}\n", pointCountTotal, execExecTotal, pntsPerSec);
     }
 
@@ -175,179 +187,60 @@ UINT RenderToImages(std::filesystem::path& appPath, std::vector<std::filesystem:
     return 1;
 }
 
-
-UINT RenderToImage(std::filesystem::path& appPath, std::filesystem::path& filePath)
+UINT GetFileNamesFromDirectory(std::filesystem::path& filePath, std::vector<std::filesystem::path>& outDirectoryFilenames)
 {
-    const int width = 2048;
-    const int height = 1640;
-    std::filesystem::path resourcePath = appPath;
-    resourcePath += "resources";
-
-    EngineInstance::SetResourcePath(resourcePath.string().c_str());
-
-    FilamentRenderer* renderer =
-        new FilamentRenderer(EngineInstance::GetInstance(), width, height,
-                             EngineInstance::GetResourceManager());
-
-    if (!renderer)
-    {
-        return 0;
-    }
-
-    std::filesystem::path path = filePath;
-    std::vector<std::filesystem::path> batchModeFilenames, batchPointcloudFilenames;
+    UINT fileCount = 0;
 
     // directory for multiple file requested
-    if (std::filesystem::is_directory(path))
+    if (std::filesystem::is_directory(filePath))
     {
-        if (std::filesystem::exists(path))
+        for (auto const& dir_entry :
+             std::filesystem::recursive_directory_iterator(filePath))
         {
-            for (auto const& dir_entry :
-                 std::filesystem::recursive_directory_iterator(path))
+            if (dir_entry.is_regular_file())
             {
-                if (dir_entry.is_regular_file())
+                for (std::string fext : ModelFileExtensions)
                 {
-                    for (std::string fext : ModelFileExtensions)
+                    if (!dir_entry.path().extension().compare(fext))
                     {
-                        if (!dir_entry.path().extension().compare(fext))
-                        {
-                            batchModeFilenames.push_back(dir_entry.path());
-                            break;
-                        }
+                        outDirectoryFilenames.push_back(dir_entry.path());
+                        break;
                     }
+                }
 
-                    for (std::string pcext : PointcloudFileExtensions)
+                for (std::string pcext : PointcloudFileExtensions)
+                {
+                    if (!dir_entry.path().extension().compare(pcext))
                     {
-                        if (!dir_entry.path().extension().compare(pcext))
-                        {
-                            batchModeFilenames.push_back(dir_entry.path());
-                            break;
-                        }
+                        outDirectoryFilenames.push_back(dir_entry.path());
+                        break;
                     }
                 }
             }
         }
     }
-    else // single file requested
-    {
-        for (std::string fext : ModelFileExtensions)
-        {
-            if (!path.extension().compare(fext))
-            {
-                batchModeFilenames.push_back(path);
-                break;
-            }
-        }
 
-        for (std::string pcext : PointcloudFileExtensions)
-        {
-            if (!path.extension().compare(pcext))
-            {
-                batchModeFilenames.push_back(path);
-                break;
-            }
-        }
-    }
+    fileCount = outDirectoryFilenames.size();
 
-    utility::LogInfo("processing {} files....\n", batchModeFilenames.size());
-
-    utility::Timer timer;
-    int pointCountTotal = 0;
-    double exeTime = 0.0, execExecTotal = 0.0;
-    tbb::concurrent_vector<std::shared_ptr<geometry::PointCloud>> cloudPtrs;
-
-    timer.Start();
-
-    if (batchModeFilenames.size() > 2)
-    {
-        pointCountTotal = LoadPointCloudFilesParallel(batchModeFilenames, cloudPtrs);
-    }
-    else
-    {
-        std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
-        if (new_cloud_ptr)
-        {
-            pointCountTotal = LoadLASorLAZToO3DCloud(batchModeFilenames[0], *new_cloud_ptr);
-            if (pointCountTotal > 0)
-            {
-                new_cloud_ptr->SetName(batchModeFilenames[0].string());
-                cloudPtrs.push_back(new_cloud_ptr);
-            }
-        }
-     }
-
-    timer.Stop();
-    exeTime = timer.GetDurationInSecond();
-    execExecTotal += exeTime;
-
-    if (pointCountTotal > 0)
-    {
-        int pntsPerSec = (int)(pointCountTotal / exeTime);
-        utility::LogInfo("Finished Loading {} Total Points, Total Loading Process Duration: {} seconds, pnts/sec = {}\n", pointCountTotal, exeTime, pntsPerSec);
-    }
-
-    for (int sz = 0; sz < batchModeFilenames.size(); ++sz)
-    {
-        if (!batchModeFilenames[sz].extension().compare(".gltf") ||
-            !batchModeFilenames[sz].extension().compare(".glb"))
-        {
-            timer.Start();
-            RenderModelToImage(renderer, batchModeFilenames[sz]);
-            timer.Stop();
-
-            exeTime = timer.GetDurationInSecond();
-            execExecTotal += exeTime;
-
-            utility::LogInfo("Model Load/Render Process Duration: {} seconds\n", exeTime);
-        }
-    }
-
-    for (std::shared_ptr<geometry::PointCloud> cloudPtr : cloudPtrs)
-    {
-        timer.Start();
-
-        std::filesystem::path cNamePath = cloudPtr->GetName();
-        RenderPointcloudToImage(renderer, cNamePath, cloudPtr);
-
-        cloudPtr->Clear();
-
-        timer.Stop();
-
-        exeTime = timer.GetDurationInSecond();
-        execExecTotal += exeTime;
-
-        utility::LogInfo("Pointcloud Render Duration: {} seconds\n", exeTime);
-    }
-
-    if (pointCountTotal > 0)
-    {
-        utility::LogInfo("==>Total Load/Render for {} files, total points: {}, Duration: {} seconds\n", batchModeFilenames.size(), pointCountTotal, execExecTotal);
-    }
-    else 
-    {
-        utility::LogInfo("==>Total Load/Render for {} files, Duration: {} seconds\n", batchModeFilenames.size(), execExecTotal);
-    }
-
-
-    delete renderer;
-
-    return 1;
+    return fileCount;
 }
 
-UINT RenderModelToImage(FilamentRenderer* modelRenderer, std::filesystem::path& filePath)
+UINT RenderModelToImage(FilamentRenderer* modelRenderer, NCraftImageGen::ImageGenResult& fileInfo)
 {
     const int width = 1024;
     const int height = 768;
     bool model_success = false;
     visualization::rendering::TriangleMeshModel loaded_model;
-    std::filesystem::path imagePath = filePath;
+    std::filesystem::path imagePath = fileInfo.m_FileName;
 
     imagePath = imagePath.replace_extension("jpg");
+
+    fileInfo.m_ImageName = imagePath;
 
     try
     {
         io::ReadTriangleModelOptions opt;
-        model_success = io::ReadTriangleModel(filePath.string(), loaded_model, opt);
+        model_success = io::ReadTriangleModel(fileInfo.m_FileName.string(), loaded_model, opt);
     }
     catch (...)
     {
@@ -361,7 +254,7 @@ UINT RenderModelToImage(FilamentRenderer* modelRenderer, std::filesystem::path& 
 
         if (scene)
         {
-            scene->AddModel(filePath.string(), loaded_model);
+            scene->AddModel(fileInfo.m_FileName.string(), loaded_model);
 
             scene->ShowAxes(false);
 
@@ -407,8 +300,7 @@ UINT RenderModelToImage(FilamentRenderer* modelRenderer, std::filesystem::path& 
     return 1;
 }
 
-UINT LoadPointCloudFilesParallel(std::vector<std::filesystem::path>& batchModeFilenames, 
-                                 tbb::concurrent_vector<std::shared_ptr<geometry::PointCloud>>& cloudPtrs)
+UINT LoadPointCloudFilesParallel(tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& outLoadResults)
 {
     UINT div = 1048576;
     int pointCount = 0;
@@ -422,82 +314,143 @@ UINT LoadPointCloudFilesParallel(std::vector<std::filesystem::path>& batchModeFi
 
     timer.Start();
 
-#pragma omp parallel for
-    for (int sz = 0; sz < batchModeFilenames.size(); ++sz)
+    if (outLoadResults.size() == 1)
     {
-        MEMORYSTATUSEX statex;
-        statex.dwLength = sizeof(statex);
-        GlobalMemoryStatusEx(&statex);
-
         utility::Timer timer2;
         timer2.Start();
+        UINT sz = 0;
 
-        if (!batchModeFilenames[sz].extension().compare(".las") ||
-            !batchModeFilenames[sz].extension().compare(".laz") ||
-            !batchModeFilenames[sz].extension().compare(".LAS") ||
-            !batchModeFilenames[sz].extension().compare(".LAZ"))
+        if (!outLoadResults[sz].m_FileName.extension().compare(".las") ||
+            !outLoadResults[sz].m_FileName.extension().compare(".laz") ||
+            !outLoadResults[sz].m_FileName.extension().compare(".LAS") ||
+            !outLoadResults[sz].m_FileName.extension().compare(".LAZ"))
         {
             std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
             if (new_cloud_ptr)
             {
-                pointCount = LoadLASorLAZToO3DCloud(batchModeFilenames[sz], *new_cloud_ptr);
+                pointCount = LoadLASorLAZToO3DCloud(outLoadResults[sz].m_FileName, *new_cloud_ptr);
                 if (pointCount > 0)
                 {
-                    new_cloud_ptr->SetName(batchModeFilenames[sz].string());
-                    cloudPtrs.push_back(new_cloud_ptr);
+                    new_cloud_ptr->SetName(outLoadResults[sz].m_FileName.string());
+                    outLoadResults[sz].m_cloudPtr = new_cloud_ptr;
                 }
             }
         }
-        else if (!batchModeFilenames[sz].extension().compare(".pcd") ||
-                 !batchModeFilenames[sz].extension().compare(".xyz") ||
-                 !batchModeFilenames[sz].extension().compare(".pts"))
+        else if (!outLoadResults[sz].m_FileName.extension().compare(".pcd") ||
+                 !outLoadResults[sz].m_FileName.extension().compare(".xyz") ||
+                 !outLoadResults[sz].m_FileName.extension().compare(".pts"))
         {
             std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
 
             if (new_cloud_ptr)
             {
-                io::ReadPointCloud(batchModeFilenames[sz].string(), *new_cloud_ptr);
+                io::ReadPointCloud(outLoadResults[sz].m_FileName.string(), *new_cloud_ptr);
                 pointCount = new_cloud_ptr->points_.size();
                 if (pointCount > 0)
                 {
-                    new_cloud_ptr->SetName(batchModeFilenames[sz].string());
-                    cloudPtrs.push_back(new_cloud_ptr);
+                    new_cloud_ptr->SetName(outLoadResults[sz].m_FileName.string());
+                    outLoadResults[sz].m_cloudPtr = new_cloud_ptr;
                 }
             }
         }
 
         timer2.Stop();
         double exeTimeInner = timer2.GetDurationInSecond();
-
         if (pointCount > 0)
         {
-            omp_set_lock(&writelock);
+            outLoadResults[sz].m_pointCount = pointCount;
+            outLoadResults[sz].m_processTimeSeconds = exeTimeInner;
+
+            utility::LogInfo("=====>Point cloud {}, points:{}, Load Duration: {} seconds\n",
+                             outLoadResults[sz].m_FileName.filename().string(), pointCount, exeTimeInner);
             pointCountTotal += pointCount;
-            utility::LogInfo("=====>Point cloud {}, points:{}, Threaded Load Duration: {} seconds\n",
-                             batchModeFilenames[sz].filename().string(), pointCount, exeTimeInner);
-            omp_unset_lock(&writelock);
         }
     }
-    omp_destroy_lock(&writelock);
+    else
+    {
+#pragma omp parallel for
+        for (int sz = 0; sz < outLoadResults.size(); ++sz)
+        {
+            MEMORYSTATUSEX statex;
+            statex.dwLength = sizeof(statex);
+            GlobalMemoryStatusEx(&statex);
+
+            utility::Timer timer2;
+            timer2.Start();
+
+            if (!outLoadResults[sz].m_FileName.extension().compare(".las") ||
+                !outLoadResults[sz].m_FileName.extension().compare(".laz") ||
+                !outLoadResults[sz].m_FileName.extension().compare(".LAS") ||
+                !outLoadResults[sz].m_FileName.extension().compare(".LAZ"))
+            {
+                std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
+                if (new_cloud_ptr)
+                {
+                    pointCount = LoadLASorLAZToO3DCloud(outLoadResults[sz].m_FileName, *new_cloud_ptr);
+                    if (pointCount > 0)
+                    {
+                        new_cloud_ptr->SetName(outLoadResults[sz].m_FileName.string());
+                        outLoadResults[sz].m_cloudPtr = new_cloud_ptr;
+                    }
+                }
+            }
+            else if (!outLoadResults[sz].m_FileName.extension().compare(".pcd") ||
+                     !outLoadResults[sz].m_FileName.extension().compare(".xyz") ||
+                     !outLoadResults[sz].m_FileName.extension().compare(".pts"))
+            {
+                std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
+
+                if (new_cloud_ptr)
+                {
+                    io::ReadPointCloud(outLoadResults[sz].m_FileName.string(), *new_cloud_ptr);
+                    pointCount = new_cloud_ptr->points_.size();
+                    if (pointCount > 0)
+                    {
+                        new_cloud_ptr->SetName(outLoadResults[sz].m_FileName.string());
+                        outLoadResults[sz].m_cloudPtr = new_cloud_ptr;
+                    }
+                }
+            }
+
+            timer2.Stop();
+            double exeTimeInner = timer2.GetDurationInSecond();
+
+            if (pointCount > 0)
+            {
+                outLoadResults[sz].m_pointCount = pointCount;
+                outLoadResults[sz].m_processTimeSeconds = exeTimeInner;
+
+                utility::LogInfo("=====>Point cloud {}, points:{}, Threaded Load Duration: {} seconds\n",
+                                 outLoadResults[sz].m_FileName.filename().string(), pointCount, exeTimeInner);
+
+                omp_set_lock(&writelock);
+                pointCountTotal += pointCount;
+                omp_unset_lock(&writelock);
+            }
+        }
+        omp_destroy_lock(&writelock);
+    }
 
     return pointCountTotal;
 }
 
-UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, std::filesystem::path& filePath, std::shared_ptr<geometry::PointCloud> new_cloud_ptr)
+UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::ImageGenResult& fileInfo)
 {
     const int width = 2048;
     const int height = 1640;
     int pointCount = 0;
 
-    std::filesystem::path imagePath = filePath;
+    std::filesystem::path imagePath = fileInfo.m_FileName;
     imagePath = imagePath.replace_extension("jpg");
 
-    pointCount = new_cloud_ptr->points_.size();
+    fileInfo.m_ImageName = imagePath;
 
-    if (new_cloud_ptr->HasPoints())
+    pointCount = fileInfo.m_cloudPtr->points_.size();
+
+    if (fileInfo.m_cloudPtr->HasPoints())
     {
         auto* scene = new Open3DScene(*modelRenderer);
-        if (scene && new_cloud_ptr)
+        if (scene && fileInfo.m_cloudPtr)
         {
 
             auto pointcloud_mat = visualization::rendering::MaterialRecord();
@@ -514,7 +467,7 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, std::filesystem::p
             scene->SetBackground(color);
             scene->ShowAxes(false);
 
-            scene->AddGeometry(filePath.string(), new_cloud_ptr.get(), pointcloud_mat, true);
+            scene->AddGeometry(fileInfo.m_FileName.string(), fileInfo.m_cloudPtr.get(), pointcloud_mat, true);
 
             auto& bounds = scene->GetBoundingBox();
 
@@ -648,4 +601,168 @@ UINT LoadLASorLAZToO3DCloud(std::filesystem::path& fileName, geometry::PointClou
 }
 
 }
+
 #pragma warning(pop)
+
+
+#if 0
+
+UINT RenderToImage(std::filesystem::path& appPath, std::filesystem::path& filePath)
+{
+    const int width = 2048;
+    const int height = 1640;
+    std::filesystem::path resourcePath = appPath;
+    resourcePath += "resources";
+
+    EngineInstance::SetResourcePath(resourcePath.string().c_str());
+
+    FilamentRenderer* renderer =
+        new FilamentRenderer(EngineInstance::GetInstance(), width, height,
+                             EngineInstance::GetResourceManager());
+
+    if (!renderer)
+    {
+        return 0;
+    }
+
+    std::filesystem::path path = filePath;
+    std::vector<std::filesystem::path> batchModeFilenames, batchPointcloudFilenames;
+
+    // directory for multiple file requested
+    if (std::filesystem::is_directory(path))
+    {
+        if (std::filesystem::exists(path))
+        {
+            for (auto const& dir_entry :
+                 std::filesystem::recursive_directory_iterator(path))
+            {
+                if (dir_entry.is_regular_file())
+                {
+                    for (std::string fext : ModelFileExtensions)
+                    {
+                        if (!dir_entry.path().extension().compare(fext))
+                        {
+                            batchModeFilenames.push_back(dir_entry.path());
+                            break;
+                        }
+                    }
+
+                    for (std::string pcext : PointcloudFileExtensions)
+                    {
+                        if (!dir_entry.path().extension().compare(pcext))
+                        {
+                            batchModeFilenames.push_back(dir_entry.path());
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else // single file requested
+    {
+        for (std::string fext : ModelFileExtensions)
+        {
+            if (!path.extension().compare(fext))
+            {
+                batchModeFilenames.push_back(path);
+                break;
+            }
+        }
+
+        for (std::string pcext : PointcloudFileExtensions)
+        {
+            if (!path.extension().compare(pcext))
+            {
+                batchModeFilenames.push_back(path);
+                break;
+            }
+        }
+    }
+
+    utility::LogInfo("processing {} files....\n", batchModeFilenames.size());
+
+    utility::Timer timer;
+    int pointCountTotal = 0;
+    double exeTime = 0.0, execExecTotal = 0.0;
+    tbb::concurrent_vector<std::shared_ptr<geometry::PointCloud>> cloudPtrs;
+
+    timer.Start();
+
+    if (batchModeFilenames.size() > 2)
+    {
+        pointCountTotal = LoadPointCloudFilesParallel(batchModeFilenames, cloudPtrs);
+    }
+    else
+    {
+        std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
+        if (new_cloud_ptr)
+        {
+            pointCountTotal = LoadLASorLAZToO3DCloud(batchModeFilenames[0], *new_cloud_ptr);
+            if (pointCountTotal > 0)
+            {
+                new_cloud_ptr->SetName(batchModeFilenames[0].string());
+                cloudPtrs.push_back(new_cloud_ptr);
+            }
+        }
+    }
+
+    timer.Stop();
+    exeTime = timer.GetDurationInSecond();
+    execExecTotal += exeTime;
+
+    if (pointCountTotal > 0)
+    {
+        int pntsPerSec = (int)(pointCountTotal / execExecTotal);
+        utility::LogInfo("Finished Loading {} Total Points, Total Loading Process Duration: {} seconds, pnts/sec = {}\n", pointCountTotal, exeTime, pntsPerSec);
+    }
+
+    for (int sz = 0; sz < batchModeFilenames.size(); ++sz)
+    {
+        if (!batchModeFilenames[sz].extension().compare(".gltf") ||
+            !batchModeFilenames[sz].extension().compare(".glb"))
+        {
+            timer.Start();
+            RenderModelToImage(renderer, batchModeFilenames[sz]);
+            timer.Stop();
+
+            exeTime = timer.GetDurationInSecond();
+            execExecTotal += exeTime;
+
+            utility::LogInfo("Model Load/Render Process Duration: {} seconds\n", exeTime);
+        }
+    }
+
+    for (std::shared_ptr<geometry::PointCloud> cloudPtr : cloudPtrs)
+    {
+        timer.Start();
+
+        std::filesystem::path cNamePath = cloudPtr->GetName();
+        RenderPointcloudToImage(renderer, cNamePath, cloudPtr);
+
+        cloudPtr->Clear();
+
+        timer.Stop();
+
+        exeTime = timer.GetDurationInSecond();
+        execExecTotal += exeTime;
+
+        utility::LogInfo("Pointcloud Render Duration: {} seconds\n", exeTime);
+    }
+
+    if (pointCountTotal > 0)
+    {
+        utility::LogInfo("==>Total Load/Render for {} files, total points: {}, Duration: {} seconds\n", batchModeFilenames.size(), pointCountTotal, execExecTotal);
+    }
+    else
+    {
+        utility::LogInfo("==>Total Load/Render for {} files, Duration: {} seconds\n", batchModeFilenames.size(), execExecTotal);
+    }
+
+
+    delete renderer;
+
+    return 1;
+}
+
+#endif

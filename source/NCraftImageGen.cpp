@@ -2,6 +2,7 @@
 #include "NCraftImageGenDll.h"
 #include "NCraftImageGenMenuGUID.h"
 #include "NCraftClassFactory.h"
+#include "wintoastlib.h"
 #include "Renderers/RenderToImage.h"
 
 // Standard DLL functions
@@ -19,6 +20,17 @@ BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
         g_AppPath = appPath.remove_filename();
 
         open3d::utility::Logger::GetInstance().SetPrintFunction(print_fcn);
+
+        std::wstring appName = L"NCraft Image Generator";
+        std::wstring appUserModelID = L"NCraft Image Message";
+ 
+        WinToastLib::WinToast::instance()->setAppName(appName);
+        WinToastLib::WinToast::instance()->setAppUserModelId(appUserModelID);
+
+        if (!WinToastLib::WinToast::instance()->initialize())
+        {
+            utility::LogInfo("WinToast Error, your system in not compatible!");
+        }
     }
     return TRUE;
 }

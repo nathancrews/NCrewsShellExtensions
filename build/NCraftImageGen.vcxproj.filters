@@ -33,6 +33,9 @@
     <ClCompile Include="..\source\NCraftImageGenMenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\wintoastlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\inc\Renderers\RenderToImage.h">
