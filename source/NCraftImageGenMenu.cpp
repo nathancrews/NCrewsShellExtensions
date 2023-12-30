@@ -9,6 +9,8 @@
 #include "wintoastlib.h"
 #include "Renderers/RenderToImage.h"
 
+void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& imageResults);
+
 class CustomHandler : public WinToastLib::IWinToastHandler
 {
 public:
@@ -55,9 +57,8 @@ public:
 };
 
 
-NCraftImageGenContextMenu::NCraftImageGenContextMenu() : m_ObjRefCount(1), _pdtobj(NULL)
+NCraftImageGenContextMenu::NCraftImageGenContextMenu() : m_ObjRefCount(1)
 {
-    _szTargetFolder[0] = 0;
     DllAddRef();
 }
 
@@ -69,44 +70,48 @@ NCraftImageGenContextMenu::~NCraftImageGenContextMenu()
 // IShellExtInit
 HRESULT NCraftImageGenContextMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj, HKEY hkeyProgID)
 {
+    utility::LogInfo("Initialize Context Menu...");
+
     HRESULT hr = E_FAIL;
 
     if (!pdtobj)
     {
-        return E_FAIL;
+        return E_INVALIDARG;
     }
+
+    m_filePaths.clear();
 
     IShellItemArray* items = nullptr;
     hr = SHCreateShellItemArrayFromDataObject(pdtobj, IID_IShellItemArray, (void**)&items);
 
-    if (!SUCCEEDED(hr))
+    if (!SUCCEEDED(hr) || !items)
     {
         return E_FAIL;
     }
 
-    utility::LogInfo("Initializing Context Menu...");
-
     DWORD fcount = 0;
     items->GetCount(&fcount);
 
-    hr = pdtobj->QueryInterface(&_pdtobj);
-    //// Get the path to the drop target folder
-    if (SUCCEEDED(hr) && fcount > 0)
+    for (DWORD i = 0; i < fcount; i++)
     {
-        for (DWORD i = 0; i < fcount; i++)
+        IShellItem* pRet = nullptr;
+        LPWSTR nameBuffer = nullptr;
+
+        items->GetItemAt(i, &pRet);
+        if (pRet)
         {
-            IShellItem* pRet = nullptr;
-            LPWSTR nameBuffer = nullptr;
+            pRet->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &nameBuffer);
+        }
 
-            items->GetItemAt(i, &pRet);
-            if (pRet)
+        if (nameBuffer && wcslen(nameBuffer) > 0)
+        {
+            LPWSTR nameBufferCopy = new WCHAR[wcslen(nameBuffer)+2];
+            if (nameBufferCopy)
             {
-                pRet->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &nameBuffer);
-            }
+                wcscpy(nameBufferCopy, nameBuffer);
+                CoTaskMemFree(nameBuffer);
 
-            if (nameBuffer)
-            {
-                std::filesystem::path testPath(std::move(nameBuffer));
+                std::filesystem::path testPath = nameBufferCopy;
 
                 if (std::filesystem::is_directory(testPath))
                 {
@@ -132,19 +137,22 @@ HRESULT NCraftImageGenContextMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDat
                         }
                     }
                 }
-            }
 
-            pRet->Release();
-            CoTaskMemFree(nameBuffer);
+                delete []nameBufferCopy;
+            }
         }
 
-        items->Release();
+        pRet->Release();
     }
+
+    items->Release();
 
     if (m_filePaths.size() == 0)
     {
         hr = E_FAIL;
     }
+
+    utility::LogInfo("Initialize Context Menu...finished");
 
     return hr;
 }
@@ -152,56 +160,76 @@ HRESULT NCraftImageGenContextMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDat
 // IContextMenu
 HRESULT NCraftImageGenContextMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT uFlags)
 {
-    if (uFlags & CMF_DEFAULTONLY)
+    utility::LogInfo("QueryContextMenu called....");
+
+    if ((m_filePaths.size() == 0) || (uFlags & CMF_DEFAULTONLY))
     {
+        utility::LogInfo("QueryContextMenu called....exiting no selected files or CMF_DEFAULTONLY");
         return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, 0);
     }
 
     if (((uFlags & 0x000F) == CMF_NORMAL) || (uFlags & CMF_EXPLORE))
     {
         m_idCmdFirst = idCmdFirst;
+       
+        //if (m_filePaths.size() > 1)
+        //{
+        //    WCHAR fileCountStr[MAX_PATH] = { 0 };
+        //    _swprintf(fileCountStr, L"%zd", m_filePaths.size());
 
-        std::wstring menuItemName = L"Generate Image Preview";
-        if (m_filePaths.size() > 1)
-        {
-            WCHAR fileCountStr[100] = { 0 };
-            _swprintf(fileCountStr, L"%zd", m_filePaths.size());
+        //    menuItemName = L"Generate " + std::wstring(fileCountStr) + L" Image Previews";
+        //}
 
-            menuItemName = L"Generate " + std::wstring(fileCountStr) + L" Image Previews";
-        }
-        else if (m_filePaths.size() == 1)
+        std::wstring menuItemName = L"Generate Image Previews";
+        LPWSTR m_menuItemName = nullptr;
+
+        m_menuItemName = (LPWSTR)CoTaskMemAlloc((menuItemName.size() + 1) * sizeof(WCHAR));
+
+        if (!m_menuItemName)
         {
-            if (std::filesystem::is_directory(m_filePaths[0]))
-            {
-                menuItemName = L"Generate Image Previews in Folder";
-            }
+            MAKE_HRESULT(SEVERITY_ERROR, 0, (USHORT)(0));
         }
+
+        wcscpy(m_menuItemName, menuItemName.c_str());
 
         MENUITEMINFO menuInfo = {};
         menuInfo.cbSize = sizeof(MENUITEMINFO);
         menuInfo.fMask = MIIM_STRING | MIIM_ID;
-        menuInfo.dwTypeData = (LPWSTR)menuItemName.c_str();
+        menuInfo.dwTypeData = m_menuItemName;
         menuInfo.wID = idCmdFirst;
 
         if (!InsertMenuItem(hmenu, 0, TRUE, &menuInfo))
         {
+            utility::LogInfo("QueryContextMenu....ERROR");
             return HRESULT_FROM_WIN32(GetLastError());
         }
 
+        CoTaskMemFree(m_menuItemName);
+
+        utility::LogInfo("QueryContextMenu....Added Menu item");
+
         return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(1));
     }
+
+    utility::LogInfo("QueryContextMenu....No menu added");
 
     return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(0));
 }
 
 HRESULT NCraftImageGenContextMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 {
-    if (!WinToastLib::WinToast::isCompatible())
-    {
-        utility::LogInfo("WinToast Error, your system is not supported!");
-    }
+    utility::LogInfo("Menu Invoke Command called....");
 
     HRESULT hr = E_FAIL;
+
+    if (!lpici)
+    {
+        hr = E_INVALIDARG;
+
+        utility::LogInfo("Menu Invoke passed bad data");
+        return hr;
+    }
+
     UINT const idCmd = LOWORD(lpici->lpVerb);
 
     if (m_filePaths.size() == 0)
@@ -226,22 +254,40 @@ HRESULT NCraftImageGenContextMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 
     tbb::concurrent_vector<NCraftImageGen::ImageGenResult> renderResults;
 
-    if (filesToImage.size() > 0)
+    hr = S_OK;
+    try
     {
-        hr = S_OK;
-        try
-        {
-            NCraftImageGen::RenderToImages(g_AppPath, filesToImage, renderResults);
-        }
-        catch (/*CMemoryException* e*/...)
-        {
-            utility::LogInfo("Error: RenderToImage crashed...\n");
-            hr = E_FAIL;
-        }
+        NCraftImageGen::RenderToImages(g_AppPath, filesToImage, renderResults);
+        SendNotificationMessages(renderResults);
 
+        m_filePaths.clear();
+    }
+    catch (/*CMemoryException* e*/...)
+    {
+        utility::LogInfo("Error: RenderToImage crashed...\n");
+        hr = E_FAIL;
     }
 
-    for (NCraftImageGen::ImageGenResult& result : renderResults)
+    utility::LogInfo("Menu Invoke Command called....Finished");
+
+    return hr;
+}
+
+void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& imageResults)
+{
+    if (!WinToastLib::WinToast::isCompatible())
+    {
+        utility::LogInfo("WinToast Error, your system is not supported!");
+    }
+
+    std::wstring infoText;
+    WCHAR pointCountStr[MAX_PATH] = { 0 };
+    WCHAR timeStr[MAX_PATH] = { 0 };
+    WCHAR fileSizeStr[MAX_PATH] = { 0 };
+    UINT millionVal = 1000000;
+    UINT kVal = 1000;
+
+    for (NCraftImageGen::ImageGenResult& result : imageResults)
     {
         WinToastLib::WinToastTemplate templ(WinToastLib::WinToastTemplate::ImageAndText04);
 
@@ -255,15 +301,9 @@ HRESULT NCraftImageGenContextMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
             templ.setImagePath(result.m_ImageName);
         }
 
-        std::wstring infoText;
-        WCHAR pointCountStr[100] = { 0 };
-        WCHAR timeStr[100] = { 0 };
-        WCHAR fileSizeStr[100] = { 0 };
-
-
-        if (result.m_fileSize > 1048576*1000)
+        if (result.m_fileSize > 1048576 * 1000)
         {
-            _swprintf(fileSizeStr, L"File size: %0.2f GB", (double)(result.m_fileSize) / (double)(1048576*1000));
+            _swprintf(fileSizeStr, L"File size: %0.2f GB", (double)(result.m_fileSize) / (double)(1048576 * 1000));
         }
         else if (result.m_fileSize > 1048576)
         {
@@ -280,11 +320,8 @@ HRESULT NCraftImageGenContextMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
         }
         else
         {
-            _swprintf(timeStr, L"%0.2fms", result.m_processTimeSeconds*1000);
+            _swprintf(timeStr, L"%0.2fms", result.m_processTimeSeconds * 1000);
         }
-
-        UINT millionVal = 1000000;
-        UINT kVal = 1000;
 
         if (result.m_modelType == 0)
         {
@@ -314,9 +351,7 @@ HRESULT NCraftImageGenContextMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 
         if (WinToastLib::WinToast::instance()->showToast(templ, new CustomHandler()) < 0)
         {
-            utility::LogInfo("WinToast Error, could not launch your toast notification!");
+            utility::LogInfo("WinToast Error, could not launch toast notification!");
         }
     }
- 
-    return hr;
 }

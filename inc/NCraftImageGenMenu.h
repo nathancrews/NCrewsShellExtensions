@@ -1,10 +1,7 @@
 #pragma once
 
 #include "priv.h"
-
 #include "NCraftClassFactory.h"
-#include <vector>
-
 
 class NCraftImageGenContextMenu : public IContextMenu,  public IShellExtInit
 {
@@ -73,10 +70,8 @@ public:
 private:
     ~NCraftImageGenContextMenu();
 
-    long        m_ObjRefCount;
-    WCHAR       _szTargetFolder[MAX_PATH];
-    IDataObject* _pdtobj;       // data object
+    long        m_ObjRefCount = 0;
     std::vector<std::wstring>  m_filePaths;
-
     UINT m_idCmdFirst = 0;
+
 };

@@ -45,9 +45,11 @@ BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
 
 HRESULT DllCanUnloadNow(void)
 {
- 
+    utility::LogInfo("DllCanUnloadNow called....");
+
     if (g_DllModuleRefCount == 0)
     {
+        utility::LogInfo("DllCanUnloadNow calling GdiplusShutdown and unloading.");
         GdiplusShutdown(g_gpToken);
     }
 
@@ -66,9 +68,6 @@ void DllRelease(void)
 
 HRESULT DllGetClassObject(_In_ REFCLSID clsid, _In_ REFIID riid, _Outptr_ LPVOID* ppv)
 {
-
-//    MessageBox(nullptr, L"DllGetClassObject", L"NCraftImageGen", MB_OK);
-
     if (!IsEqualCLSID(clsid, NCraftImageGenMenuGUID))
     {
         return CLASS_E_CLASSNOTAVAILABLE;
@@ -87,14 +86,8 @@ HRESULT DllGetClassObject(_In_ REFCLSID clsid, _In_ REFIID riid, _Outptr_ LPVOID
         if (nCF)
         {
             res = nCF->QueryInterface(riid, ppv);
- /*           if (res == S_OK)
-            {
-                MessageBox(nullptr, L"QueryInterface", L"NCraftImageGen", MB_OK);
-            }*/
-
             nCF->Release();
         }
-
     }
 
     return res;
