@@ -1,9 +1,10 @@
 #include "NCraftImageGen.h"
 #include "NCraftImageGenDll.h"
 #include "NCraftImageGenMenuGUID.h"
+#include "NCraftImageGenThumbnailGUID.h"
 #include "NCraftClassFactory.h"
 #include "wintoastlib.h"
-#include "Renderers/RenderToImage.h"
+#include "Renderers/RenderToImageCommon.h"
 
 // Standard DLL functions
 BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
@@ -45,15 +46,25 @@ BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
 
 HRESULT DllCanUnloadNow(void)
 {
-    utility::LogInfo("DllCanUnloadNow called....");
+    CHAR ModuleRefCountStr[MAX_PATH] = { 0 };
+    sprintf(ModuleRefCountStr, "%d", g_DllModuleRefCount);
 
-    if (g_DllModuleRefCount == 0)
+    std::string refReport = "g_DllModuleRefCount = " + std::string(ModuleRefCountStr);
+
+    utility::LogInfo("DllCanUnloadNow called...");
+    utility::LogInfo(refReport.c_str());
+
+    if (g_DllModuleRefCount <= 0)
     {
+        WinToastLib::WinToast::instance()->clear();
+
         utility::LogInfo("DllCanUnloadNow calling GdiplusShutdown and unloading.");
         GdiplusShutdown(g_gpToken);
+
+        return S_OK;
     }
 
-    return (g_DllModuleRefCount == 0) ? S_OK : S_FALSE;
+    return S_FALSE;
 }
 
 void DllAddRef(void)
@@ -68,17 +79,22 @@ void DllRelease(void)
 
 HRESULT DllGetClassObject(_In_ REFCLSID clsid, _In_ REFIID riid, _Outptr_ LPVOID* ppv)
 {
-    if (!IsEqualCLSID(clsid, NCraftImageGenMenuGUID))
-    {
-        return CLASS_E_CLASSNOTAVAILABLE;
-    }
-
     if (!ppv)
     {
         return E_INVALIDARG;
     }
 
     HRESULT res = E_UNEXPECTED;
+
+    if (IsEqualCLSID(clsid, NCraftImageGenThumbnailGUID))
+    {
+        NCraftClassFactory* nCF = new NCraftClassFactory();
+        if (nCF)
+        {
+            res = nCF->QueryInterface(riid, ppv);
+            nCF->Release();
+        }
+    }
 
     if (IsEqualCLSID(clsid, NCraftImageGenMenuGUID))
     {
@@ -133,6 +149,79 @@ HRESULT DllRegisterServer()
     }
 
     RegCloseKey(hkey);
+
+//*****************************************************************************************
+    // Thumbnail Extension
+
+    wchar_t* thumbExtGUID = nullptr;
+
+    res = StringFromCLSID(NCraftImageGenThumbnailGUID, &thumbExtGUID);
+    lpSubKey = L"Software\\Classes\\CLSID\\" + std::wstring(thumbExtGUID);
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_CREATE_SUB_KEY, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    lpSubKey = L"InProcServer32";
+    res = RegCreateKeyEx(hkey, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)dllName, (DWORD)(std::wstring(dllName).size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    lpKeyValue = L"Apartment";
+
+    res = RegSetValueEx(hkey, L"ThreadingModel", 0, REG_SZ, (BYTE*)lpKeyValue.c_str(), (DWORD)((lpKeyValue.size() + 1U) * 2U));
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
+
+    lpSubKey = L"Software\\Classes\\.glb\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    std::wstring thumbExtGUIDStr(thumbExtGUID);
+
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)thumbExtGUIDStr.c_str(), (DWORD)(thumbExtGUIDStr.size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
+
+    lpSubKey = L"Software\\Classes\\glb_auto_file\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)thumbExtGUIDStr.c_str(), (DWORD)(thumbExtGUIDStr.size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
+
 
     //**************************************************************************************************************
     // Register for file types
@@ -274,6 +363,12 @@ HRESULT DllRegisterServer()
         {
             return E_UNEXPECTED;
         }
+
+        res = RegSetValueEx(hkey, std::wstring(thumbExtGUID).c_str(), 0, REG_SZ, (BYTE*)dllName, (DWORD)(std::wstring(dllName).size() + 1U) * 2U);
+        if (res != ERROR_SUCCESS)
+        {
+            return E_UNEXPECTED;
+        }
         RegCloseKey(hkey);
     }
 
@@ -290,6 +385,34 @@ HRESULT DllUnregisterServer()
     DWORD res = StringFromCLSID(NCraftImageGenMenuGUID, &tempStr);
 
     std::wstring lpSubKey = L"Software\\Classes\\CLSID\\" + std::wstring(tempStr) + L"\\InprocServer32";
+
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+        if (res != ERROR_SUCCESS)
+        {
+            return E_UNEXPECTED;
+        }
+
+        RegCloseKey(hkey);
+    }
+
+    lpSubKey = L"Software\\Classes\\CLSID\\" + std::wstring(tempStr);
+
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+        if (res != ERROR_SUCCESS)
+        {
+            return E_UNEXPECTED;
+        }
+
+        RegCloseKey(hkey);
+    }
+
+    res = StringFromCLSID(NCraftImageGenThumbnailGUID, &tempStr);
+
+    lpSubKey = L"Software\\Classes\\CLSID\\" + std::wstring(tempStr) + L"\\InprocServer32";
 
     if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
     {

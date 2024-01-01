@@ -230,7 +230,10 @@
     <ClCompile Include="..\source\NCraftClassFactory.cpp" />
     <ClCompile Include="..\source\NCraftImageGen.cpp" />
     <ClCompile Include="..\source\NCraftImageGenMenu.cpp" />
-    <ClCompile Include="..\source\Renderers\RenderToImage.cpp" />
+    <ClCompile Include="..\source\NCraftImageGenThumbnail.cpp" />
+    <ClCompile Include="..\source\Renderers\RenderGLTFToImage.cpp" />
+    <ClCompile Include="..\source\Renderers\RenderPointCloudToImage.cpp" />
+    <ClCompile Include="..\source\Renderers\RenderToImageCommon.cpp" />
     <ClCompile Include="..\source\wintoastlib.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -239,8 +242,12 @@
     <ClInclude Include="..\inc\NCraftImageGenDll.h" />
     <ClInclude Include="..\inc\NCraftImageGenMenu.h" />
     <ClInclude Include="..\inc\NCraftImageGenMenuGUID.h" />
+    <ClInclude Include="..\inc\NCraftImageGenThumbnail.h" />
+    <ClInclude Include="..\inc\NCraftImageGenThumbnailGUID.h" />
     <ClInclude Include="..\inc\Priv.h" />
-    <ClInclude Include="..\inc\Renderers\RenderToImage.h" />
+    <ClInclude Include="..\inc\Renderers\RenderGLTFToImage.h" />
+    <ClInclude Include="..\inc\Renderers\RenderPointCloudToImage.h" />
+    <ClInclude Include="..\inc\Renderers\RenderToImageCommon.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

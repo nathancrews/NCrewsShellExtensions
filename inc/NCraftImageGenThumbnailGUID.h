@@ -1,0 +1,6 @@
+#pragma once
+#include "priv.h"
+#include <initguid.h>
+
+// {0C0CDDD3-2D85-44A9-B976-09CD8B77DC39}
+DEFINE_GUID(NCraftImageGenThumbnailGUID, 0xc0cddd3, 0x2d85, 0x44a9, 0xb9, 0x76, 0x9, 0xcd, 0x8b, 0x77, 0xdc, 0x39);

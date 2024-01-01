@@ -1,6 +1,7 @@
 #include "NCraftImageGen.h"
 #include "NCraftClassFactory.h"
 #include "NCraftImageGenMenu.h"
+#include "NCraftImageGenThumbnail.h"
 
 
 NCraftClassFactory::NCraftClassFactory() : m_ObjRefCount(1)
@@ -60,6 +61,7 @@ HRESULT NCraftClassFactory::QueryInterface(_In_ REFIID riid, _COM_Outptr_ void**
 
 HRESULT NCraftClassFactory::CreateInstance(_In_opt_ IUnknown* pUnkOuter, _In_ REFIID riid, _COM_Outptr_ void** ppvObject)
 {
+
     if (!ppvObject)
     {
         return E_INVALIDARG;
@@ -73,6 +75,22 @@ HRESULT NCraftClassFactory::CreateInstance(_In_opt_ IUnknown* pUnkOuter, _In_ RE
     *ppvObject = nullptr;
 
     HRESULT hres = E_NOINTERFACE;
+
+    if (IsEqualIID(riid, IID_IThumbnailProvider) || IsEqualIID(riid, IID_IInitializeWithStream) ||
+        IsEqualIID(riid, IID_IInitializeWithFile) ||
+        IsEqualIID(riid, IID_IInitializeWithItem))
+    {
+        NCraftImageGenThumbnail* cThumb = new NCraftImageGenThumbnail();
+        if (cThumb)
+        {
+            hres = cThumb->QueryInterface(riid, ppvObject);
+            cThumb->Release();
+        }
+        else
+        {
+            hres = E_OUTOFMEMORY;
+        }
+    }
 
     if (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IContextMenu))
     {
@@ -88,7 +106,6 @@ HRESULT NCraftClassFactory::CreateInstance(_In_opt_ IUnknown* pUnkOuter, _In_ RE
         }
     }
 
-
     return hres;
 }
 
@@ -96,6 +113,4 @@ HRESULT NCraftClassFactory::LockServer(BOOL fLock)
 {
     return E_NOTIMPL;
 }
-
-
 

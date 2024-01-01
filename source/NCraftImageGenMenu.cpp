@@ -7,22 +7,37 @@
 #include <fstream>
 #include <process.h>
 #include "wintoastlib.h"
-#include "Renderers/RenderToImage.h"
+#include "Renderers/RenderPointcloudToImage.h"
+#include "Renderers/RenderGLTFToImage.h"
 
 void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& imageResults);
 
 class CustomHandler : public WinToastLib::IWinToastHandler
 {
 public:
+
+    CustomHandler()
+    {
+        DllAddRef(); 
+        utility::LogInfo("IWinToastHandler: CustomHandler() called");
+    }
+    ~CustomHandler()
+    {
+        DllRelease(); 
+        utility::LogInfo("IWinToastHandler: ~CustomHandler() called");
+    }
+
     void toastActivated() const
     {
-        std::wcout << L"The user clicked in this toast" << std::endl;
+        utility::LogInfo("IWinToastHandler: Activated");
+        //std::wcout << L"The user clicked in this toast" << std::endl;
        // exit(0);
     }
 
     void toastActivated(int actionIndex) const
     {
-        std::wcout << L"The user clicked on action #" << actionIndex << std::endl;
+        utility::LogInfo("IWinToastHandler: The user clicked on action");
+        //std::wcout << L"The user clicked on action #" << actionIndex << std::endl;
        // exit(16 + actionIndex);
     }
 
@@ -31,19 +46,24 @@ public:
         switch (state)
         {
             case UserCanceled:
-                std::wcout << L"The user dismissed this toast" << std::endl;
+                utility::LogInfo("IWinToastHandler: UserCanceled");
+              //  std::wcout << L"The user dismissed this toast" << std::endl;
               //  exit(1);
                 break;
             case TimedOut:
-                std::wcout << L"The toast has timed out" << std::endl;
+                utility::LogInfo("IWinToastHandler: TimedOut");
+
+              //  std::wcout << L"The toast has timed out" << std::endl;
               //  exit(2);
                 break;
             case ApplicationHidden:
-                std::wcout << L"The application hid the toast using ToastNotifier.hide()" << std::endl;
+                utility::LogInfo("IWinToastHandler: ApplicationHidden");
+               // std::wcout << L"The application hid the toast using ToastNotifier.hide()" << std::endl;
                // exit(3);
                 break;
             default:
-                std::wcout << L"Toast not activated" << std::endl;
+                utility::LogInfo("IWinToastHandler: not activated");
+               // std::wcout << L"Toast not activated" << std::endl;
                // exit(4);
                 break;
         }
@@ -51,7 +71,8 @@ public:
 
     void toastFailed() const
     {
-        std::wcout << L"Error showing current toast" << std::endl;
+        utility::LogInfo("IWinToastHandler: toastFailed");
+       // std::wcout << L"Error showing current toast" << std::endl;
     //    exit(5);
     }
 };
@@ -119,9 +140,9 @@ HRESULT NCraftImageGenContextMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDat
                 }
                 else
                 {
-                    for (std::string fext : NCraftImageGen::ModelFileExtensions)
+                    for (std::string pcext : NCraftImageGen::ModelFileExtensions)
                     {
-                        if (!testPath.extension().compare(fext))
+                        if (!testPath.extension().compare(pcext))
                         {
                             m_filePaths.push_back(testPath);
                             break;
@@ -172,30 +193,31 @@ HRESULT NCraftImageGenContextMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu,
     {
         m_idCmdFirst = idCmdFirst;
        
-        //if (m_filePaths.size() > 1)
-        //{
-        //    WCHAR fileCountStr[MAX_PATH] = { 0 };
-        //    _swprintf(fileCountStr, L"%zd", m_filePaths.size());
-
-        //    menuItemName = L"Generate " + std::wstring(fileCountStr) + L" Image Previews";
-        //}
-
         std::wstring menuItemName = L"Generate Image Previews";
-        LPWSTR m_menuItemName = nullptr;
 
-        m_menuItemName = (LPWSTR)CoTaskMemAlloc((menuItemName.size() + 1) * sizeof(WCHAR));
+        if (m_filePaths.size() > 1)
+        {
+            WCHAR fileCountStr[MAX_PATH] = { 0 };
+            _swprintf(fileCountStr, L"%zd", m_filePaths.size());
 
-        if (!m_menuItemName)
+            menuItemName = L"Generate " + std::wstring(fileCountStr) + L" Image Previews";
+        }
+       
+        LPWSTR menuItemNameStr = nullptr;
+
+        menuItemNameStr = (LPWSTR)CoTaskMemAlloc((menuItemName.size() + 1) * sizeof(WCHAR));
+
+        if (!menuItemNameStr)
         {
             MAKE_HRESULT(SEVERITY_ERROR, 0, (USHORT)(0));
         }
 
-        wcscpy(m_menuItemName, menuItemName.c_str());
+        wcscpy(menuItemNameStr, menuItemName.c_str());
 
         MENUITEMINFO menuInfo = {};
         menuInfo.cbSize = sizeof(MENUITEMINFO);
         menuInfo.fMask = MIIM_STRING | MIIM_ID;
-        menuInfo.dwTypeData = m_menuItemName;
+        menuInfo.dwTypeData = menuItemNameStr;
         menuInfo.wID = idCmdFirst;
 
         if (!InsertMenuItem(hmenu, 0, TRUE, &menuInfo))
@@ -204,7 +226,7 @@ HRESULT NCraftImageGenContextMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu,
             return HRESULT_FROM_WIN32(GetLastError());
         }
 
-        CoTaskMemFree(m_menuItemName);
+        CoTaskMemFree(menuItemNameStr);
 
         utility::LogInfo("QueryContextMenu....Added Menu item");
 
@@ -238,7 +260,7 @@ HRESULT NCraftImageGenContextMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
         return hr;
     }
 
-    if (idCmd != 0)
+    if (idCmd > 50)
     {
         utility::LogInfo("Menu Command ID is not ZERO: {}, m_idCmdFirst: {}\n", idCmd, m_idCmdFirst);
         return hr;
@@ -257,7 +279,8 @@ HRESULT NCraftImageGenContextMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
     hr = S_OK;
     try
     {
-        NCraftImageGen::RenderToImages(g_AppPath, filesToImage, renderResults);
+        NCraftImageGen::RenderModelsToImages(g_AppPath, filesToImage, renderResults);
+        NCraftImageGen::RenderPointcloudFiles(g_AppPath, filesToImage, renderResults);
         SendNotificationMessages(renderResults);
 
         m_filePaths.clear();
@@ -289,69 +312,73 @@ void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenRes
 
     for (NCraftImageGen::ImageGenResult& result : imageResults)
     {
-        WinToastLib::WinToastTemplate templ(WinToastLib::WinToastTemplate::ImageAndText04);
+        if (result.m_pointCount > 0)
+        {
 
-        templ.setDuration(WinToastLib::WinToastTemplate::Short);
+            WinToastLib::WinToastTemplate templ(WinToastLib::WinToastTemplate::ImageAndText04);
 
-        templ.setTextField(result.m_ImageName.filename(), WinToastLib::WinToastTemplate::FirstLine);
-        templ.setTextField(result.m_FileName.filename(), WinToastLib::WinToastTemplate::SecondLine);
+            templ.setDuration(WinToastLib::WinToastTemplate::Short);
 
-        if (std::filesystem::exists(result.m_ImageName))
-        {
-            templ.setImagePath(result.m_ImageName);
-        }
+            templ.setTextField(result.m_ImageName.filename(), WinToastLib::WinToastTemplate::FirstLine);
+            templ.setTextField(result.m_FileName.filename(), WinToastLib::WinToastTemplate::SecondLine);
 
-        if (result.m_fileSize > 1048576 * 1000)
-        {
-            _swprintf(fileSizeStr, L"File size: %0.2f GB", (double)(result.m_fileSize) / (double)(1048576 * 1000));
-        }
-        else if (result.m_fileSize > 1048576)
-        {
-            _swprintf(fileSizeStr, L"File size: %0.2f MB", (double)(result.m_fileSize) / (double)(1048576));
-        }
-        else
-        {
-            _swprintf(fileSizeStr, L"File size: %0.2f KB", (double)result.m_fileSize / (double)1048);
-        }
-
-        if (result.m_processTimeSeconds > 1.0)
-        {
-            _swprintf(timeStr, L"%0.2fs", result.m_processTimeSeconds);
-        }
-        else
-        {
-            _swprintf(timeStr, L"%0.2fms", result.m_processTimeSeconds * 1000);
-        }
-
-        if (result.m_modelType == 0)
-        {
-            if (result.m_pointCount > millionVal)
+            if (std::filesystem::exists(result.m_ImageName))
             {
-                _swprintf(pointCountStr, L"%0.2f M", (double)(result.m_pointCount) / (double)millionVal);
+                templ.setImagePath(result.m_ImageName);
             }
-            else if (result.m_pointCount > kVal)
+
+            if (result.m_fileSize > 1048576 * 1000)
             {
-                _swprintf(pointCountStr, L"%0.2f K", (double)(result.m_pointCount) / (double)kVal);
+                _swprintf(fileSizeStr, L"File size: %0.2f GB", (double)(result.m_fileSize) / (double)(1048576 * 1000));
+            }
+            else if (result.m_fileSize > 1048576)
+            {
+                _swprintf(fileSizeStr, L"File size: %0.2f MB", (double)(result.m_fileSize) / (double)(1048576));
             }
             else
             {
-                _swprintf(pointCountStr, L"%d", result.m_pointCount);
+                _swprintf(fileSizeStr, L"File size: %0.2f KB", (double)result.m_fileSize / (double)1048);
             }
 
-            infoText = L"Points: " + std::wstring(pointCountStr) + L", Time: " + timeStr;
-        }
-        else
-        {
-            infoText = L"Time: " + std::wstring(timeStr);
-        }
+            if (result.m_processTimeSeconds > 1.0)
+            {
+                _swprintf(timeStr, L"%0.2fs", result.m_processTimeSeconds);
+            }
+            else
+            {
+                _swprintf(timeStr, L"%0.2fms", result.m_processTimeSeconds * 1000);
+            }
 
-        templ.setTextField(infoText, WinToastLib::WinToastTemplate::ThirdLine);
+            if (result.m_modelType == 0)
+            {
+                if (result.m_pointCount > millionVal)
+                {
+                    _swprintf(pointCountStr, L"%0.2f M", (double)(result.m_pointCount) / (double)millionVal);
+                }
+                else if (result.m_pointCount > kVal)
+                {
+                    _swprintf(pointCountStr, L"%0.2f K", (double)(result.m_pointCount) / (double)kVal);
+                }
+                else
+                {
+                    _swprintf(pointCountStr, L"%d", result.m_pointCount);
+                }
 
-        templ.setAttributionText(fileSizeStr);
+                infoText = L"Points: " + std::wstring(pointCountStr) + L", Time: " + timeStr;
+            }
+            else
+            {
+                infoText = L"Time: " + std::wstring(timeStr);
+            }
 
-        if (WinToastLib::WinToast::instance()->showToast(templ, new CustomHandler()) < 0)
-        {
-            utility::LogInfo("WinToast Error, could not launch toast notification!");
+            templ.setTextField(infoText, WinToastLib::WinToastTemplate::ThirdLine);
+
+            templ.setAttributionText(fileSizeStr);
+
+            if (WinToastLib::WinToast::instance()->showToast(templ, new CustomHandler()) < 0)
+            {
+                utility::LogInfo("WinToast Error, could not launch toast notification!");
+            }
         }
     }
 }
