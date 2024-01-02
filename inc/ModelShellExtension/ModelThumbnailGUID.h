@@ -1,0 +1,6 @@
+#pragma once
+#include "priv.h"
+#include <initguid.h>
+
+// {0C6D56CF-1C57-4BE1-8736-5A3D02A68187}
+DEFINE_GUID(ModelThumbnailGUID, 0xc6d56cf, 0x1c57, 0x4be1, 0x87, 0x36, 0x5a, 0x3d, 0x2, 0xa6, 0x81, 0x87);

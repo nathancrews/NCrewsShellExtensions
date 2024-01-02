@@ -102,11 +102,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>.\Release\</OutDir>
-    <IntDir>.\int\$(Configuration)\</IntDir>
+    <IntDir>.\int\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <OutDir>.\RelWithDebInfo\</OutDir>
-    <IntDir>.\int\$(Configuration)\</IntDir>
+    <IntDir>.\int\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -227,23 +227,14 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\source\NCraftClassFactory.cpp" />
     <ClCompile Include="..\source\NCraftImageGen.cpp" />
-    <ClCompile Include="..\source\NCraftImageGenMenu.cpp" />
-    <ClCompile Include="..\source\NCraftImageGenThumbnail.cpp" />
     <ClCompile Include="..\source\Renderers\RenderGLTFToImage.cpp" />
     <ClCompile Include="..\source\Renderers\RenderPointCloudToImage.cpp" />
     <ClCompile Include="..\source\Renderers\RenderToImageCommon.cpp" />
-    <ClCompile Include="..\source\wintoastlib.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\inc\NCraftClassFactory.h" />
     <ClInclude Include="..\inc\NCraftImageGen.h" />
     <ClInclude Include="..\inc\NCraftImageGenDll.h" />
-    <ClInclude Include="..\inc\NCraftImageGenMenu.h" />
-    <ClInclude Include="..\inc\NCraftImageGenMenuGUID.h" />
-    <ClInclude Include="..\inc\NCraftImageGenThumbnail.h" />
-    <ClInclude Include="..\inc\NCraftImageGenThumbnailGUID.h" />
     <ClInclude Include="..\inc\Priv.h" />
     <ClInclude Include="..\inc\Renderers\RenderGLTFToImage.h" />
     <ClInclude Include="..\inc\Renderers\RenderPointCloudToImage.h" />

@@ -21,16 +21,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\source\NCraftClassFactory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\NCraftImageGen.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\NCraftImageGenMenu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\wintoastlib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\source\Renderers\RenderGLTFToImage.cpp">
@@ -42,21 +33,9 @@
     <ClCompile Include="..\source\Renderers\RenderPointCloudToImage.cpp">
       <Filter>Source Files\Renderers</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\NCraftImageGenThumbnail.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\inc\NCraftClassFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\inc\NCraftImageGen.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\inc\NCraftImageGenMenu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\inc\NCraftImageGenMenuGUID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\Priv.h">
@@ -76,12 +55,6 @@
     </ClInclude>
     <ClInclude Include="..\inc\Renderers\RenderPointCloudToImage.h">
       <Filter>Header Files\Renderers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\inc\NCraftImageGenThumbnail.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\inc\NCraftImageGenThumbnailGUID.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -12,7 +12,7 @@ using namespace Gdiplus;
 
 #ifdef NCRAFTIMAGEGENAPI_EXPORT
 #define NCRAFTIMAGEGENAPI __declspec(dllexport)
-#elif defined(LANDXML2GLTFDLLAPI_IMPORT)
+#elif defined(NCRAFTIMAGEGENAPI_IMPORT)
 #define NCRAFTIMAGEGENAPI __declspec(dllimport)
 #else
 #define NCRAFTIMAGEGENAPI
@@ -36,7 +36,7 @@ using namespace open3d::visualization::rendering;
 namespace NCraftImageGen
 {
 
-struct ImageGenResult
+NCRAFTIMAGEGENAPI struct ImageGenResult
 {
     ImageGenResult() {};
     ImageGenResult(std::filesystem::path& filePath) { m_FileName = filePath; };
@@ -50,7 +50,7 @@ struct ImageGenResult
     std::shared_ptr<geometry::PointCloud> m_cloudPtr;
 };
 
-UINT GetFileNamesFromDirectory(std::filesystem::path& filePath, std::vector<std::filesystem::path>& outDirectoryFilenames);
+NCRAFTIMAGEGENAPI UINT GetFileNamesFromDirectory(std::filesystem::path& filePath, std::vector<std::filesystem::path>& outDirectoryFilenames);
 NCRAFTIMAGEGENAPI int GetEncoderClsid(const WCHAR* format, CLSID* pClsid);
 
 NCRAFTIMAGEGENAPI extern std::vector<std::string> ModelFileExtensions;

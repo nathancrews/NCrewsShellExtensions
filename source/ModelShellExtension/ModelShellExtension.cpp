@@ -1,5 +1,9 @@
-#include "NCraftImageGen.h"
-#include "NCraftImageGenDll.h"
+#include "ModelShellExtension.h"
+#include "ModelShellExtensionDll.h"
+#include "ModelMenuGUID.h"
+#include "ModelThumbnailGUID.h"
+#include "ModelClassFactory.h"
+#include "wintoastlib.h"
 #include "Renderers/RenderToImageCommon.h"
 
 // Standard DLL functions
@@ -18,9 +22,17 @@ BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
 
         open3d::utility::Logger::GetInstance().SetPrintFunction(print_fcn);
 
-        std::wstring appName = L"NCraft Image Generator";
-        std::wstring appUserModelID = L"NCraft Image Message";
+        std::wstring appName = L"NCraft Model Image Generator";
+        std::wstring appUserModelID = L"NCraft Model Image Message";
  
+        WinToastLib::WinToast::instance()->setAppName(appName);
+        WinToastLib::WinToast::instance()->setAppUserModelId(appUserModelID);
+
+        if (!WinToastLib::WinToast::instance()->initialize())
+        {
+            utility::LogInfo("WinToast Error, your system in not compatible!");
+        }
+
         GdiplusStartupInput gpStartupInput;
         Gdiplus::Status mstat = GdiplusStartup(&g_gpToken, &gpStartupInput, NULL);
         if (mstat != Gdiplus::Status::Ok)
@@ -32,7 +44,6 @@ BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
     return TRUE;
 }
 
-#if 0
 HRESULT DllCanUnloadNow(void)
 {
     CHAR ModuleRefCountStr[MAX_PATH] = { 0 };
@@ -75,9 +86,9 @@ HRESULT DllGetClassObject(_In_ REFCLSID clsid, _In_ REFIID riid, _Outptr_ LPVOID
 
     HRESULT res = E_UNEXPECTED;
 
-    if (IsEqualCLSID(clsid, NCraftImageGenThumbnailGUID))
+    if (IsEqualCLSID(clsid, ModelMenuGUID))
     {
-        NCraftClassFactory* nCF = new NCraftClassFactory();
+        ModelClassFactory* nCF = new ModelClassFactory();
         if (nCF)
         {
             res = nCF->QueryInterface(riid, ppv);
@@ -85,9 +96,9 @@ HRESULT DllGetClassObject(_In_ REFCLSID clsid, _In_ REFIID riid, _Outptr_ LPVOID
         }
     }
 
-    if (IsEqualCLSID(clsid, NCraftImageGenMenuGUID))
+    if (IsEqualCLSID(clsid, ModelThumbnailGUID))
     {
-        NCraftClassFactory* nCF = new NCraftClassFactory();
+        ModelClassFactory* nCF = new ModelClassFactory();
         if (nCF)
         {
             res = nCF->QueryInterface(riid, ppv);
@@ -103,8 +114,11 @@ HRESULT DllRegisterServer()
     HKEY hkey;
     DWORD lpDisp;
 
+    wchar_t* thumbExtGUID = nullptr;
     wchar_t* menuExtGUID = nullptr;
-    DWORD res = StringFromCLSID(NCraftImageGenMenuGUID, &menuExtGUID);
+    DWORD res = StringFromCLSID(ModelMenuGUID, &menuExtGUID);
+    res = StringFromCLSID(ModelThumbnailGUID, &thumbExtGUID);
+
     std::wstring lpSubKey = L"Software\\Classes\\CLSID\\" + std::wstring(menuExtGUID);
 
     res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_CREATE_SUB_KEY, NULL, &hkey, &lpDisp);
@@ -142,9 +156,7 @@ HRESULT DllRegisterServer()
 //*****************************************************************************************
     // Thumbnail Extension
 
-    wchar_t* thumbExtGUID = nullptr;
 
-    res = StringFromCLSID(NCraftImageGenThumbnailGUID, &thumbExtGUID);
     lpSubKey = L"Software\\Classes\\CLSID\\" + std::wstring(thumbExtGUID);
 
     res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_CREATE_SUB_KEY, NULL, &hkey, &lpDisp);
@@ -215,7 +227,7 @@ HRESULT DllRegisterServer()
     //**************************************************************************************************************
     // Register for file types
 
-    lpSubKey = L"Software\\Classes\\.las\\ShellEx\\ContextMenuHandlers\\NCraftImageGen";
+    lpSubKey = L"Software\\Classes\\.gltf\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
 
     res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
     if (res != ERROR_SUCCESS)
@@ -230,7 +242,7 @@ HRESULT DllRegisterServer()
 
     RegCloseKey(hkey);
 
-    lpSubKey = L"Software\\Classes\\.laz\\ShellEx\\ContextMenuHandlers\\NCraftImageGen";
+    lpSubKey = L"Software\\Classes\\.glb\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
 
     res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
     if (res != ERROR_SUCCESS)
@@ -245,53 +257,7 @@ HRESULT DllRegisterServer()
 
     RegCloseKey(hkey);
 
-    lpSubKey = L"Software\\Classes\\.pcd\\ShellEx\\ContextMenuHandlers\\NCraftImageGen";
-
-    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
-    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
-
-    RegCloseKey(hkey);
-
-
-    lpSubKey = L"Software\\Classes\\.gltf\\ShellEx\\ContextMenuHandlers\\NCraftImageGen";
-
-    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
-    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
-
-    RegCloseKey(hkey);
-
-    lpSubKey = L"Software\\Classes\\.glb\\ShellEx\\ContextMenuHandlers\\NCraftImageGen";
-
-    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
-    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
-
-    RegCloseKey(hkey);
-
-    lpSubKey = L"Software\\Classes\\gltf_auto_file\\ShellEx\\ContextMenuHandlers\\NCraftImageGen";
+    lpSubKey = L"Software\\Classes\\gltf_auto_file\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
 
     res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
     if (res != ERROR_SUCCESS)
@@ -307,7 +273,7 @@ HRESULT DllRegisterServer()
     RegCloseKey(hkey);
 
    
-    lpSubKey = L"Software\\Classes\\glb_auto_file\\ShellEx\\ContextMenuHandlers\\NCraftImageGen";
+    lpSubKey = L"Software\\Classes\\glb_auto_file\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
 
     res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
     if (res != ERROR_SUCCESS)
@@ -323,7 +289,7 @@ HRESULT DllRegisterServer()
     RegCloseKey(hkey);
 
 
-    lpSubKey = L"Software\\Classes\\Directory\\ShellEx\\ContextMenuHandlers\\NCraftImageGen";
+    lpSubKey = L"Software\\Classes\\Directory\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
 
     res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
     if (res != ERROR_SUCCESS)
@@ -371,7 +337,7 @@ HRESULT DllUnregisterServer()
 {
     HKEY hkey;
     wchar_t* tempStr = nullptr;
-    DWORD res = StringFromCLSID(NCraftImageGenMenuGUID, &tempStr);
+    DWORD res = StringFromCLSID(ModelMenuGUID, &tempStr);
 
     std::wstring lpSubKey = L"Software\\Classes\\CLSID\\" + std::wstring(tempStr) + L"\\InprocServer32";
 
@@ -399,7 +365,7 @@ HRESULT DllUnregisterServer()
         RegCloseKey(hkey);
     }
 
-    res = StringFromCLSID(NCraftImageGenThumbnailGUID, &tempStr);
+    res = StringFromCLSID(ModelThumbnailGUID, &tempStr);
 
     lpSubKey = L"Software\\Classes\\CLSID\\" + std::wstring(tempStr) + L"\\InprocServer32";
 
@@ -433,4 +399,3 @@ HRESULT DllUnregisterServer()
 
     return S_OK;
 }
-#endif

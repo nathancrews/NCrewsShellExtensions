@@ -1,0 +1,6 @@
+#pragma once
+#include "priv.h"
+#include <initguid.h>
+
+// {C2E79339-590A-4B13-AFCF-3A31FB39C7A8}
+DEFINE_GUID(CloudMenuGUID,  0xc2e79339, 0x590a, 0x4b13, 0xaf, 0xcf, 0x3a, 0x31, 0xfb, 0x39, 0xc7, 0xa8);
