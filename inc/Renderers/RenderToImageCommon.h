@@ -50,7 +50,8 @@ NCRAFTIMAGEGENAPI struct ImageGenResult
     std::shared_ptr<geometry::PointCloud> m_cloudPtr;
 };
 
-NCRAFTIMAGEGENAPI UINT GetFileNamesFromDirectory(std::filesystem::path& filePath, std::vector<std::filesystem::path>& outDirectoryFilenames);
+NCRAFTIMAGEGENAPI UINT GetFileNamesFromDirectory(std::filesystem::path& filePath, std::vector<std::string>& allowedFileExtensions, 
+                                                 std::vector<std::filesystem::path>& outDirectoryFilenames);
 NCRAFTIMAGEGENAPI int GetEncoderClsid(const WCHAR* format, CLSID* pClsid);
 
 NCRAFTIMAGEGENAPI extern std::vector<std::string> ModelFileExtensions;

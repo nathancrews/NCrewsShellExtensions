@@ -14,7 +14,7 @@ std::vector<std::string> PointcloudFileExtensions{ ".las",
 ".PLY" };
 
 
-UINT GetFileNamesFromDirectory(std::filesystem::path& filePath, std::vector<std::filesystem::path>& outDirectoryFilenames)
+UINT GetFileNamesFromDirectory(std::filesystem::path& filePath, std::vector<std::string>& allowedFileExtensions, std::vector<std::filesystem::path>& outDirectoryFilenames)
 {
     UINT fileCount = 0;
 
@@ -26,18 +26,9 @@ UINT GetFileNamesFromDirectory(std::filesystem::path& filePath, std::vector<std:
         {
             if (dir_entry.is_regular_file())
             {
-                for (std::string fext : ModelFileExtensions)
+                for (std::string fext : allowedFileExtensions)
                 {
                     if (!dir_entry.path().extension().compare(fext))
-                    {
-                        outDirectoryFilenames.push_back(dir_entry.path());
-                        break;
-                    }
-                }
-
-                for (std::string pcext : PointcloudFileExtensions)
-                {
-                    if (!dir_entry.path().extension().compare(pcext))
                     {
                         outDirectoryFilenames.push_back(dir_entry.path());
                         break;

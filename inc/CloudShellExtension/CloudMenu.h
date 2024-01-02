@@ -71,7 +71,7 @@ private:
     ~CloudMenu();
 
     long        m_ObjRefCount = 0;
-    std::vector<std::wstring>  m_filePaths;
+    std::vector<std::filesystem::path>  m_filePaths;
     UINT m_idCmdFirst = 0;
 
 };

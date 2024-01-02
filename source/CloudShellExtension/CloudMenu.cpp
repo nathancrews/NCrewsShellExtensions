@@ -134,7 +134,7 @@ HRESULT CloudMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj,
 
                 if (std::filesystem::is_directory(testPath))
                 {
-                    m_filePaths.push_back(testPath);
+                    NCraftImageGen::GetFileNamesFromDirectory(testPath, NCraftImageGen::PointcloudFileExtensions, m_filePaths);
                 }
                 else
                 {
@@ -189,7 +189,7 @@ HRESULT CloudMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst
             WCHAR fileCountStr[MAX_PATH] = { 0 };
             _swprintf(fileCountStr, L"%zd", m_filePaths.size());
 
-            menuItemName = L"Generate " + std::wstring(fileCountStr) + L" Image Previews";
+            menuItemName = L"Generate " + std::wstring(fileCountStr) + L" Pointcloud Images";
         }
        
         LPWSTR menuItemNameStr = nullptr;

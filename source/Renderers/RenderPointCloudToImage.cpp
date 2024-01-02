@@ -50,7 +50,7 @@ UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::file
     {
         if (std::filesystem::is_directory(testPath))
         {
-            GetFileNamesFromDirectory(testPath, batchModeFilenames);
+            GetFileNamesFromDirectory(testPath, PointcloudFileExtensions, batchModeFilenames);
         }
         else
         {

@@ -28,7 +28,7 @@ UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::files
     {
         if (std::filesystem::is_directory(testPath))
         {
-            GetFileNamesFromDirectory(testPath, batchModeFilenames);
+            GetFileNamesFromDirectory(testPath, ModelFileExtensions, batchModeFilenames);
         }
         else
         {
