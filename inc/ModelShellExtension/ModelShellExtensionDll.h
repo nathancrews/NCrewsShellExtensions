@@ -11,19 +11,3 @@ std::wstring g_AppName = L"Model Shell Extension";
 std::wstring g_RegAppName = L"ModelShellExtension";
 ULONG_PTR g_gpToken;
 
-void print_fcn(const std::string& logString)
-{
-    std::filesystem::path logFilePath = g_AppPath;
-
-    logFilePath.replace_filename("1_ModelShellExtension");
-    logFilePath.replace_extension("log");
-
-    std::fstream fs;
-    fs.open(logFilePath, std::fstream::out | std::fstream::app);
-
-    fs << logString;
-    fs << "\n";
-
-    fs.flush();
-    fs.close();
-}

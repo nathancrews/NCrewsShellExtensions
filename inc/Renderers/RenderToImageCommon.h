@@ -36,17 +36,19 @@ using namespace open3d::visualization::rendering;
 namespace NCraftImageGen
 {
 
-NCRAFTIMAGEGENAPI struct ImageGenResult
+struct ImageGenResult
 {
     ImageGenResult() {};
     ImageGenResult(std::filesystem::path& filePath) { m_FileName = filePath; };
 
+    bool m_imageFileCacheOk = false;
     UINT m_modelType = 0; // 0 = point cloud, 1 = gltf
     std::filesystem::path  m_FileName;
     std::filesystem::path m_ImageName;
-    UINT m_fileSize = 0;
-    UINT m_pointCount = 0;
+    uintmax_t m_fileSize = 0;
     double m_processTimeSeconds = 0.0;
+
+    uintmax_t m_pointCount = 0;
     std::shared_ptr<geometry::PointCloud> m_cloudPtr;
 };
 

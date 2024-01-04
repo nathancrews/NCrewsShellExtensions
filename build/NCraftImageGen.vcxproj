@@ -181,6 +181,7 @@
       <ProgramDataBaseFileName>$(OutDIr)$(TargetName).pdb</ProgramDataBaseFileName>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

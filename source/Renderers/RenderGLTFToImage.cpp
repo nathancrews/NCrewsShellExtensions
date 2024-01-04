@@ -53,32 +53,48 @@ UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::files
         }
     }
 
+    utility::LogInfo("processing {} files....\n", batchModeFilenames.size());
+
     for (std::filesystem::path reqPath : batchModeFilenames)
     {
+        utility::LogInfo("Checking image cache for {}", reqPath.string().c_str());
+
         NCraftImageGen::ImageGenResult toAddResult(reqPath);
 
         uintmax_t fsize = 0;
         __std_win_error wep = std::filesystem::_File_size(reqPath, fsize);
 
+        toAddResult.m_imageFileCacheOk = false;
         toAddResult.m_fileSize = fsize;
+        toAddResult.m_modelType = 1;
 
-        if (!reqPath.extension().compare(".gltf") ||
-            !reqPath.extension().compare(".glb"))
+        std::filesystem::file_time_type sourceFiletime = std::filesystem::last_write_time(reqPath);
+        std::filesystem::path imagePath = reqPath;
+        imagePath = imagePath.replace_extension("jpg");
+
+        toAddResult.m_ImageName = imagePath;
+
+        if (std::filesystem::exists(imagePath))
         {
-            toAddResult.m_modelType = 1;
+            std::filesystem::file_time_type imageFiletime = std::filesystem::last_write_time(imagePath);
+
+            if (sourceFiletime <= imageFiletime)
+            {
+                utility::LogInfo("Skipping image, file up to date: {}", imagePath.string().c_str());
+                toAddResult.m_imageFileCacheOk = true;
+            }
         }
 
         outRenderResults.push_back(toAddResult);
-    }
 
-    utility::LogInfo("processing {} files....\n", batchModeFilenames.size());
+    }
 
     utility::Timer timer;
     double exeTime = 0.0, execExecTotal = 0.0;
 
     for (int sz = 0; sz < outRenderResults.size(); ++sz)
     {
-        if (outRenderResults[sz].m_modelType == 1)
+        if (outRenderResults[sz].m_imageFileCacheOk == false)
         {
             timer.Start();
             RenderModelToImage(renderer, outRenderResults[sz]);
@@ -88,12 +104,11 @@ UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::files
             execExecTotal += exeTime;
 
             outRenderResults[sz].m_processTimeSeconds = exeTime;
-
-            utility::LogInfo("Model Load/Render Process Duration: {} seconds\n", exeTime);
         }
+        utility::LogInfo("{} Load/Render Process Duration: {}s", outRenderResults[sz].m_FileName.string().c_str(), exeTime);
     }
 
-    utility::LogInfo("Finished Loading {} files, Total Process Duration: {} seconds", outRenderResults.size(), execExecTotal);
+    utility::LogInfo("Finished rendering {} files, Total Process Duration: {} seconds", outRenderResults.size(), execExecTotal);
 
     delete renderer;
 
@@ -107,11 +122,6 @@ UINT RenderModelToImage(FilamentRenderer* modelRenderer, NCraftImageGen::ImageGe
     const int height = 768;
     bool model_success = false;
     visualization::rendering::TriangleMeshModel loaded_model;
-    std::filesystem::path imagePath = fileInfo.m_FileName;
-
-    imagePath = imagePath.replace_extension("jpg");
-
-    fileInfo.m_ImageName = imagePath;
 
     try
     {
@@ -164,7 +174,7 @@ UINT RenderModelToImage(FilamentRenderer* modelRenderer, NCraftImageGen::ImageGe
                 modelRenderer->BeginFrame();
                 modelRenderer->EndFrame();
 
-                io::WriteImage(imagePath.string(), *img);
+                io::WriteImage(fileInfo.m_ImageName.string(), *img);
             }
 
             delete scene;
@@ -262,7 +272,7 @@ HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath, std::filesystem::pa
                     {
                         utility::LogInfo("got HBITMAP ok");
                     }
-                     
+
                     delete bitmap;
 
                     std::filesystem::remove(imagePath);

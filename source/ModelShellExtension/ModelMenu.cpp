@@ -28,14 +28,13 @@ public:
     void toastActivated() const
     {
         utility::LogInfo("IWinToastHandler: Activated");
-        //std::wcout << L"The user clicked in this toast" << std::endl;
        // exit(0);
     }
 
     void toastActivated(int actionIndex) const
     {
         utility::LogInfo("IWinToastHandler: The user clicked on action");
-        //std::wcout << L"The user clicked on action #" << actionIndex << std::endl;
+
        // exit(16 + actionIndex);
     }
 
@@ -45,32 +44,32 @@ public:
         {
             case UserCanceled:
                 utility::LogInfo("IWinToastHandler: UserCanceled");
-              //  std::wcout << L"The user dismissed this toast" << std::endl;
+
               //  exit(1);
                 break;
             case TimedOut:
                 utility::LogInfo("IWinToastHandler: TimedOut");
 
-              //  std::wcout << L"The toast has timed out" << std::endl;
               //  exit(2);
                 break;
             case ApplicationHidden:
                 utility::LogInfo("IWinToastHandler: ApplicationHidden");
-               // std::wcout << L"The application hid the toast using ToastNotifier.hide()" << std::endl;
+
                // exit(3);
                 break;
             default:
                 utility::LogInfo("IWinToastHandler: not activated");
-               // std::wcout << L"Toast not activated" << std::endl;
+
                // exit(4);
                 break;
         }
+
+
     }
 
     void toastFailed() const
     {
         utility::LogInfo("IWinToastHandler: toastFailed");
-       // std::wcout << L"Error showing current toast" << std::endl;
     //    exit(5);
     }
 };
@@ -89,7 +88,8 @@ ModelMenu::~ModelMenu()
 // IShellExtInit
 HRESULT ModelMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj, HKEY hkeyProgID)
 {
-    utility::LogInfo("Initialize Context Menu...");
+    open3d::utility::Logger::GetInstance().SetPrintFunction(model_print_fcn);
+    utility::LogInfo("Model: Initialize Context Menu...");
 
     HRESULT hr = E_FAIL;
 
@@ -162,7 +162,7 @@ HRESULT ModelMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj,
         hr = E_FAIL;
     }
 
-    utility::LogInfo("Initialize Context Menu...finished");
+    utility::LogInfo("Model: Initialize Context Menu...finished");
 
     return hr;
 }
@@ -182,7 +182,7 @@ HRESULT ModelMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst
     {
         m_idCmdFirst = idCmdFirst;
 
-        std::wstring menuItemName = L"Generate glTF/GLB Images";
+        std::wstring menuItemName = L"Generate glTF/GLB Image";
 
         if (m_filePaths.size() > 1)
         {
@@ -201,6 +201,14 @@ HRESULT ModelMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst
             MAKE_HRESULT(SEVERITY_ERROR, 0, (USHORT)(0));
         }
 
+
+        //MENUITEMINFO menuInfoSep = {};
+        //menuInfoSep.cbSize = sizeof(MENUITEMINFO);
+        //menuInfoSep.fMask = MIIM_FTYPE;
+        //menuInfoSep.fType = MFT_SEPARATOR;
+
+        //InsertMenuItem(hmenu, 0, TRUE, &menuInfoSep);
+
         wcscpy(menuItemNameStr, menuItemName.c_str());
 
         MENUITEMINFO menuInfo = {};
@@ -211,13 +219,13 @@ HRESULT ModelMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst
 
         if (!InsertMenuItem(hmenu, 0, TRUE, &menuInfo))
         {
-            utility::LogInfo("QueryContextMenu....ERROR");
+            utility::LogInfo("Model: QueryContextMenu....ERROR");
             return HRESULT_FROM_WIN32(GetLastError());
         }
 
         CoTaskMemFree(menuItemNameStr);
 
-        utility::LogInfo("QueryContextMenu....Added Menu item");
+        utility::LogInfo("Model: QueryContextMenu....Added Menu item");
 
         return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(1));
     }
@@ -229,7 +237,9 @@ HRESULT ModelMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst
 
 HRESULT ModelMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 {
-    utility::LogInfo("Menu Invoke Command called....");
+    open3d::utility::Logger::GetInstance().SetPrintFunction(model_print_fcn);
+
+    utility::LogInfo("Model: Menu Invoke Command called....");
 
     HRESULT hr = E_FAIL;
 
@@ -237,7 +247,7 @@ HRESULT ModelMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
     {
         hr = E_INVALIDARG;
 
-        utility::LogInfo("Menu Invoke passed bad data");
+        utility::LogInfo("Model: Menu Invoke passed bad data");
         return hr;
     }
 
@@ -245,13 +255,13 @@ HRESULT ModelMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 
     if (m_filePaths.size() == 0)
     {
-        utility::LogInfo("m_filePaths is ZERO\n");
+        utility::LogInfo("Model: m_filePaths is ZERO\n");
         return hr;
     }
 
     if (idCmd > 50)
     {
-        utility::LogInfo("Menu Command ID is not ZERO: {}, m_idCmdFirst: {}\n", idCmd, m_idCmdFirst);
+        utility::LogInfo("Model: Menu Command ID is not ZERO: {}, m_idCmdFirst: {}\n", idCmd, m_idCmdFirst);
         return hr;
     }
 
@@ -275,11 +285,11 @@ HRESULT ModelMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
     }
     catch (/*CMemoryException* e*/...)
     {
-        utility::LogInfo("Error: RenderToImage crashed...\n");
+        utility::LogInfo("Model: Error: RenderToImage crashed...\n");
         hr = E_FAIL;
     }
 
-    utility::LogInfo("Menu Invoke Command called....Finished");
+    utility::LogInfo("Model: Menu Invoke Command called....Finished");
 
     return hr;
 }
@@ -288,7 +298,7 @@ void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenRes
 {
     if (!WinToastLib::WinToast::isCompatible())
     {
-        utility::LogInfo("WinToast Error, your system is not supported!");
+        utility::LogInfo("Model: WinToast Error, your system is not supported!");
     }
 
     std::wstring infoText;
@@ -298,49 +308,76 @@ void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenRes
     UINT millionVal = 1000000;
     UINT kVal = 1000;
 
-    for (NCraftImageGen::ImageGenResult& result : imageResults)
+    if (imageResults.size() > 5)
     {
-        WinToastLib::WinToastTemplate templ(WinToastLib::WinToastTemplate::ImageAndText04);
+        WinToastLib::WinToastTemplate templ(WinToastLib::WinToastTemplate::ImageAndText02);
+
+        templ.setTextField(imageResults[0].m_ImageName.filename(), WinToastLib::WinToastTemplate::FirstLine);
+
+        if (std::filesystem::exists(imageResults[0].m_ImageName))
+        {
+            templ.setImagePath(imageResults[0].m_ImageName);
+        }
+
+        _swprintf(fileSizeStr, L"Generated: %d images", (int)imageResults.size());
+        templ.setTextField(fileSizeStr, WinToastLib::WinToastTemplate::SecondLine);
 
         templ.setDuration(WinToastLib::WinToastTemplate::Short);
 
-        templ.setTextField(result.m_ImageName.filename(), WinToastLib::WinToastTemplate::FirstLine);
-        templ.setTextField(result.m_FileName.filename(), WinToastLib::WinToastTemplate::SecondLine);
-
-        if (std::filesystem::exists(result.m_ImageName))
-        {
-            templ.setImagePath(result.m_ImageName);
-        }
-
-        if (result.m_fileSize > 1048576 * 1000)
-        {
-            _swprintf(fileSizeStr, L"File size: %0.2f GB", (double)(result.m_fileSize) / (double)(1048576 * 1000));
-        }
-        else if (result.m_fileSize > 1048576)
-        {
-            _swprintf(fileSizeStr, L"File size: %0.2f MB", (double)(result.m_fileSize) / (double)(1048576));
-        }
-        else
-        {
-            _swprintf(fileSizeStr, L"File size: %0.2f KB", (double)result.m_fileSize / (double)1048);
-        }
-
-        if (result.m_processTimeSeconds > 1.0)
-        {
-            _swprintf(timeStr, L"%0.2fs", result.m_processTimeSeconds);
-        }
-        else
-        {
-            _swprintf(timeStr, L"%0.2fms", result.m_processTimeSeconds * 1000);
-        }
-
-        templ.setTextField(infoText, WinToastLib::WinToastTemplate::ThirdLine);
-
-        templ.setAttributionText(fileSizeStr);
+        templ.setExpiration(10000);
 
         if (WinToastLib::WinToast::instance()->showToast(templ, new ModelCustomHandler()) < 0)
         {
-            utility::LogInfo("WinToast Error, could not launch toast notification!");
+            utility::LogInfo("Model: WinToast Error, could not launch toast notification!");
+        }
+    }
+    else
+    {
+        for (NCraftImageGen::ImageGenResult& result : imageResults)
+        {
+            WinToastLib::WinToastTemplate templ(WinToastLib::WinToastTemplate::ImageAndText04);
+
+            templ.setDuration(WinToastLib::WinToastTemplate::Short);
+
+            templ.setTextField(result.m_ImageName.filename(), WinToastLib::WinToastTemplate::FirstLine);
+            templ.setTextField(result.m_FileName.filename(), WinToastLib::WinToastTemplate::SecondLine);
+
+            if (std::filesystem::exists(result.m_ImageName))
+            {
+                templ.setImagePath(result.m_ImageName);
+            }
+
+            if (result.m_fileSize > 1048576 * 1000)
+            {
+                _swprintf(fileSizeStr, L"File size: %0.2f GB", (double)(result.m_fileSize) / (double)(1048576 * 1000));
+            }
+            else if (result.m_fileSize > 1048576)
+            {
+                _swprintf(fileSizeStr, L"File size: %0.2f MB", (double)(result.m_fileSize) / (double)(1048576));
+            }
+            else
+            {
+                _swprintf(fileSizeStr, L"File size: %0.2f KB", (double)result.m_fileSize / (double)1048);
+            }
+
+            if (result.m_processTimeSeconds > 1.0)
+            {
+                _swprintf(timeStr, L"%0.2fs", result.m_processTimeSeconds);
+            }
+            else
+            {
+                _swprintf(timeStr, L"%0.2fms", result.m_processTimeSeconds * 1000);
+            }
+
+            templ.setTextField(infoText, WinToastLib::WinToastTemplate::ThirdLine);
+
+            templ.setAttributionText(fileSizeStr);
+            templ.setExpiration(10000);
+
+            if (WinToastLib::WinToast::instance()->showToast(templ, new ModelCustomHandler()) < 0)
+            {
+                utility::LogInfo("Model: WinToast Error, could not launch toast notification!");
+            }
         }
     }
 }

@@ -20,8 +20,6 @@ BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
         std::filesystem::path appPath = g_DllModelName;
         g_AppPath = appPath.remove_filename();
 
-        open3d::utility::Logger::GetInstance().SetPrintFunction(print_fcn);
-
         std::wstring appName = L"NCraft Model Image Generator";
         std::wstring appUserModelID = L"NCraft Model Image Message";
  

@@ -19,8 +19,6 @@ BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
         std::filesystem::path appPath = g_DllModelName;
         g_AppPath = appPath.remove_filename();
 
-        open3d::utility::Logger::GetInstance().SetPrintFunction(print_fcn);
-
         std::wstring appName = L"NCraft Cloud Image Generator";
         std::wstring appUserModelID = L"NCraft Cloud Image Message";
  
@@ -188,7 +186,40 @@ HRESULT DllRegisterServer()
 
     RegCloseKey(hkey);
 
+    lpSubKey = L"Software\\Classes\\.ply\\ShellEx\\ContextMenuHandlers\\CloudShellExtension";
 
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
+
+
+    //lpSubKey = L"SOFTWARE\\Classes\\SystemFileAssociations\\.ply\\ShellEx\\ContextMenuHandlers\\CloudShellExtension";
+
+    //res = RegCreateKeyEx(HKEY_LOCAL_MACHINE, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    //if (res != ERROR_SUCCESS)
+    //{
+    //    return E_UNEXPECTED;
+    //}
+    //res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+    //if (res != ERROR_SUCCESS)
+    //{
+    //    return E_UNEXPECTED;
+    //}
+
+    //RegCloseKey(hkey);
+
+
+    //**************************************************************************************************************
+    // For Directories
     lpSubKey = L"Software\\Classes\\Directory\\ShellEx\\ContextMenuHandlers\\CloudShellExtension";
 
     res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);

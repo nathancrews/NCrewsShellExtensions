@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CloudShellExtension", "Clou
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModelShellExtension", "ModelShellExtension.vcxproj", "{2E7F05D1-89D7-4028-8C63-5606D35ECA69}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "DLTFShellExtSetup", "..\DLTFShellExtSetup\DLTFShellExtSetup.vdproj", "{6F04FF1D-1D65-4056-8CB3-7D67DA2F74FB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -55,6 +57,12 @@ Global
 		{2E7F05D1-89D7-4028-8C63-5606D35ECA69}.RelWithDebInfo|x64.Build.0 = Release|x64
 		{2E7F05D1-89D7-4028-8C63-5606D35ECA69}.RelWithDebInfo|x86.ActiveCfg = Release|Win32
 		{2E7F05D1-89D7-4028-8C63-5606D35ECA69}.RelWithDebInfo|x86.Build.0 = Release|Win32
+		{6F04FF1D-1D65-4056-8CB3-7D67DA2F74FB}.Debug|x64.ActiveCfg = Debug
+		{6F04FF1D-1D65-4056-8CB3-7D67DA2F74FB}.Debug|x86.ActiveCfg = Debug
+		{6F04FF1D-1D65-4056-8CB3-7D67DA2F74FB}.Release|x64.ActiveCfg = Release
+		{6F04FF1D-1D65-4056-8CB3-7D67DA2F74FB}.Release|x86.ActiveCfg = Release
+		{6F04FF1D-1D65-4056-8CB3-7D67DA2F74FB}.RelWithDebInfo|x64.ActiveCfg = Release
+		{6F04FF1D-1D65-4056-8CB3-7D67DA2F74FB}.RelWithDebInfo|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

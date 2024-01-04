@@ -16,12 +16,12 @@ public:
 
     CloudCustomHandler()
     {
-        DllAddRef(); 
+        DllAddRef();
         utility::LogInfo("IWinToastHandler: CustomHandler() called");
     }
     ~CloudCustomHandler()
     {
-        DllRelease(); 
+        DllRelease();
         utility::LogInfo("IWinToastHandler: ~CustomHandler() called");
     }
 
@@ -45,32 +45,32 @@ public:
         {
             case UserCanceled:
                 utility::LogInfo("IWinToastHandler: UserCanceled");
-              //  std::wcout << L"The user dismissed this toast" << std::endl;
+
               //  exit(1);
                 break;
             case TimedOut:
                 utility::LogInfo("IWinToastHandler: TimedOut");
 
-              //  std::wcout << L"The toast has timed out" << std::endl;
               //  exit(2);
                 break;
             case ApplicationHidden:
                 utility::LogInfo("IWinToastHandler: ApplicationHidden");
-               // std::wcout << L"The application hid the toast using ToastNotifier.hide()" << std::endl;
+
                // exit(3);
                 break;
             default:
                 utility::LogInfo("IWinToastHandler: not activated");
-               // std::wcout << L"Toast not activated" << std::endl;
+
                // exit(4);
                 break;
         }
+
     }
 
     void toastFailed() const
     {
         utility::LogInfo("IWinToastHandler: toastFailed");
-       // std::wcout << L"Error showing current toast" << std::endl;
+
     //    exit(5);
     }
 };
@@ -89,7 +89,9 @@ CloudMenu::~CloudMenu()
 // IShellExtInit
 HRESULT CloudMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj, HKEY hkeyProgID)
 {
-    utility::LogInfo("Initialize Context Menu...");
+    open3d::utility::Logger::GetInstance().SetPrintFunction(cloud_print_fcn);
+
+    utility::LogInfo("Cloud: Initialize Context Menu...");
 
     HRESULT hr = E_FAIL;
 
@@ -124,7 +126,7 @@ HRESULT CloudMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj,
 
         if (nameBuffer && wcslen(nameBuffer) > 0)
         {
-            LPWSTR nameBufferCopy = new WCHAR[wcslen(nameBuffer)+2];
+            LPWSTR nameBufferCopy = new WCHAR[wcslen(nameBuffer) + 2];
             if (nameBufferCopy)
             {
                 wcscpy(nameBufferCopy, nameBuffer);
@@ -148,7 +150,7 @@ HRESULT CloudMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj,
                     }
                 }
 
-                delete []nameBufferCopy;
+                delete[]nameBufferCopy;
             }
         }
 
@@ -162,7 +164,7 @@ HRESULT CloudMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj,
         hr = E_FAIL;
     }
 
-    utility::LogInfo("Initialize Context Menu...finished");
+    utility::LogInfo("Cloud: Initialize Context Menu...finished");
 
     return hr;
 }
@@ -170,19 +172,19 @@ HRESULT CloudMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj,
 // IContextMenu
 HRESULT CloudMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT uFlags)
 {
-    utility::LogInfo("QueryContextMenu called....");
+    utility::LogInfo("Cloud: QueryContextMenu called....");
 
     if ((m_filePaths.size() == 0) || (uFlags & CMF_DEFAULTONLY))
     {
-        utility::LogInfo("QueryContextMenu called....exiting no selected files or CMF_DEFAULTONLY");
+        utility::LogInfo("Cloud: QueryContextMenu called....exiting no selected files or CMF_DEFAULTONLY");
         return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, 0);
     }
 
     if (((uFlags & 0x000F) == CMF_NORMAL) || (uFlags & CMF_EXPLORE))
     {
         m_idCmdFirst = idCmdFirst;
-       
-        std::wstring menuItemName = L"Generate Pointcloud Images";
+
+        std::wstring menuItemName = L"Generate Pointcloud Image";
 
         if (m_filePaths.size() > 1)
         {
@@ -191,7 +193,7 @@ HRESULT CloudMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst
 
             menuItemName = L"Generate " + std::wstring(fileCountStr) + L" Pointcloud Images";
         }
-       
+
         LPWSTR menuItemNameStr = nullptr;
 
         menuItemNameStr = (LPWSTR)CoTaskMemAlloc((menuItemName.size() + 1) * sizeof(WCHAR));
@@ -217,19 +219,20 @@ HRESULT CloudMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst
 
         CoTaskMemFree(menuItemNameStr);
 
-        utility::LogInfo("QueryContextMenu....Added Menu item");
+        utility::LogInfo("Cloud: QueryContextMenu....Added Menu item");
 
         return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(1));
     }
 
-    utility::LogInfo("QueryContextMenu....No menu added");
+    utility::LogInfo("Cloud: QueryContextMenu....No menu added");
 
     return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(0));
 }
 
 HRESULT CloudMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 {
-    utility::LogInfo("Menu Invoke Command called....");
+    open3d::utility::Logger::GetInstance().SetPrintFunction(cloud_print_fcn);
+    utility::LogInfo("Cloud: Menu Invoke Command called....");
 
     HRESULT hr = E_FAIL;
 
@@ -237,7 +240,7 @@ HRESULT CloudMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
     {
         hr = E_INVALIDARG;
 
-        utility::LogInfo("Menu Invoke passed bad data");
+        utility::LogInfo("Cloud: Menu Invoke passed bad data");
         return hr;
     }
 
@@ -245,13 +248,13 @@ HRESULT CloudMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 
     if (m_filePaths.size() == 0)
     {
-        utility::LogInfo("m_filePaths is ZERO\n");
+        utility::LogInfo("Cloud: m_filePaths is ZERO\n");
         return hr;
     }
 
     if (idCmd > 50)
     {
-        utility::LogInfo("Menu Command ID is not ZERO: {}, m_idCmdFirst: {}\n", idCmd, m_idCmdFirst);
+        utility::LogInfo("Cloud: Menu Command ID is not ZERO: {}, m_idCmdFirst: {}\n", idCmd, m_idCmdFirst);
         return hr;
     }
 
@@ -275,11 +278,11 @@ HRESULT CloudMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
     }
     catch (/*CMemoryException* e*/...)
     {
-        utility::LogInfo("Error: RenderPointcloudFiles crashed...\n");
+        utility::LogInfo("Cloud: Error: RenderPointcloudFiles crashed...\n");
         hr = E_FAIL;
     }
 
-    utility::LogInfo("Menu Invoke Command called....Finished");
+    utility::LogInfo("Cloud: Menu Invoke Command called....Finished");
 
     return hr;
 }
@@ -288,57 +291,136 @@ void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenRes
 {
     if (!WinToastLib::WinToast::isCompatible())
     {
-        utility::LogInfo("WinToast Error, your system is not supported!");
+        utility::LogInfo("Cloud: WinToast Error, your system is not supported!");
     }
 
     std::wstring infoText;
     WCHAR pointCountStr[MAX_PATH] = { 0 };
     WCHAR timeStr[MAX_PATH] = { 0 };
     WCHAR fileSizeStr[MAX_PATH] = { 0 };
+    uintmax_t totalPointsProcessed = 0;
+    double totalProcessingTime = 0;
+    double totalFileSize = 0.0;
     UINT millionVal = 1000000;
     UINT kVal = 1000;
 
-    for (NCraftImageGen::ImageGenResult& result : imageResults)
+
+    if (imageResults.size() > 4)
     {
-        if (result.m_pointCount > 0)
+        for (NCraftImageGen::ImageGenResult& result : imageResults)
         {
+            totalPointsProcessed += result.m_pointCount;
+            totalProcessingTime += result.m_processTimeSeconds;
+            totalFileSize += result.m_fileSize;
+        }
 
-            WinToastLib::WinToastTemplate templ(WinToastLib::WinToastTemplate::ImageAndText04);
+        WinToastLib::WinToastTemplate templ(WinToastLib::WinToastTemplate::ImageAndText04);
 
-            templ.setDuration(WinToastLib::WinToastTemplate::Short);
+        templ.setDuration(WinToastLib::WinToastTemplate::Short);
+ //       templ.setExpiration(10000);
 
-            templ.setTextField(result.m_ImageName.filename(), WinToastLib::WinToastTemplate::FirstLine);
-            templ.setTextField(result.m_FileName.filename(), WinToastLib::WinToastTemplate::SecondLine);
+        templ.setTextField(imageResults[0].m_ImageName.filename(), WinToastLib::WinToastTemplate::FirstLine);
 
-            if (std::filesystem::exists(result.m_ImageName))
-            {
-                templ.setImagePath(result.m_ImageName);
-            }
+        if (std::filesystem::exists(imageResults[0].m_ImageName))
+        {
+            templ.setImagePath(imageResults[0].m_ImageName);
+        }
 
-            if (result.m_fileSize > 1048576 * 1000)
-            {
-                _swprintf(fileSizeStr, L"File size: %0.2f GB", (double)(result.m_fileSize) / (double)(1048576 * 1000));
-            }
-            else if (result.m_fileSize > 1048576)
-            {
-                _swprintf(fileSizeStr, L"File size: %0.2f MB", (double)(result.m_fileSize) / (double)(1048576));
-            }
-            else
-            {
-                _swprintf(fileSizeStr, L"File size: %0.2f KB", (double)result.m_fileSize / (double)1048);
-            }
+        _swprintf(fileSizeStr, L"Generated: %d images", (int)imageResults.size());
 
-            if (result.m_processTimeSeconds > 1.0)
-            {
-                _swprintf(timeStr, L"%0.2fs", result.m_processTimeSeconds);
-            }
-            else
-            {
-                _swprintf(timeStr, L"%0.2fms", result.m_processTimeSeconds * 1000);
-            }
+        templ.setTextField(fileSizeStr, WinToastLib::WinToastTemplate::FirstLine);
 
-            if (result.m_modelType == 0)
+        if (totalFileSize > 1048576 * 1000)
+        {
+            _swprintf(fileSizeStr, L"Total File size: %0.2f GB", (double)(totalFileSize) / (double)(1048576 * 1000));
+        }
+        else if (totalFileSize > 1048576)
+        {
+            _swprintf(fileSizeStr, L"Total File size: %0.2f MB", (double)(totalFileSize) / (double)(1048576));
+        }
+        else
+        {
+            _swprintf(fileSizeStr, L"Total File size: %0.2f KB", (double)(totalFileSize / (double)1048));
+        }
+
+        if (totalProcessingTime > 1.0)
+        {
+            _swprintf(timeStr, L"%0.2fs", totalProcessingTime);
+        }
+        else
+        {
+            _swprintf(timeStr, L"%0.2fms", totalProcessingTime * 1000);
+        }
+
+        if (totalPointsProcessed > millionVal)
+        {
+            _swprintf(pointCountStr, L"%0.2f M", (double)(totalPointsProcessed) / (double)millionVal);
+        }
+        else if (totalPointsProcessed > kVal)
+        {
+            _swprintf(pointCountStr, L"%0.2f K", (double)(totalPointsProcessed) / (double)kVal);
+        }
+        else
+        {
+            _swprintf(pointCountStr, L"%zd", totalPointsProcessed);
+        }
+
+        infoText = L"Total Points: " + std::wstring(pointCountStr);
+
+        templ.setTextField(infoText, WinToastLib::WinToastTemplate::SecondLine);
+
+        templ.setTextField(fileSizeStr, WinToastLib::WinToastTemplate::ThirdLine);
+
+        infoText = L"Total Process time: " + std::wstring(timeStr);
+
+        templ.setAttributionText(infoText);
+
+        if (WinToastLib::WinToast::instance()->showToast(templ, new CloudCustomHandler()) < 0)
+        {
+            utility::LogInfo("Cloud: WinToast Error, could not launch toast notification!");
+        }
+    }
+    else
+    {
+        for (NCraftImageGen::ImageGenResult& result : imageResults)
+        {
+            if (result.m_pointCount > 0)
             {
+
+                WinToastLib::WinToastTemplate templ(WinToastLib::WinToastTemplate::ImageAndText04);
+
+                templ.setDuration(WinToastLib::WinToastTemplate::Short);
+
+                templ.setTextField(result.m_ImageName.filename(), WinToastLib::WinToastTemplate::FirstLine);
+                templ.setTextField(result.m_FileName.filename(), WinToastLib::WinToastTemplate::SecondLine);
+
+                if (std::filesystem::exists(result.m_ImageName))
+                {
+                    templ.setImagePath(result.m_ImageName);
+                }
+
+                if (result.m_fileSize > 1048576 * 1000)
+                {
+                    _swprintf(fileSizeStr, L"File size: %0.2f GB", (double)(result.m_fileSize) / (double)(1048576 * 1000));
+                }
+                else if (result.m_fileSize > 1048576)
+                {
+                    _swprintf(fileSizeStr, L"File size: %0.2f MB", (double)(result.m_fileSize) / (double)(1048576));
+                }
+                else
+                {
+                    _swprintf(fileSizeStr, L"File size: %0.2f KB", (double)result.m_fileSize / (double)1048);
+                }
+
+                if (result.m_processTimeSeconds > 1.0)
+                {
+                    _swprintf(timeStr, L"%0.2fs", result.m_processTimeSeconds);
+                }
+                else
+                {
+                    _swprintf(timeStr, L"%0.2fms", result.m_processTimeSeconds * 1000);
+                }
+
                 if (result.m_pointCount > millionVal)
                 {
                     _swprintf(pointCountStr, L"%0.2f M", (double)(result.m_pointCount) / (double)millionVal);
@@ -349,23 +431,20 @@ void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenRes
                 }
                 else
                 {
-                    _swprintf(pointCountStr, L"%d", result.m_pointCount);
+                    _swprintf(pointCountStr, L"%zd", result.m_pointCount);
                 }
 
                 infoText = L"Points: " + std::wstring(pointCountStr) + L", Time: " + timeStr;
-            }
-            else
-            {
-                infoText = L"Time: " + std::wstring(timeStr);
-            }
 
-            templ.setTextField(infoText, WinToastLib::WinToastTemplate::ThirdLine);
+                templ.setTextField(infoText, WinToastLib::WinToastTemplate::ThirdLine);
 
-            templ.setAttributionText(fileSizeStr);
+                templ.setAttributionText(fileSizeStr);
 
-            if (WinToastLib::WinToast::instance()->showToast(templ, new CloudCustomHandler()) < 0)
-            {
-                utility::LogInfo("WinToast Error, could not launch toast notification!");
+//                templ.setExpiration(10000);
+                if (WinToastLib::WinToast::instance()->showToast(templ, new CloudCustomHandler()) < 0)
+                {
+                    utility::LogInfo("Cloud: WinToast Error, could not launch toast notification!");
+                }
             }
         }
     }

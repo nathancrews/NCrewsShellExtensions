@@ -13,20 +13,20 @@ BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
         DWORD strSize = MAX_PATH;
         GetModuleFileNameW(hInstance, g_DllModelName, strSize);
 
-        std::filesystem::path appPath = g_DllModelName;
-        g_AppPath = appPath.remove_filename();
+        //std::filesystem::path appPath = g_DllModelName;
+        //g_AppPath = appPath.remove_filename();
 
-        open3d::utility::Logger::GetInstance().SetPrintFunction(print_fcn);
+        //open3d::utility::Logger::GetInstance().SetPrintFunction(print_fcn);
 
-        std::wstring appName = L"NCraft Image Generator";
-        std::wstring appUserModelID = L"NCraft Image Message";
+        //std::wstring appName = L"NCraft Image Generator";
+        //std::wstring appUserModelID = L"NCraft Image Message";
  
-        GdiplusStartupInput gpStartupInput;
-        Gdiplus::Status mstat = GdiplusStartup(&g_gpToken, &gpStartupInput, NULL);
-        if (mstat != Gdiplus::Status::Ok)
-        {
-            utility::LogInfo("Error: GdiplusStartup");
-        }
+        //GdiplusStartupInput gpStartupInput;
+        //Gdiplus::Status mstat = GdiplusStartup(&g_gpToken, &gpStartupInput, NULL);
+        //if (mstat != Gdiplus::Status::Ok)
+        //{
+        //    utility::LogInfo("Error: GdiplusStartup");
+        //}
 
     }
     return TRUE;

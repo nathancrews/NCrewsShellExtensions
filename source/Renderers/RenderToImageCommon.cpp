@@ -8,10 +8,14 @@ std::vector<std::string> PointcloudFileExtensions{ ".las",
 ".laz",
 ".pcd",
 ".ply",
+".pts",
+".xyz",
 ".LAS",
 ".LAZ",
 ".PCD",
-".PLY" };
+".PLY",
+".PTS",
+".XYZ" };
 
 
 UINT GetFileNamesFromDirectory(std::filesystem::path& filePath, std::vector<std::string>& allowedFileExtensions, std::vector<std::filesystem::path>& outDirectoryFilenames)

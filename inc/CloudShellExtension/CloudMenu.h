@@ -3,6 +3,23 @@
 #include "priv.h"
 #include "CloudClassFactory.h"
 
+static void cloud_print_fcn(const std::string& logString)
+{
+    std::filesystem::path logFilePath = g_AppPath;
+
+    logFilePath.replace_filename("1_CloudShellExtension");
+    logFilePath.replace_extension("log");
+
+    std::fstream fs;
+    fs.open(logFilePath, std::fstream::out | std::fstream::app);
+
+    fs << logString;
+    fs << "\n";
+
+    fs.flush();
+    fs.close();
+}
+
 class CloudMenu : public IContextMenu,  public IShellExtInit
 {
 public:

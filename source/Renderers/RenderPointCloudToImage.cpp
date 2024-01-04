@@ -9,6 +9,10 @@
 #include <pdal/PointTable.hpp>
 #include <pdal/PointView.hpp>
 #include <pdal/io/LasReader.hpp>
+#include <pdal/io/PtsReader.hpp>
+#include <pdal/io/PlyReader.hpp>
+#include <pdal/io/PcdReader.hpp>
+#include <pdal/io/TextReader.hpp>
 #include <pdal/io/LasHeader.hpp>
 
 #include "pcl/PCLHeader.h"
@@ -26,7 +30,7 @@ namespace NCraftImageGen
 {
 
 UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::filesystem::path>& filePaths,
-                             tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& outRenderResults)
+                           tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& outRenderResults)
 {
     const int width = 2048;
     const int height = 1640;
@@ -83,6 +87,24 @@ UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::file
         __std_win_error wep = std::filesystem::_File_size(reqPath, fsize);
 
         toAddResult.m_fileSize = fsize;
+        toAddResult.m_modelType = 0;
+
+        std::filesystem::file_time_type sourceFiletime = std::filesystem::last_write_time(reqPath);
+        std::filesystem::path imagePath = reqPath;
+        imagePath = imagePath.replace_extension("jpg");
+
+        toAddResult.m_ImageName = imagePath;
+
+        if (std::filesystem::exists(imagePath))
+        {
+            std::filesystem::file_time_type imageFiletime = std::filesystem::last_write_time(imagePath);
+
+            if (sourceFiletime <= imageFiletime)
+            {
+                utility::LogInfo("Skipping image, cache file up to date: {}", imagePath.string().c_str());
+                toAddResult.m_imageFileCacheOk = true;
+            }
+        }
 
         outRenderResults.push_back(toAddResult);
     }
@@ -113,7 +135,8 @@ UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::file
     {
         timer.Start();
 
-        if (outRenderResults[sz].m_cloudPtr.get() && outRenderResults[sz].m_pointCount > 0)
+        if ((outRenderResults[sz].m_imageFileCacheOk == false) && 
+            outRenderResults[sz].m_cloudPtr.get() && outRenderResults[sz].m_pointCount > 0)
         {
             RenderPointcloudToImage(renderer, outRenderResults[sz]);
             outRenderResults[sz].m_cloudPtr->Clear();
@@ -215,6 +238,108 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
     return pointCount;
 }
 
+UINT LoadPointCloudFile(NCraftImageGen::ImageGenResult& outLoadResults)
+{
+    int pointCount = 0;
+    double execExecTotal = 0.0;
+    double exeTime = 0.0;
+
+    utility::Timer timer2;
+    timer2.Start();
+
+    if (!outLoadResults.m_FileName.extension().compare(".las") ||
+        !outLoadResults.m_FileName.extension().compare(".laz") ||
+        !outLoadResults.m_FileName.extension().compare(".LAS") ||
+        !outLoadResults.m_FileName.extension().compare(".LAZ"))
+    {
+        std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
+        if (new_cloud_ptr)
+        {
+            pointCount = LoadLASorLAZToO3DCloud(outLoadResults.m_FileName, *new_cloud_ptr);
+            outLoadResults.m_pointCount = pointCount;
+
+            if (pointCount > 0)
+            {
+                new_cloud_ptr->SetName(outLoadResults.m_FileName.string());
+                outLoadResults.m_cloudPtr = new_cloud_ptr;
+            }
+        }
+    }
+    else if (!outLoadResults.m_FileName.extension().compare(".ply"))
+    {
+        std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
+
+        pointCount = LoadPLYToO3DCloud(outLoadResults.m_FileName, *new_cloud_ptr);
+        outLoadResults.m_pointCount = pointCount;
+
+        if (pointCount > 0)
+        {
+            new_cloud_ptr->SetName(outLoadResults.m_FileName.string());
+            outLoadResults.m_cloudPtr = new_cloud_ptr;
+        }
+
+    }
+    else if (!outLoadResults.m_FileName.extension().compare(".pts"))
+    {
+        std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
+
+        pointCount = LoadPTSToO3DCloud(outLoadResults.m_FileName, *new_cloud_ptr);
+        outLoadResults.m_pointCount = pointCount;
+
+        if (pointCount > 0)
+        {
+            new_cloud_ptr->SetName(outLoadResults.m_FileName.string());
+            outLoadResults.m_cloudPtr = new_cloud_ptr;
+        }
+
+    }
+    else if (!outLoadResults.m_FileName.extension().compare(".xyz"))
+    {
+        std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
+
+        pointCount = LoadXYZToO3DCloud(outLoadResults.m_FileName, *new_cloud_ptr);
+        outLoadResults.m_pointCount = pointCount;
+
+        if (pointCount > 0)
+        {
+            new_cloud_ptr->SetName(outLoadResults.m_FileName.string());
+            outLoadResults.m_cloudPtr = new_cloud_ptr;
+        }
+
+    }
+    else if (!outLoadResults.m_FileName.extension().compare(".pcd"))
+    {
+        std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
+
+        if (new_cloud_ptr)
+        {
+            if (io::ReadPointCloud(outLoadResults.m_FileName.string(), *new_cloud_ptr))
+            {
+                pointCount = new_cloud_ptr->points_.size();
+                outLoadResults.m_pointCount = pointCount;
+                if (pointCount > 0)
+                {
+                    new_cloud_ptr->SetName(outLoadResults.m_FileName.string());
+                    outLoadResults.m_cloudPtr = new_cloud_ptr;
+                }
+            }
+        }
+    }
+
+    timer2.Stop();
+    double exeTimeInner = timer2.GetDurationInSecond();
+
+    if (pointCount > 0)
+    {
+        outLoadResults.m_processTimeSeconds = exeTimeInner;
+
+        utility::LogInfo("=====>Point cloud {}, points:{}, Load Duration: {} seconds\n",
+                         outLoadResults.m_FileName.filename().string(), pointCount, exeTimeInner);
+    }
+
+    return pointCount;
+}
+
 
 UINT LoadPointCloudFilesParallel(tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& outLoadResults)
 {
@@ -232,125 +357,47 @@ UINT LoadPointCloudFilesParallel(tbb::concurrent_vector<NCraftImageGen::ImageGen
 
     if (outLoadResults.size() == 1)
     {
-        utility::Timer timer2;
-        timer2.Start();
-        UINT sz = 0;
-
-        if (!outLoadResults[sz].m_FileName.extension().compare(".las") ||
-            !outLoadResults[sz].m_FileName.extension().compare(".laz") ||
-            !outLoadResults[sz].m_FileName.extension().compare(".LAS") ||
-            !outLoadResults[sz].m_FileName.extension().compare(".LAZ"))
+        if (outLoadResults[0].m_imageFileCacheOk == false)
         {
-            std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
-            if (new_cloud_ptr)
-            {
-                pointCount = LoadLASorLAZToO3DCloud(outLoadResults[sz].m_FileName, *new_cloud_ptr);
-                outLoadResults[sz].m_pointCount = pointCount;
-
-                if (pointCount > 0)
-                {
-                    new_cloud_ptr->SetName(outLoadResults[sz].m_FileName.string());
-                    outLoadResults[sz].m_cloudPtr = new_cloud_ptr;
-                }
-            }
-        }
-        else if (!outLoadResults[sz].m_FileName.extension().compare(".pcd") ||
-                 !outLoadResults[sz].m_FileName.extension().compare(".ply"))
-        {
-            std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
-
-            if (new_cloud_ptr)
-            {
-                if (io::ReadPointCloud(outLoadResults[sz].m_FileName.string(), *new_cloud_ptr))
-                {
-                    pointCount = new_cloud_ptr->points_.size();
-                    outLoadResults[sz].m_pointCount = pointCount;
-                    if (pointCount > 0)
-                    {
-                        new_cloud_ptr->SetName(outLoadResults[sz].m_FileName.string());
-                        outLoadResults[sz].m_cloudPtr = new_cloud_ptr;
-                    }
-                }
-            }
-        }
-
-        timer2.Stop();
-        double exeTimeInner = timer2.GetDurationInSecond();
-        if (pointCount > 0)
-        {
-            outLoadResults[sz].m_pointCount = pointCount;
-            outLoadResults[sz].m_processTimeSeconds = exeTimeInner;
-
-            utility::LogInfo("=====>Point cloud {}, points:{}, Load Duration: {} seconds\n",
-                             outLoadResults[sz].m_FileName.filename().string(), pointCount, exeTimeInner);
-            pointCountTotal += pointCount;
+            pointCount = LoadPointCloudFile(outLoadResults[0]);
+            pointCountTotal = pointCount;
         }
     }
     else
     {
+
 #pragma omp parallel for
         for (int sz = 0; sz < outLoadResults.size(); ++sz)
         {
-            MEMORYSTATUSEX statex;
-            statex.dwLength = sizeof(statex);
-            GlobalMemoryStatusEx(&statex);
-
-            utility::Timer timer2;
-            timer2.Start();
-
-            if (!outLoadResults[sz].m_FileName.extension().compare(".las") ||
-                !outLoadResults[sz].m_FileName.extension().compare(".laz") ||
-                !outLoadResults[sz].m_FileName.extension().compare(".LAS") ||
-                !outLoadResults[sz].m_FileName.extension().compare(".LAZ"))
+            if (outLoadResults[sz].m_imageFileCacheOk == false)
             {
-                std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
-                if (new_cloud_ptr)
+                MEMORYSTATUSEX statex;
+                statex.dwLength = sizeof(statex);
+                GlobalMemoryStatusEx(&statex);
+
+                utility::Timer timer2;
+                timer2.Start();
+
+                pointCount = LoadPointCloudFile(outLoadResults[sz]);
+
+                timer2.Stop();
+                double exeTimeInner = timer2.GetDurationInSecond();
+
+                if (pointCount > 0)
                 {
-                    pointCount = LoadLASorLAZToO3DCloud(outLoadResults[sz].m_FileName, *new_cloud_ptr);
                     outLoadResults[sz].m_pointCount = pointCount;
-                    if (pointCount > 0)
-                    {
-                        new_cloud_ptr->SetName(outLoadResults[sz].m_FileName.string());
-                        outLoadResults[sz].m_cloudPtr = new_cloud_ptr;
-                    }
+                    outLoadResults[sz].m_processTimeSeconds = exeTimeInner;
+
+                    utility::LogInfo("@@===>Threaded Point cloud {}, points:{}, Load Duration: {} seconds\n",
+                                     outLoadResults[sz].m_FileName.filename().string(), pointCount, exeTimeInner);
+
+                    omp_set_lock(&writelock);
+                    pointCountTotal += pointCount;
+                    omp_unset_lock(&writelock);
                 }
-            }
-            else if (!outLoadResults[sz].m_FileName.extension().compare(".pcd") ||
-                     !outLoadResults[sz].m_FileName.extension().compare(".ply"))
-            {
-                std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
-
-                if (new_cloud_ptr)
-                {
-                    if (io::ReadPointCloud(outLoadResults[sz].m_FileName.string(), *new_cloud_ptr))
-                    {
-                        pointCount = new_cloud_ptr->points_.size();
-                        outLoadResults[sz].m_pointCount = pointCount;
-                        if (pointCount > 0)
-                        {
-                            new_cloud_ptr->SetName(outLoadResults[sz].m_FileName.string());
-                            outLoadResults[sz].m_cloudPtr = new_cloud_ptr;
-                        }
-                    }
-                }
-            }
-
-            timer2.Stop();
-            double exeTimeInner = timer2.GetDurationInSecond();
-
-            if (pointCount > 0)
-            {
-                outLoadResults[sz].m_pointCount = pointCount;
-                outLoadResults[sz].m_processTimeSeconds = exeTimeInner;
-
-                utility::LogInfo("=====>Point cloud {}, points:{}, Threaded Load Duration: {} seconds\n",
-                                 outLoadResults[sz].m_FileName.filename().string(), pointCount, exeTimeInner);
-
-                omp_set_lock(&writelock);
-                pointCountTotal += pointCount;
-                omp_unset_lock(&writelock);
             }
         }
+
         omp_destroy_lock(&writelock);
     }
 
@@ -385,7 +432,7 @@ UINT LoadLASorLAZToO3DCloud(std::filesystem::path& fileName, geometry::PointClou
 
     pointsInFile = lsHeader.pointCount();
 
-    utility::LogInfo("::::Point cloud file: {}, points:{}", fileName.filename().string(), pointsInFile);
+    utility::LogInfo("LAS/LAZ::::Point cloud file: {}, points:{}", fileName.filename().string(), pointsInFile);
 
     if (lsHeader.pointCount() < 5)
     {
@@ -456,6 +503,217 @@ UINT LoadLASorLAZToO3DCloud(std::filesystem::path& fileName, geometry::PointClou
 
     return pointsInFile;
 }
+
+UINT LoadPLYToO3DCloud(std::filesystem::path& fileName, geometry::PointCloud& pointcloud)
+{
+    bool baseSet = false;
+    double px = 0.0, py = 0.0, pz = 0.0;
+    double pBasex = 0.0, pBasey = 0.0, pBasez = 0.0;
+    int pointCount = 0;
+    // color from point intensity factor
+    double cfactor = 255.0 / 65536.0;
+    uint64_t pointsInFile = 0;
+    pcl::PointXYZRGB pclPoint, point;
+    int pointStep = 1;
+    int pointToPixel = 750000;
+    PointTable table;
+    Eigen::Vector3d o3dPoint, o3dColor;
+    Options ops1;
+    PlyReader reader;
+
+    ops1.add("filename", fileName.string());
+    reader.setOptions(ops1);
+
+    QuickInfo pInfo = reader.preview();
+
+    if (pInfo.m_pointCount < 1)
+    {
+        utility::LogInfo("Error 1: PLY... NO points {} \n", pointsInFile);
+        return 0;
+    }
+
+    pointsInFile = pInfo.m_pointCount;
+
+    utility::LogInfo("::::Point cloud file: {}, points:{}", fileName.filename().string(), pointsInFile);
+
+    if (pointsInFile > pointToPixel)
+    {
+        pointStep = pointsInFile / pointToPixel;
+    }
+
+    utility::LogInfo("PLY...Point cloud points {}, thinning factor: {}, \n", pointsInFile, pointStep);
+
+    reader.prepare(table);
+    PointViewSet point_views = reader.execute(table);
+
+    if (point_views.size() < 1)
+    {
+        utility::LogInfo("Error 2: PLY... NO points {} \n", pointsInFile);
+        return 0;
+    }
+
+    for (PointViewPtr point_view : point_views)
+    {
+        for (pdal::PointId idx = 0; idx < (point_view->size() - pointStep); idx += pointStep)
+        {
+            if (!baseSet && (idx == 0))
+            {
+                pBasex = point_view->getFieldAs<double>(pdal::Dimension::Id::X, idx);
+                pBasey = point_view->getFieldAs<double>(pdal::Dimension::Id::Y, idx);
+                pBasez = point_view->getFieldAs<double>(pdal::Dimension::Id::Z, idx);
+
+                baseSet = true;
+            }
+
+            px = point_view->getFieldAs<double>(pdal::Dimension::Id::X, idx);
+            py = point_view->getFieldAs<double>(pdal::Dimension::Id::Y, idx);
+            pz = point_view->getFieldAs<double>(pdal::Dimension::Id::Z, idx);
+
+            o3dPoint[0] = px - pBasex;
+            o3dPoint[1] = py - pBasey;
+            o3dPoint[2] = pz - pBasez;
+
+            pclPoint.r = point_view->getFieldAs<int>(pdal::Dimension::Id::Red, idx) >> 8;
+            pclPoint.g = point_view->getFieldAs<int>(pdal::Dimension::Id::Green, idx) >> 8;
+            pclPoint.b = point_view->getFieldAs<int>(pdal::Dimension::Id::Blue, idx) >> 8;
+
+            if ((pclPoint.r == 0 && pclPoint.g == 0 && pclPoint.b == 0))
+            {
+                pclPoint.r = point_view->getFieldAs<int>(pdal::Dimension::Id::Red, idx);
+                pclPoint.g = point_view->getFieldAs<int>(pdal::Dimension::Id::Green, idx);
+                pclPoint.b = point_view->getFieldAs<int>(pdal::Dimension::Id::Blue, idx);
+            }
+
+            // if no color use point intensity
+            if (pclPoint.r == 0 && pclPoint.g == 0 && pclPoint.b == 0)
+            {
+                double testVal = point_view->getFieldAs<int>(pdal::Dimension::Id::Intensity, idx);
+
+                o3dColor[0] = (double)testVal * cfactor;
+                o3dColor[1] = (double)testVal * cfactor;
+                o3dColor[2] = (double)testVal * cfactor;
+            }
+            else
+            {
+                o3dColor[0] = (double)(pclPoint.r / 255.f);
+                o3dColor[1] = (double)(pclPoint.g / 255.f);
+                o3dColor[2] = (double)(pclPoint.b / 255.f);
+            }
+
+            pointcloud.points_.push_back(o3dPoint);
+            pointcloud.colors_.push_back(o3dColor);
+
+            pointCount++;
+        }
+    }
+
+    return pointsInFile;
+}
+
+UINT LoadPTSToO3DCloud(std::filesystem::path& fileName, geometry::PointCloud& pointcloud)
+{
+    bool baseSet = false;
+    double px = 0.0, py = 0.0, pz = 0.0;
+    double pBasex = 0.0, pBasey = 0.0, pBasez = 0.0;
+    int pointCount = 0;
+    // color from point intensity factor
+    double cfactor = 255.0 / 65536.0;
+    uint64_t pointsInFile = 0;
+    pcl::PointXYZRGB pclPoint, point;
+    int pointStep = 1;
+    int pointToPixel = 750000;
+    PointTable table;
+    Eigen::Vector3d o3dPoint, o3dColor;
+    Options ops1;
+    PtsReader reader;
+
+    ops1.add("filename", fileName.string());
+    reader.setOptions(ops1);
+
+    reader.prepare(table);
+    PointViewSet point_views = reader.execute(table);
+
+    if (point_views.size() < 1)
+    {
+        utility::LogInfo("Error 2: PTS... NO points {} \n", pointsInFile);
+        return 0;
+    }
+
+    pointsInFile = point_views.begin()->get()->size();
+
+    utility::LogInfo("PTS::::Point cloud file: {}, points:{}", fileName.filename().string(), pointsInFile);
+
+    if (pointsInFile > pointToPixel)
+    {
+        pointStep = pointsInFile / pointToPixel;
+    }
+
+    utility::LogInfo("PTS...Point cloud points {}, thinning factor: {}, \n", pointsInFile, pointStep);
+
+    for (PointViewPtr point_view : point_views)
+    {
+        for (pdal::PointId idx = 0; idx < (point_view->size() - pointStep); idx += pointStep)
+        {
+            if (!baseSet && (idx == 0))
+            {
+                pBasex = point_view->getFieldAs<double>(pdal::Dimension::Id::X, idx);
+                pBasey = point_view->getFieldAs<double>(pdal::Dimension::Id::Y, idx);
+                pBasez = point_view->getFieldAs<double>(pdal::Dimension::Id::Z, idx);
+
+                baseSet = true;
+            }
+
+            px = point_view->getFieldAs<double>(pdal::Dimension::Id::X, idx);
+            py = point_view->getFieldAs<double>(pdal::Dimension::Id::Y, idx);
+            pz = point_view->getFieldAs<double>(pdal::Dimension::Id::Z, idx);
+
+            o3dPoint[0] = px - pBasex;
+            o3dPoint[1] = py - pBasey;
+            o3dPoint[2] = pz - pBasez;
+
+            pclPoint.r = point_view->getFieldAs<int>(pdal::Dimension::Id::Red, idx) >> 8;
+            pclPoint.g = point_view->getFieldAs<int>(pdal::Dimension::Id::Green, idx) >> 8;
+            pclPoint.b = point_view->getFieldAs<int>(pdal::Dimension::Id::Blue, idx) >> 8;
+
+            if ((pclPoint.r == 0 && pclPoint.g == 0 && pclPoint.b == 0))
+            {
+                pclPoint.r = point_view->getFieldAs<int>(pdal::Dimension::Id::Red, idx);
+                pclPoint.g = point_view->getFieldAs<int>(pdal::Dimension::Id::Green, idx);
+                pclPoint.b = point_view->getFieldAs<int>(pdal::Dimension::Id::Blue, idx);
+            }
+
+            // if no color use point intensity
+            if (pclPoint.r == 0 && pclPoint.g == 0 && pclPoint.b == 0)
+            {
+                double testVal = point_view->getFieldAs<int>(pdal::Dimension::Id::Intensity, idx);
+
+                o3dColor[0] = (double)testVal * cfactor;
+                o3dColor[1] = (double)testVal * cfactor;
+                o3dColor[2] = (double)testVal * cfactor;
+            }
+            else
+            {
+                o3dColor[0] = (double)(pclPoint.r / 255.f);
+                o3dColor[1] = (double)(pclPoint.g / 255.f);
+                o3dColor[2] = (double)(pclPoint.b / 255.f);
+            }
+
+            pointcloud.points_.push_back(o3dPoint);
+            pointcloud.colors_.push_back(o3dColor);
+
+            pointCount++;
+        }
+    }
+
+    return pointsInFile;
+}
+
+UINT LoadXYZToO3DCloud(std::filesystem::path& fileName, geometry::PointCloud& pointcloud)
+{
+    return 0;
+}
+
+
 
 }
 
