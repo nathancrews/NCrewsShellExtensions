@@ -171,10 +171,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NCRAFTIMAGEGENAPI_EXPORT;DEBUG;_WIN32;_WINDOWS;WIN32;WINDOWS;FMT_HEADER_ONLY=0;FMT_USE_WINDOWS_H=0;FMT_STRING_ALIAS=1;_CRT_SECURE_NO_WARNINGS;_GLIBCXX_USE_CXX11_ABI=1;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;NOMINMAX;_USE_MATH_DEFINES;_ENABLE_EXTENDED_ALIGNED_STORAGE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NCRAFTIMAGEGENAPI_EXPORT;NDEBUG;_WIN32;_WINDOWS;WIN32;WINDOWS;FMT_HEADER_ONLY=0;FMT_USE_WINDOWS_H=0;FMT_STRING_ALIAS=1;_CRT_SECURE_NO_WARNINGS;_GLIBCXX_USE_CXX11_ABI=1;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;NOMINMAX;_USE_MATH_DEFINES;_ENABLE_EXTENDED_ALIGNED_STORAGE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>..\NCraftImageGen\inc;..\inc;.\inc;D:\3rdpartylibs\Open3D\include;D:/3rdpartylibs/Open3D/include/open3d/3rdparty;D:\3rdpartylibs\PCL1.13\include\pcl-1.13;D:\3rdpartylibs\PCL1.13\3rdParty\Boost\include\boost-1_82;D:\3rdpartylibs\pdal\Library\include;D:\3rdpartylibs\TBB\tbb2018\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\NCraftImageGen\inc;..\inc;.\inc;D:\3rdpartylibs\Open3D\include;D:/3rdpartylibs/Open3D/include/open3d/3rdparty;D:\3rdpartylibs\PCL1.13\include\pcl-1.13;D:\3rdpartylibs\PCL1.13\3rdParty\Boost\include\boost-1_82;D:\3rdpartylibs\pdal\Library\include;D:\3rdpartylibs\TBB\tbb2018\include;D:\3rdpartylibs\opencv\build\include</AdditionalIncludeDirectories>
       <Optimization>MaxSpeed</Optimization>
       <OpenMPSupport>true</OpenMPSupport>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -190,7 +190,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>..\source\NCraftImageGen.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>D:\3rdpartylibs\Open3D\build\lib\Release;%(AdditionalLibraryDirectories);D:\3rdpartylibs\pdal\Library\lib;D:\3rdpartylibs\PCL1.13\lib;D:\3rdpartylibs\TBB\tbb2018\lib\intel64\vc14</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);Open3D.lib;tbb.lib;pdalcpp.lib;pcl_search.lib;pcl_common.lib;pcl_surface.lib;pcl_io.lib;pcl_features.lib;pcl_segmentation.lib;pcl_filters.lib;pcl_octree.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);Open3D.lib;tbb.lib;pdalcpp.lib;pcl_search.lib;pcl_common.lib;pcl_surface.lib;pcl_io.lib;pcl_features.lib;pcl_segmentation.lib;pcl_filters.lib;pcl_octree.lib;D:\3rdpartylibs\opencv\build\x64\vc16\lib\opencv_world490.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>

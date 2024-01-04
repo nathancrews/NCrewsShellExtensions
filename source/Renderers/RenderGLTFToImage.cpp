@@ -53,7 +53,7 @@ UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::files
         }
     }
 
-    utility::LogInfo("processing {} files....\n", batchModeFilenames.size());
+    utility::LogInfo("processing {} files....", batchModeFilenames.size());
 
     for (std::filesystem::path reqPath : batchModeFilenames)
     {

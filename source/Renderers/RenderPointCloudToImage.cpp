@@ -6,6 +6,12 @@
 #include "open3d/io/FileFormatIO.h"
 #include "open3d/io/PointCloudIO.h"
 
+#include <opencv2/opencv.hpp>
+#include "opencv2/imgcodecs.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
+
 #include <pdal/PointTable.hpp>
 #include <pdal/PointView.hpp>
 #include <pdal/io/LasReader.hpp>
@@ -135,7 +141,7 @@ UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::file
     {
         timer.Start();
 
-        if ((outRenderResults[sz].m_imageFileCacheOk == false) && 
+        if ((outRenderResults[sz].m_imageFileCacheOk == false) &&
             outRenderResults[sz].m_cloudPtr.get() && outRenderResults[sz].m_pointCount > 0)
         {
             RenderPointcloudToImage(renderer, outRenderResults[sz]);
@@ -168,14 +174,18 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
 {
     const int width = 1440;
     const int height = 1080;
-    int pointCount = 0;
+    UINT millionVal = 1000000;
+    UINT kVal = 1000;
+    char pointCountStr[MAX_PATH] = { 0 };
+    char timeStr[MAX_PATH] = { 0 };
+    char fileSizeStr[MAX_PATH] = { 0 };
+    std::string infoText;
 
     std::filesystem::path imagePath = fileInfo.m_FileName;
+
     imagePath = imagePath.replace_extension("jpg");
 
     fileInfo.m_ImageName = imagePath;
-
-    pointCount = fileInfo.m_cloudPtr->points_.size();
 
     if (fileInfo.m_cloudPtr->HasPoints())
     {
@@ -187,18 +197,17 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
             pointcloud_mat.shader = "defaultUnlit";
             pointcloud_mat.point_size = 4.0f;
             pointcloud_mat.base_color = { 0.5f, 0.5f, 0.5f, 1.0f };
-            pointcloud_mat.absorption_color = { 0.4f, 0.4f, 0.4f };
-            pointcloud_mat.emissive_color = { 0.4f, 0.4f, 0.4f, 1.0f };
+            //pointcloud_mat.absorption_color = { 0.4f, 0.4f, 0.4f };
+            //pointcloud_mat.emissive_color = { 0.4f, 0.4f, 0.4f, 1.0f };
             pointcloud_mat.sRGB_color = false;
             scene->SetLighting(Open3DScene::LightingProfile::NO_SHADOWS, { 0.5f, -0.5f, -0.5f });
             scene->GetScene()->EnableSunLight(true);
             scene->GetScene()->SetSunLightIntensity(35000);
-            Eigen::Vector4f color = { 0.6, 0.6, 0.7, 1.0 };
+            Eigen::Vector4f color = { 1.0, 1.0, 1.0, 1.0 };
             scene->SetBackground(color);
             scene->ShowAxes(false);
 
             scene->AddGeometry(fileInfo.m_FileName.string(), fileInfo.m_cloudPtr.get(), pointcloud_mat, true);
-
             auto& bounds = scene->GetBoundingBox();
 
             if (bounds.GetMaxExtent() > 0.0f)
@@ -221,21 +230,102 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
                     };
 
                 scene->GetView()->SetViewport(0, 0, width, height);
-
                 modelRenderer->RenderToImage(scene->GetView(), scene->GetScene(), callback);
                 modelRenderer->BeginFrame();
                 modelRenderer->EndFrame();
 
-                io::WriteImage(imagePath.string(), *img);
+                io::WriteImage(imagePath.string(), *img, 100);
 
-                utility::LogInfo("Writing image file: {}\n", imagePath.string());
+                utility::LogInfo("Creating OpenCV image...");
+
+                cv::Mat imgWithText2;
+                cv::Scalar textColor(255, 0, 0);
+                double textScale = 1.25;
+                double lineWidth = 1.0;
+                unsigned int rowSpacing = 25, horOffset = 25;
+
+                imgWithText2.create(img->height_, img->width_, CV_8UC3);
+
+                if (imgWithText2.data)
+                {
+                    memcpy(imgWithText2.data, img->data_.data(), img->data_.size());
+
+                    utility::LogInfo("Writing text to OpenCV image..");
+
+                    int bl = 0;
+
+                    infoText = "Produced by: NCraft Pointcloud Shell Extension 1.0";
+                    cv::Size ts = cv::getTextSize(infoText, cv::FONT_HERSHEY_SIMPLEX, textScale, lineWidth, &bl);
+                    
+                    unsigned int nextTextRow = ts.height + rowSpacing;
+
+                    cv::putText(imgWithText2, infoText, cv::Point(horOffset, nextTextRow),
+                                cv::FONT_HERSHEY_SIMPLEX, textScale, textColor);
+
+                    infoText = "Source file name: " + fileInfo.m_FileName.filename().string();
+                    nextTextRow += ts.height + rowSpacing;
+                    cv::putText(imgWithText2, infoText, cv::Point(horOffset, nextTextRow),
+                                cv::FONT_HERSHEY_SIMPLEX, textScale, textColor);
+
+                    if (fileInfo.m_fileSize > 1048576 * 1000)
+                    {
+                        sprintf(fileSizeStr, "Source file size: %0.3f GB", (double)(fileInfo.m_fileSize) / (double)(1048576 * 1000));
+                    }
+                    else if (fileInfo.m_fileSize > 1048576)
+                    {
+                        sprintf(fileSizeStr, "Source file size: %0.3f MB", (double)(fileInfo.m_fileSize) / (double)(1048576));
+                    }
+                    else
+                    {
+                        sprintf(fileSizeStr, "Source file size: %0.2f KB", (double)(fileInfo.m_fileSize / (double)1048));
+                    }
+
+                    nextTextRow += ts.height + rowSpacing;
+
+                    infoText = fileSizeStr;
+
+                    cv::putText(imgWithText2, infoText, cv::Point(horOffset, nextTextRow),
+                                cv::FONT_HERSHEY_SIMPLEX, textScale, textColor);
+
+                    if (fileInfo.m_pointCount > millionVal)
+                    {
+                        sprintf(pointCountStr, "%0.3f M", (double)(fileInfo.m_pointCount) / (double)millionVal);
+                    }
+                    else if (fileInfo.m_pointCount > kVal)
+                    {
+                        sprintf(pointCountStr, "%0.3f K", (double)(fileInfo.m_pointCount) / (double)kVal);
+                    }
+                    else
+                    {
+                        sprintf(pointCountStr, "%zd", fileInfo.m_pointCount);
+                    }
+
+                    nextTextRow += ts.height + rowSpacing;
+
+                    infoText = "Number of points : " + std::string(pointCountStr);
+
+                    cv::putText(imgWithText2, infoText, cv::Point(horOffset, nextTextRow),
+                                cv::FONT_HERSHEY_SIMPLEX, textScale, textColor);
+
+                    //*******************************************************************************************************
+                    utility::LogInfo("Writing image file with text: {}", fileInfo.m_ImageName.string());
+                    cv::imwrite(fileInfo.m_ImageName.string().c_str(), imgWithText2);
+
+                    imgWithText2.release();
+                }
+                else
+                {
+                    utility::LogInfo("Writing image file: {}", imagePath.string());
+                    io::WriteImage(imagePath.string(), *img, 100);
+                }
+
             }
 
             delete scene;
         }
     }
 
-    return pointCount;
+    return 1;
 }
 
 UINT LoadPointCloudFile(NCraftImageGen::ImageGenResult& outLoadResults)
@@ -317,6 +407,7 @@ UINT LoadPointCloudFile(NCraftImageGen::ImageGenResult& outLoadResults)
             {
                 pointCount = new_cloud_ptr->points_.size();
                 outLoadResults.m_pointCount = pointCount;
+
                 if (pointCount > 0)
                 {
                     new_cloud_ptr->SetName(outLoadResults.m_FileName.string());

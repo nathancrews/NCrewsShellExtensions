@@ -28,7 +28,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
 
         if (!WinToastLib::WinToast::instance()->initialize())
         {
-            utility::LogInfo("WinToast Error, your system in not compatible!");
+            utility::LogInfo("WinToast Error, system is not compatible!");
         }
 
         GdiplusStartupInput gpStartupInput;

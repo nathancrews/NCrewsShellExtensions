@@ -50,7 +50,7 @@ STDMETHODIMP ModelThumbnail::Initialize(IStream* pstream, DWORD grfMode)
 
     m_filePath = std::filesystem::temp_directory_path();
 
-    utility::LogInfo("Initialize With Stream called {}", m_filePath.string().c_str());
+//    utility::LogInfo("Initialize With Stream called {}", m_filePath.string().c_str());
 
     if (pstream->Stat(&stat, STATFLAG_DEFAULT) != S_OK)
     {

@@ -88,25 +88,24 @@ ModelMenu::~ModelMenu()
 // IShellExtInit
 HRESULT ModelMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj, HKEY hkeyProgID)
 {
-    open3d::utility::Logger::GetInstance().SetPrintFunction(model_print_fcn);
-    utility::LogInfo("Model: Initialize Context Menu...");
-
     HRESULT hr = E_FAIL;
 
-    if (!pdtobj)
+    if (!pdtobj || g_DllModuleRefCount == 0)
     {
-        return E_INVALIDARG;
+        return hr;
     }
-
-    m_filePaths.clear();
 
     IShellItemArray* items = nullptr;
     hr = SHCreateShellItemArrayFromDataObject(pdtobj, IID_IShellItemArray, (void**)&items);
 
     if (!SUCCEEDED(hr) || !items)
     {
-        return E_FAIL;
+        return hr;
     }
+
+    m_filePaths.clear();
+    open3d::utility::Logger::GetInstance().SetPrintFunction(model_print_fcn);
+    utility::LogInfo("Model: Initialize Context Menu...");
 
     DWORD fcount = 0;
     items->GetCount(&fcount);

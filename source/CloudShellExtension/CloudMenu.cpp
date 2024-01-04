@@ -89,19 +89,13 @@ CloudMenu::~CloudMenu()
 // IShellExtInit
 HRESULT CloudMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj, HKEY hkeyProgID)
 {
-    open3d::utility::Logger::GetInstance().SetPrintFunction(cloud_print_fcn);
-
-    utility::LogInfo("Cloud: Initialize Context Menu...");
-
     HRESULT hr = E_FAIL;
 
-    if (!pdtobj)
+    if (!pdtobj || g_DllModuleRefCount == 0)
     {
-        return E_INVALIDARG;
+        return hr;
     }
-
-    m_filePaths.clear();
-
+    
     IShellItemArray* items = nullptr;
     hr = SHCreateShellItemArrayFromDataObject(pdtobj, IID_IShellItemArray, (void**)&items);
 
@@ -109,6 +103,12 @@ HRESULT CloudMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj,
     {
         return E_FAIL;
     }
+
+    open3d::utility::Logger::GetInstance().SetPrintFunction(cloud_print_fcn);
+    utility::LogInfo("Cloud: Initialize Context Menu...");
+
+    m_filePaths.clear();
+
 
     DWORD fcount = 0;
     items->GetCount(&fcount);
@@ -272,7 +272,7 @@ HRESULT CloudMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
     try
     {
         NCraftImageGen::RenderPointcloudFiles(g_AppPath, filesToImage, renderResults);
-        SendNotificationMessages(renderResults);
+//        SendNotificationMessages(renderResults);
 
         m_filePaths.clear();
     }
@@ -291,7 +291,7 @@ void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenRes
 {
     if (!WinToastLib::WinToast::isCompatible())
     {
-        utility::LogInfo("Cloud: WinToast Error, your system is not supported!");
+        utility::LogInfo("Cloud: WinToast Error, system is not supported!");
     }
 
     std::wstring infoText;
@@ -317,7 +317,7 @@ void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenRes
         WinToastLib::WinToastTemplate templ(WinToastLib::WinToastTemplate::ImageAndText04);
 
         templ.setDuration(WinToastLib::WinToastTemplate::Short);
- //       templ.setExpiration(10000);
+        templ.setExpiration(50000);
 
         templ.setTextField(imageResults[0].m_ImageName.filename(), WinToastLib::WinToastTemplate::FirstLine);
 
