@@ -39,6 +39,12 @@
     <ClInclude Include="..\inc\wintoastlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\Renderers\RenderGLTFToImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\Renderers\RenderToImageCommon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\ModelShellExtension\ModelClassFactory.cpp">
@@ -54,6 +60,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\source\ModelShellExtension\ModelThumbnail.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Renderers\RenderGLTFToImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Renderers\RenderToImageCommon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

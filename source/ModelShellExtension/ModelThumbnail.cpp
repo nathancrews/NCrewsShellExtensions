@@ -16,7 +16,6 @@ ModelThumbnail::~ModelThumbnail()
 
 STDMETHODIMP ModelThumbnail::GetSite(REFIID riid, void** ppvSite)
 {
-    utility::LogInfo("GetSite called...");
     if (m_pSite)
     {
         return m_pSite->QueryInterface(riid, ppvSite);
@@ -26,7 +25,6 @@ STDMETHODIMP ModelThumbnail::GetSite(REFIID riid, void** ppvSite)
 
 STDMETHODIMP ModelThumbnail::SetSite(IUnknown* pUnkSite)
 {
-    utility::LogInfo("SetSite called...");
     if (m_pSite)
     {
         m_pSite->Release();
@@ -49,8 +47,6 @@ STDMETHODIMP ModelThumbnail::Initialize(IStream* pstream, DWORD grfMode)
     WCHAR  tempFileName[MAX_PATH] = { 0 };
 
     m_filePath = std::filesystem::temp_directory_path();
-
-//    utility::LogInfo("Initialize With Stream called {}", m_filePath.string().c_str());
 
     if (pstream->Stat(&stat, STATFLAG_DEFAULT) != S_OK)
     {

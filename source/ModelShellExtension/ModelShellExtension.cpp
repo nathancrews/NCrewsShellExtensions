@@ -6,6 +6,23 @@
 #include "wintoastlib.h"
 #include "Renderers/RenderToImageCommon.h"
 
+void model_print_fcn(const std::string& logString)
+{
+    std::filesystem::path logFilePath = std::filesystem::temp_directory_path();
+
+    logFilePath.replace_filename("ModelShellExtension");
+    logFilePath.replace_extension("log");
+
+    std::fstream fs;
+    fs.open(logFilePath, std::fstream::out | std::fstream::app);
+
+    fs << logString;
+    fs << "\n";
+
+    fs.flush();
+    fs.close();
+}
+
 // Standard DLL functions
 BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
 {
@@ -20,6 +37,8 @@ BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
         std::filesystem::path appPath = g_DllModelName;
         g_AppPath = appPath.remove_filename();
 
+        open3d::utility::Logger::GetInstance().SetPrintFunction(model_print_fcn);
+        
         std::wstring appName = L"NCraft Model Image Generator";
         std::wstring appUserModelID = L"NCraft Model Image Message";
  
@@ -117,6 +136,9 @@ HRESULT DllRegisterServer()
     DWORD res = StringFromCLSID(ModelMenuGUID, &menuExtGUID);
     res = StringFromCLSID(ModelThumbnailGUID, &thumbExtGUID);
 
+    //*****************************************************************************************
+    // Register COM content menu
+
     std::wstring lpSubKey = L"Software\\Classes\\CLSID\\" + std::wstring(menuExtGUID);
 
     res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_CREATE_SUB_KEY, NULL, &hkey, &lpDisp);
@@ -151,9 +173,8 @@ HRESULT DllRegisterServer()
 
     RegCloseKey(hkey);
 
-//*****************************************************************************************
-    // Thumbnail Extension
-
+    //*****************************************************************************************
+    // Register COM thumbnail generator
 
     lpSubKey = L"Software\\Classes\\CLSID\\" + std::wstring(thumbExtGUID);
 
@@ -186,6 +207,10 @@ HRESULT DllRegisterServer()
 
     RegCloseKey(hkey);
 
+
+    //*****************************************************************************************
+    // Register Thumbnail generator file types
+
     lpSubKey = L"Software\\Classes\\.glb\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
 
     res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
@@ -212,7 +237,6 @@ HRESULT DllRegisterServer()
         return E_UNEXPECTED;
     }
 
-
     res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)thumbExtGUIDStr.c_str(), (DWORD)(thumbExtGUIDStr.size() + 1U) * 2U);
     if (res != ERROR_SUCCESS)
     {
@@ -223,7 +247,7 @@ HRESULT DllRegisterServer()
 
 
     //**************************************************************************************************************
-    // Register for file types
+    // Register context menu for file types
 
     lpSubKey = L"Software\\Classes\\.gltf\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
 
@@ -286,7 +310,6 @@ HRESULT DllRegisterServer()
 
     RegCloseKey(hkey);
 
-
     lpSubKey = L"Software\\Classes\\Directory\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
 
     res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
@@ -302,11 +325,8 @@ HRESULT DllRegisterServer()
 
     RegCloseKey(hkey);
 
-    //
     //**************************************************************************************************************
-
-
-    // Put extension on the approved list
+    // Put extensions on the approved list
     lpSubKey = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved";
 
     if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
@@ -334,63 +354,130 @@ HRESULT DllRegisterServer()
 HRESULT DllUnregisterServer()
 {
     HKEY hkey;
-    wchar_t* tempStr = nullptr;
-    DWORD res = StringFromCLSID(ModelMenuGUID, &tempStr);
 
-    std::wstring lpSubKey = L"Software\\Classes\\CLSID\\" + std::wstring(tempStr) + L"\\InprocServer32";
+    wchar_t* thumbExtGUID = nullptr;
+    wchar_t* menuExtGUID = nullptr;
+    DWORD res = StringFromCLSID(ModelMenuGUID, &menuExtGUID);
+    res = StringFromCLSID(ModelThumbnailGUID, &thumbExtGUID);
 
-    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
-    {
-        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
-        if (res != ERROR_SUCCESS)
-        {
-            return E_UNEXPECTED;
-        }
+    //*****************************************************************************************************
+    // Remove the COM servers
 
-        RegCloseKey(hkey);
-    }
-
-    lpSubKey = L"Software\\Classes\\CLSID\\" + std::wstring(tempStr);
+    std::wstring lpSubKey = L"Software\\Classes\\CLSID\\" + std::wstring(menuExtGUID) + L"\\InprocServer32";
 
     if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
     {
         res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
-        if (res != ERROR_SUCCESS)
-        {
-            return E_UNEXPECTED;
-        }
 
         RegCloseKey(hkey);
     }
 
-    res = StringFromCLSID(ModelThumbnailGUID, &tempStr);
-
-    lpSubKey = L"Software\\Classes\\CLSID\\" + std::wstring(tempStr) + L"\\InprocServer32";
+    lpSubKey = L"Software\\Classes\\CLSID\\" + std::wstring(menuExtGUID);
 
     if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
     {
         res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
-        if (res != ERROR_SUCCESS)
-        {
-            return E_UNEXPECTED;
-        }
 
         RegCloseKey(hkey);
     }
 
-    lpSubKey = L"Software\\Classes\\CLSID\\" + std::wstring(tempStr);
+    lpSubKey = L"Software\\Classes\\CLSID\\" + std::wstring(thumbExtGUID) + L"\\InprocServer32";
 
     if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
     {
         res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
-        if (res != ERROR_SUCCESS)
-        {
-            return E_UNEXPECTED;
-        }
 
         RegCloseKey(hkey);
     }
 
+    lpSubKey = L"Software\\Classes\\CLSID\\" + std::wstring(thumbExtGUID);
+
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+    //*****************************************************************************************************
+
+    //*****************************************************************************************************
+    // Remove Thumbnail file associations
+
+    lpSubKey = L"Software\\Classes\\.glb\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    lpSubKey = L"Software\\Classes\\glb_auto_file\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    //******************************************************************************************************
+    // Remove the context menu handlers for file types
+
+    lpSubKey = L"Software\\Classes\\Directory\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    lpSubKey = L"Software\\Classes\\glb_auto_file\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+
+    lpSubKey = L"Software\\Classes\\gltf_auto_file\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    lpSubKey = L"Software\\Classes\\.glb\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    lpSubKey = L"Software\\Classes\\.gltf\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    //*****************************************************************************************************
+    // Remove extensions from the approved list
+    lpSubKey = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved";
+
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(hkey, std::wstring(menuExtGUID).c_str());
+
+        res = RegDeleteKey(hkey, std::wstring(thumbExtGUID).c_str());
+
+        RegCloseKey(hkey);
+    }
 
 
     SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);

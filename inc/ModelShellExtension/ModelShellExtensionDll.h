@@ -10,4 +10,3 @@ std::filesystem::path g_AppPath;
 std::wstring g_AppName = L"Model Shell Extension";
 std::wstring g_RegAppName = L"ModelShellExtension";
 ULONG_PTR g_gpToken;
-

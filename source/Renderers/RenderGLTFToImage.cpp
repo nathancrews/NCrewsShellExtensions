@@ -6,21 +6,12 @@ namespace NCraftImageGen
 UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::filesystem::path>& filePaths,
                           tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& outRenderResults)
 {
-    const int width = 2048;
-    const int height = 1640;
+    const int width = 1024;
+    const int height = 768;
+
     std::filesystem::path resourcePath = appPath;
-    resourcePath += "resources";
-
+    resourcePath += L"resources";
     EngineInstance::SetResourcePath(resourcePath.string().c_str());
-
-    FilamentRenderer* renderer =
-        new FilamentRenderer(EngineInstance::GetInstance(), width, height,
-                             EngineInstance::GetResourceManager());
-
-    if (!renderer)
-    {
-        return 0;
-    }
 
     std::vector<std::filesystem::path> batchModeFilenames;
 
@@ -43,6 +34,11 @@ UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::files
         }
     }
 
+    if (batchModeFilenames.empty())
+    {
+        return 0;
+    }
+
     if (batchModeFilenames.size() > 25)
     {
         int retval = MessageBox(nullptr, L"    Proceed to Generate Images?", L"Info: Many files selected", MB_YESNO);
@@ -54,6 +50,15 @@ UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::files
     }
 
     utility::LogInfo("processing {} files....", batchModeFilenames.size());
+
+    FilamentRenderer* renderer =
+        new FilamentRenderer(EngineInstance::GetInstance(), width, height,
+                             EngineInstance::GetResourceManager());
+
+    if (!renderer)
+    {
+        return 0;
+    }
 
     for (std::filesystem::path reqPath : batchModeFilenames)
     {
@@ -86,7 +91,6 @@ UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::files
         }
 
         outRenderResults.push_back(toAddResult);
-
     }
 
     utility::Timer timer;

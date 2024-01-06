@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DOCUMENT Type="Advanced Installer" CreateVersion="21.3.1" version="21.3.1" Modules="simple" RootPath="." Language="en" Id="{78345939-C7C4-42AB-AEC0-615EB6C0C57A}">
+  <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
+    <ROW Name="HiddenItems" Value="AppXProductDetailsComponent;AppXDependenciesComponent;AppXAppDetailsComponent;AppXVisualAssetsComponent;AppXCapabilitiesComponent;AppXAppDeclarationsComponent;AppXUriRulesComponent;FixupComponent;MsiXDiffComponent;MsixManifestEditorComponent"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
+    <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
+    <ROW Property="ALLUSERS" Value="1"/>
+    <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
+    <ROW Property="ARPPRODUCTICON" Value="samples_Dir.exe" Type="8"/>
+    <ROW Property="Manufacturer" Value="NCraft Software"/>
+    <ROW Property="ProductCode" Value="1033:{3E438FD3-82E7-4A3D-8E04-2D662A09D58B} " Type="16"/>
+    <ROW Property="ProductLanguage" Value="1033"/>
+    <ROW Property="ProductName" Value="NCraft GLTF Shell Extension"/>
+    <ROW Property="ProductVersion" Value="1.0.0" Options="32"/>
+    <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
+    <ROW Property="UpgradeCode" Value="{B06B7F66-286F-4F7B-9071-CF658B42940D}"/>
+    <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
+    <ROW Property="WindowsType9XDisplay" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT40" MultiBuildValue="DefaultBuild:Windows NT 4.0" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT40Display" MultiBuildValue="DefaultBuild:Windows NT 4.0" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT50" MultiBuildValue="DefaultBuild:Windows 2000" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT50Display" MultiBuildValue="DefaultBuild:Windows 2000" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT5X" MultiBuildValue="DefaultBuild:Windows XP/2003" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT5XDisplay" MultiBuildValue="DefaultBuild:Windows XP/2003" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT60" MultiBuildValue="DefaultBuild:Windows Vista/Server 2008" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT60Display" MultiBuildValue="DefaultBuild:Windows Vista/Server 2008" ValueLocId="-"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiDirsComponent">
+    <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR:." IsPseudoRoot="1"/>
+    <ROW Directory="AppDataFolder" Directory_Parent="TARGETDIR" DefaultDir="APPDAT~1|AppDataFolder" IsPseudoRoot="1"/>
+    <ROW Directory="Buggy_Dir" Directory_Parent="samples_Dir" DefaultDir="Buggy"/>
+    <ROW Directory="DesktopFolder" Directory_Parent="TARGETDIR" DefaultDir="DESKTO~1|DesktopFolder" IsPseudoRoot="1"/>
+    <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
+    <ROW Directory="resources_Dir" Directory_Parent="APPDIR" DefaultDir="RESOUR~1|resources"/>
+    <ROW Directory="samples_Dir" Directory_Parent="AppDataFolder" DefaultDir="GLTFSA~1|GLTF Samples"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
+    <ROW Component="APPDIR" ComponentId="{311DDFE9-59F2-40CC-994F-0B8AD056D9BD}" Directory_="APPDIR" Attributes="0"/>
+    <ROW Component="Approved" ComponentId="{AB7B634E-1BAB-4407-A280-5909789B21C9}" Directory_="APPDIR" Attributes="260" KeyPath="Approved"/>
+    <ROW Component="Buggy.glb" ComponentId="{C18F28AE-D377-4EFE-B62E-09312CEC6B60}" Directory_="samples_Dir" Attributes="0" KeyPath="Buggy.glb" Type="0"/>
+    <ROW Component="Buggy.gltf" ComponentId="{CD98E60C-FF15-4A84-B001-7F8CAD09D095}" Directory_="Buggy_Dir" Attributes="0" KeyPath="Buggy.gltf" Type="0"/>
+    <ROW Component="C6D56CF1C574BE187365A3D02A68187" ComponentId="{230739E6-AACC-46EB-8810-4E81E69DB8A3}" Directory_="APPDIR" Attributes="260" KeyPath="C6D56CF1C574BE187365A3D02A68187"/>
+    <ROW Component="C6D56CF1C574BE187365A3D02A68187_1" ComponentId="{D998E089-432E-4780-87B5-35CBB9511623}" Directory_="APPDIR" Attributes="260" KeyPath="C6D56CF1C574BE187365A3D02A68187_1"/>
+    <ROW Component="C6D56CF1C574BE187365A3D02A68187_2" ComponentId="{E06E5569-1A12-42EB-9502-206E74AED5E3}" Directory_="APPDIR" Attributes="260" KeyPath="C6D56CF1C574BE187365A3D02A68187_2"/>
+    <ROW Component="CB7B16EE63F0498AAD7E857BD1B560C6" ComponentId="{5D1F35B4-270C-4796-A1AA-27BEB60111D5}" Directory_="APPDIR" Attributes="260" KeyPath="CB7B16EE63F0498AAD7E857BD1B560C6"/>
+    <ROW Component="CB7B16EE63F0498AAD7E857BD1B560C6_1" ComponentId="{011E3D2D-4351-47AA-9C29-77758E8228E5}" Directory_="APPDIR" Attributes="260" KeyPath="CB7B16EE63F0498AAD7E857BD1B560C6_1"/>
+    <ROW Component="CB7B16EE63F0498AAD7E857BD1B560C6_2" ComponentId="{10809881-F27D-48F0-A77C-CCEDFA7D94BB}" Directory_="APPDIR" Attributes="260" KeyPath="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
+    <ROW Component="CLSID" ComponentId="{5AE57BA5-C45D-4AEB-82E6-B9F4AB96C683}" Directory_="APPDIR" Attributes="260" KeyPath="CLSID"/>
+    <ROW Component="ContextMenuHandlers_4" ComponentId="{1B471459-7DE4-4594-9C9B-C200DE9DF83E}" Directory_="APPDIR" Attributes="260" KeyPath="ContextMenuHandlers_6"/>
+    <ROW Component="CurrentVersion" ComponentId="{A9BB0318-2836-48E5-BA18-943F25700D6F}" Directory_="APPDIR" Attributes="260" KeyPath="CurrentVersion"/>
+    <ROW Component="EditFlags_1" ComponentId="{034FBAD4-3EEB-40D4-A7CE-3F832E22A227}" Directory_="APPDIR" Attributes="260" KeyPath="EditFlags_1"/>
+    <ROW Component="FriendlyTypeName_1" ComponentId="{4A5C1644-662D-48A7-84BC-9BDCD57868F0}" Directory_="APPDIR" Attributes="260" KeyPath="FriendlyTypeName_1"/>
+    <ROW Component="FullDetails_1" ComponentId="{C998655F-5E49-4EC6-B2A8-1CFB94105205}" Directory_="APPDIR" Attributes="260" KeyPath="FullDetails_1"/>
+    <ROW Component="InProcServer32" ComponentId="{402477EA-A869-4C7B-A815-1C4ED6239DE2}" Directory_="APPDIR" Attributes="260" KeyPath="InProcServer32_1"/>
+    <ROW Component="InProcServer32_1" ComponentId="{2D6B3963-F866-4CE3-B393-C77372516118}" Directory_="APPDIR" Attributes="260" KeyPath="InProcServer32"/>
+    <ROW Component="InfoTip_1" ComponentId="{10FF1A8A-E2D2-417D-BDD9-404FC4C4D07E}" Directory_="APPDIR" Attributes="260" KeyPath="InfoTip_1"/>
+    <ROW Component="Microsoft" ComponentId="{1CF6AE86-1FC6-449F-B126-81B0C6AF20B0}" Directory_="APPDIR" Attributes="260" KeyPath="Microsoft"/>
+    <ROW Component="ModelShellExtension.dll" ComponentId="{9831ACB7-3921-41A9-AE8A-A122F18587A6}" Directory_="APPDIR" Attributes="256" KeyPath="ModelShellExtension.dll"/>
+    <ROW Component="Open3D.dll" ComponentId="{453D62AA-3E10-4864-8D78-98E5F6A9D7CD}" Directory_="APPDIR" Attributes="256" KeyPath="Open3D.dll"/>
+    <ROW Component="PreviewDetails_1" ComponentId="{EB29C321-D91A-4B85-81B8-41CA0F57D76F}" Directory_="APPDIR" Attributes="260" KeyPath="PreviewDetails_1"/>
+    <ROW Component="PreviewTitle_1" ComponentId="{6CD23FFE-4C12-441E-A543-20FD4B585135}" Directory_="APPDIR" Attributes="260" KeyPath="PreviewTitle_1"/>
+    <ROW Component="ProductInformation" ComponentId="{52408035-0660-44E2-A512-46080183C2FB}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
+    <ROW Component="ShellEx" ComponentId="{46A79AA5-3D95-4FF1-9F69-874DC36AD2E7}" Directory_="APPDIR" Attributes="260" KeyPath="ShellEx_2"/>
+    <ROW Component="ThreadingModel" ComponentId="{B330A725-FCFD-4AB0-9BE5-571193B619D2}" Directory_="APPDIR" Attributes="260" KeyPath="ThreadingModel"/>
+    <ROW Component="ThreadingModel_2" ComponentId="{D3086D37-38FD-4B19-87CF-0C2BA3A6F28C}" Directory_="APPDIR" Attributes="260" KeyPath="ThreadingModel_2"/>
+    <ROW Component="Windows" ComponentId="{7B504763-5DB8-426C-9720-DB8E40F31A2C}" Directory_="APPDIR" Attributes="260" KeyPath="Windows"/>
+    <ROW Component="_" ComponentId="{3A2BC902-68CF-40A6-8C28-D0DF0030DC29}" Directory_="APPDIR" Attributes="260" KeyPath="_"/>
+    <ROW Component="__1" ComponentId="{5A8901E3-3524-4F08-B375-BA39B82A277E}" Directory_="APPDIR" Attributes="260" KeyPath="__1"/>
+    <ROW Component="__10" ComponentId="{8C9FCDCE-0DD3-4421-A13D-FF3345DC7384}" Directory_="APPDIR" Attributes="260" KeyPath="__10"/>
+    <ROW Component="__11" ComponentId="{323F41D2-55EC-48B4-A1CC-BB60A7DFB6DC}" Directory_="APPDIR" Attributes="260" KeyPath="__11"/>
+    <ROW Component="__13" ComponentId="{F1B6E2A5-50DA-4A7D-B723-CA91D5560D1E}" Directory_="APPDIR" Attributes="260" KeyPath="__13"/>
+    <ROW Component="__14" ComponentId="{312C035C-38CF-4984-B65C-DE0BB5CDF366}" Directory_="APPDIR" Attributes="260" KeyPath="__14"/>
+    <ROW Component="__16" ComponentId="{39E0FEE5-DDD7-4904-8CA1-20CE5CF45A9E}" Directory_="APPDIR" Attributes="260" KeyPath="__16"/>
+    <ROW Component="__2" ComponentId="{6D7604A4-E622-4230-ADED-F5B0F3D0E0AF}" Directory_="APPDIR" Attributes="260" KeyPath="__2"/>
+    <ROW Component="__4" ComponentId="{405205D5-CF80-4217-9ADF-86A6AFEA4AD5}" Directory_="APPDIR" Attributes="260" KeyPath="__4"/>
+    <ROW Component="__7" ComponentId="{31D17358-7EB4-410F-AD82-3F1F4D56EABF}" Directory_="APPDIR" Attributes="260" KeyPath="__7"/>
+    <ROW Component="brightday_ibl.ktx" ComponentId="{A57650F6-D288-4350-86F4-575BADF040FE}" Directory_="resources_Dir" Attributes="0" KeyPath="brightday_ibl.ktx" Type="0"/>
+    <ROW Component="libopenblas.dll" ComponentId="{4D3BD59F-66E2-4243-AF3A-6EF15B14C09E}" Directory_="APPDIR" Attributes="256" KeyPath="libopenblas.dll"/>
+    <ROW Component="tbb.dll" ComponentId="{D7CBD31D-6665-41E9-8F91-A5BDC3EF788F}" Directory_="APPDIR" Attributes="256" KeyPath="tbb.dll"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
+    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0"/>
+    <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
+    <ROW File="libopenblas.dll" Component_="libopenblas.dll" FileName="LIBOPE~1.DLL|libopenblas.dll" Attributes="0" SourcePath="Release\ModelShellExtension\libopenblas.dll" SelfReg="false"/>
+    <ROW File="ModelShellExtension.dll" Component_="ModelShellExtension.dll" FileName="MODELS~1.DLL|ModelShellExtension.dll" Attributes="0" SourcePath="Release\ModelShellExtension\ModelShellExtension.dll" SelfReg="false"/>
+    <ROW File="Open3D.dll" Component_="Open3D.dll" FileName="Open3D.dll" Attributes="0" SourcePath="Release\ModelShellExtension\Open3D.dll" SelfReg="false"/>
+    <ROW File="brightday_ibl.ktx" Component_="brightday_ibl.ktx" FileName="BRIGHT~1.KTX|brightday_ibl.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\brightday_ibl.ktx" SelfReg="false"/>
+    <ROW File="brightday_skybox.ktx" Component_="brightday_ibl.ktx" FileName="BRIGHT~2.KTX|brightday_skybox.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\brightday_skybox.ktx" SelfReg="false"/>
+    <ROW File="colorMap.filamat" Component_="brightday_ibl.ktx" FileName="COLORM~1.FIL|colorMap.filamat" Attributes="0" SourcePath="Release\ModelShellExtension\resources\colorMap.filamat" SelfReg="false"/>
+    <ROW File="crossroads_ibl.ktx" Component_="brightday_ibl.ktx" FileName="CROSSR~1.KTX|crossroads_ibl.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\crossroads_ibl.ktx" SelfReg="false"/>
+    <ROW File="crossroads_skybox.ktx" Component_="brightday_ibl.ktx" FileName="CROSSR~2.KTX|crossroads_skybox.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\crossroads_skybox.ktx" SelfReg="false"/>
+    <ROW File="defaultGradient.png" Component_="brightday_ibl.ktx" FileName="DEFAUL~1.PNG|defaultGradient.png" Attributes="0" SourcePath="Release\ModelShellExtension\resources\defaultGradient.png" SelfReg="false"/>
+    <ROW File="defaultLit.filamat" Component_="brightday_ibl.ktx" FileName="DEFAUL~1.FIL|defaultLit.filamat" Attributes="0" SourcePath="Release\ModelShellExtension\resources\defaultLit.filamat" SelfReg="false"/>
+    <ROW File="defaultLitSSR.filamat" Component_="brightday_ibl.ktx" FileName="DEFAUL~2.FIL|defaultLitSSR.filamat" Attributes="0" SourcePath="Release\ModelShellExtension\resources\defaultLitSSR.filamat" SelfReg="false"/>
+    <ROW File="defaultLitTransparency.filamat" Component_="brightday_ibl.ktx" FileName="DEFAUL~3.FIL|defaultLitTransparency.filamat" Attributes="0" SourcePath="Release\ModelShellExtension\resources\defaultLitTransparency.filamat" SelfReg="false"/>
+    <ROW File="defaultTexture.png" Component_="brightday_ibl.ktx" FileName="DEFAUL~2.PNG|defaultTexture.png" Attributes="0" SourcePath="Release\ModelShellExtension\resources\defaultTexture.png" SelfReg="false"/>
+    <ROW File="defaultUnlit.filamat" Component_="brightday_ibl.ktx" FileName="DEFAUL~4.FIL|defaultUnlit.filamat" Attributes="0" SourcePath="Release\ModelShellExtension\resources\defaultUnlit.filamat" SelfReg="false"/>
+    <ROW File="defaultUnlitTransparency.filamat" Component_="brightday_ibl.ktx" FileName="DEFAUL~5.FIL|defaultUnlitTransparency.filamat" Attributes="0" SourcePath="Release\ModelShellExtension\resources\defaultUnlitTransparency.filamat" SelfReg="false"/>
+    <ROW File="default_ibl.ktx" Component_="brightday_ibl.ktx" FileName="DEFAUL~1.KTX|default_ibl.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\default_ibl.ktx" SelfReg="false"/>
+    <ROW File="default_skybox.ktx" Component_="brightday_ibl.ktx" FileName="DEFAUL~2.KTX|default_skybox.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\default_skybox.ktx" SelfReg="false"/>
+    <ROW File="depth.filamat" Component_="brightday_ibl.ktx" FileName="DEPTH~1.FIL|depth.filamat" Attributes="0" SourcePath="Release\ModelShellExtension\resources\depth.filamat" SelfReg="false"/>
+    <ROW File="depth_value.filamat" Component_="brightday_ibl.ktx" FileName="DEPTH_~1.FIL|depth_value.filamat" Attributes="0" SourcePath="Release\ModelShellExtension\resources\depth_value.filamat" SelfReg="false"/>
+    <ROW File="hall_ibl.ktx" Component_="brightday_ibl.ktx" FileName="hall_ibl.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\hall_ibl.ktx" SelfReg="false"/>
+    <ROW File="hall_skybox.ktx" Component_="brightday_ibl.ktx" FileName="HALL_S~1.KTX|hall_skybox.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\hall_skybox.ktx" SelfReg="false"/>
+    <ROW File="img_blit.filamat" Component_="brightday_ibl.ktx" FileName="IMG_BL~1.FIL|img_blit.filamat" Attributes="0" SourcePath="Release\ModelShellExtension\resources\img_blit.filamat" SelfReg="false"/>
+    <ROW File="infiniteGroundPlane.filamat" Component_="brightday_ibl.ktx" FileName="INFINI~1.FIL|infiniteGroundPlane.filamat" Attributes="0" SourcePath="Release\ModelShellExtension\resources\infiniteGroundPlane.filamat" SelfReg="false"/>
+    <ROW File="konzerthaus_ibl.ktx" Component_="brightday_ibl.ktx" FileName="KONZER~1.KTX|konzerthaus_ibl.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\konzerthaus_ibl.ktx" SelfReg="false"/>
+    <ROW File="konzerthaus_skybox.ktx" Component_="brightday_ibl.ktx" FileName="KONZER~2.KTX|konzerthaus_skybox.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\konzerthaus_skybox.ktx" SelfReg="false"/>
+    <ROW File="nightlights_ibl.ktx" Component_="brightday_ibl.ktx" FileName="NIGHTL~1.KTX|nightlights_ibl.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\nightlights_ibl.ktx" SelfReg="false"/>
+    <ROW File="nightlights_skybox.ktx" Component_="brightday_ibl.ktx" FileName="NIGHTL~2.KTX|nightlights_skybox.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\nightlights_skybox.ktx" SelfReg="false"/>
+    <ROW File="normals.filamat" Component_="brightday_ibl.ktx" FileName="NORMAL~1.FIL|normals.filamat" Attributes="0" SourcePath="Release\ModelShellExtension\resources\normals.filamat" SelfReg="false"/>
+    <ROW File="park2_ibl.ktx" Component_="brightday_ibl.ktx" FileName="PARK2_~1.KTX|park2_ibl.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\park2_ibl.ktx" SelfReg="false"/>
+    <ROW File="park2_skybox.ktx" Component_="brightday_ibl.ktx" FileName="PARK2_~2.KTX|park2_skybox.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\park2_skybox.ktx" SelfReg="false"/>
+    <ROW File="park_ibl.ktx" Component_="brightday_ibl.ktx" FileName="park_ibl.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\park_ibl.ktx" SelfReg="false"/>
+    <ROW File="park_skybox.ktx" Component_="brightday_ibl.ktx" FileName="PARK_S~1.KTX|park_skybox.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\park_skybox.ktx" SelfReg="false"/>
+    <ROW File="pillars_ibl.ktx" Component_="brightday_ibl.ktx" FileName="PILLAR~1.KTX|pillars_ibl.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\pillars_ibl.ktx" SelfReg="false"/>
+    <ROW File="pillars_skybox.ktx" Component_="brightday_ibl.ktx" FileName="PILLAR~2.KTX|pillars_skybox.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\pillars_skybox.ktx" SelfReg="false"/>
+    <ROW File="pointcloud.filamat" Component_="brightday_ibl.ktx" FileName="POINTC~1.FIL|pointcloud.filamat" Attributes="0" SourcePath="Release\ModelShellExtension\resources\pointcloud.filamat" SelfReg="false"/>
+    <ROW File="RobotoBold.ttf" Component_="brightday_ibl.ktx" FileName="ROBOTO~1.TTF|Roboto-Bold.ttf" Attributes="0" SourcePath="Release\ModelShellExtension\resources\Roboto-Bold.ttf" SelfReg="false"/>
+    <ROW File="RobotoBoldItalic.ttf" Component_="brightday_ibl.ktx" FileName="ROBOTO~2.TTF|Roboto-BoldItalic.ttf" Attributes="0" SourcePath="Release\ModelShellExtension\resources\Roboto-BoldItalic.ttf" SelfReg="false"/>
+    <ROW File="RobotoLicense.txt" Component_="brightday_ibl.ktx" FileName="ROBOTO~1.TXT|Roboto-License.txt" Attributes="0" SourcePath="Release\ModelShellExtension\resources\Roboto-License.txt" SelfReg="false"/>
+    <ROW File="RobotoMedium.ttf" Component_="brightday_ibl.ktx" FileName="ROBOTO~3.TTF|Roboto-Medium.ttf" Attributes="0" SourcePath="Release\ModelShellExtension\resources\Roboto-Medium.ttf" SelfReg="false"/>
+    <ROW File="RobotoMediumItalic.ttf" Component_="brightday_ibl.ktx" FileName="ROBOTO~4.TTF|Roboto-MediumItalic.ttf" Attributes="0" SourcePath="Release\ModelShellExtension\resources\Roboto-MediumItalic.ttf" SelfReg="false"/>
+    <ROW File="RobotoMonoMedium.ttf" Component_="brightday_ibl.ktx" FileName="ROBOTO~5.TTF|RobotoMono-Medium.ttf" Attributes="0" SourcePath="Release\ModelShellExtension\resources\RobotoMono-Medium.ttf" SelfReg="false"/>
+    <ROW File="streetlamp_ibl.ktx" Component_="brightday_ibl.ktx" FileName="STREET~1.KTX|streetlamp_ibl.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\streetlamp_ibl.ktx" SelfReg="false"/>
+    <ROW File="streetlamp_skybox.ktx" Component_="brightday_ibl.ktx" FileName="STREET~2.KTX|streetlamp_skybox.ktx" Attributes="0" SourcePath="Release\ModelShellExtension\resources\streetlamp_skybox.ktx" SelfReg="false"/>
+    <ROW File="ui_blit.filamat" Component_="brightday_ibl.ktx" FileName="UI_BLI~1.FIL|ui_blit.filamat" Attributes="0" SourcePath="Release\ModelShellExtension\resources\ui_blit.filamat" SelfReg="false"/>
+    <ROW File="unlitBackground.filamat" Component_="brightday_ibl.ktx" FileName="UNLITB~1.FIL|unlitBackground.filamat" Attributes="0" SourcePath="Release\ModelShellExtension\resources\unlitBackground.filamat" SelfReg="false"/>
+    <ROW File="unlitGradient.filamat" Component_="brightday_ibl.ktx" FileName="UNLITG~1.FIL|unlitGradient.filamat" Attributes="0" SourcePath="Release\ModelShellExtension\resources\unlitGradient.filamat" SelfReg="false"/>
+    <ROW File="unlitLine.filamat" Component_="brightday_ibl.ktx" FileName="UNLITL~1.FIL|unlitLine.filamat" Attributes="0" SourcePath="Release\ModelShellExtension\resources\unlitLine.filamat" SelfReg="false"/>
+    <ROW File="unlitPolygonOffset.filamat" Component_="brightday_ibl.ktx" FileName="UNLITP~1.FIL|unlitPolygonOffset.filamat" Attributes="0" SourcePath="Release\ModelShellExtension\resources\unlitPolygonOffset.filamat" SelfReg="false"/>
+    <ROW File="unlitSolidColor.filamat" Component_="brightday_ibl.ktx" FileName="UNLITS~1.FIL|unlitSolidColor.filamat" Attributes="0" SourcePath="Release\ModelShellExtension\resources\unlitSolidColor.filamat" SelfReg="false"/>
+    <ROW File="Buggy.gltf" Component_="Buggy.gltf" FileName="BUGGY~1.GLT|Buggy.gltf" Attributes="0" SourcePath="Release\ModelShellExtension\samples\Buggy\Buggy.gltf" SelfReg="false"/>
+    <ROW File="Buggy0.bin" Component_="Buggy.gltf" FileName="Buggy0.bin" Attributes="0" SourcePath="Release\ModelShellExtension\samples\Buggy\Buggy0.bin" SelfReg="false"/>
+    <ROW File="Buggy.glb" Component_="Buggy.glb" FileName="Buggy.glb" Attributes="0" SourcePath="Release\ModelShellExtension\samples\Buggy.glb" SelfReg="false"/>
+    <ROW File="tbb.dll" Component_="tbb.dll" FileName="tbb.dll" Attributes="0" SourcePath="Release\ModelShellExtension\tbb.dll" SelfReg="false"/>
+    <ROW File="NCraft.ico" Component_="brightday_ibl.ktx" FileName="NCraft.ico" Attributes="0" SourcePath="Release\ModelShellExtension\resources\NCraft.ico" SelfReg="false"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
+    <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
+    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="0" Languages="en" InstallationType="4" SummInfoMetadata="Page Count:450" UseLargeSchema="true" MsiPackageType="x64"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
+    <ROW Path="&lt;AI_DICTS&gt;ui.ail"/>
+    <ROW Path="&lt;AI_DICTS&gt;ui_en.ail"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.FragmentComponent">
+    <ROW Fragment="CommonUI.aip" Path="&lt;AI_FRAGS&gt;CommonUI.aip"/>
+    <ROW Fragment="FolderDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\FolderDlg.aip"/>
+    <ROW Fragment="MaintenanceTypeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\MaintenanceTypeDlg.aip"/>
+    <ROW Fragment="MaintenanceWelcomeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\MaintenanceWelcomeDlg.aip"/>
+    <ROW Fragment="SequenceDialogs.aip" Path="&lt;AI_THEMES&gt;classic\fragments\SequenceDialogs.aip"/>
+    <ROW Fragment="Sequences.aip" Path="&lt;AI_FRAGS&gt;Sequences.aip"/>
+    <ROW Fragment="StaticUIStrings.aip" Path="&lt;AI_FRAGS&gt;StaticUIStrings.aip"/>
+    <ROW Fragment="Themes.aip" Path="&lt;AI_FRAGS&gt;Themes.aip"/>
+    <ROW Fragment="UI.aip" Path="&lt;AI_THEMES&gt;classic\fragments\UI.aip"/>
+    <ROW Fragment="Validation.aip" Path="&lt;AI_FRAGS&gt;Validation.aip"/>
+    <ROW Fragment="VerifyRemoveDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\VerifyRemoveDlg.aip"/>
+    <ROW Fragment="VerifyRepairDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\VerifyRepairDlg.aip"/>
+    <ROW Fragment="WelcomeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\WelcomeDlg.aip"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiBinaryComponent">
+    <ROW Name="aicustact.dll" SourcePath="&lt;AI_CUSTACTS&gt;aicustact.dll"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiControlEventComponent">
+    <ROW Dialog_="WelcomeDlg" Control_="Next" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="FolderDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_INSTALL" Ordering="201"/>
+    <ROW Dialog_="FolderDlg" Control_="Back" Event="NewDialog" Argument="WelcomeDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="MaintenanceWelcomeDlg" Control_="Next" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="99"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_MAINT" Ordering="198"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="CustomizeDlg" Condition="AI_MAINT" Ordering="202"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_INSTALL" Ordering="197"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="201"/>
+    <ROW Dialog_="CustomizeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_MAINT" Ordering="101"/>
+    <ROW Dialog_="CustomizeDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="ChangeButton" Event="NewDialog" Argument="CustomizeDlg" Condition="AI_MAINT" Ordering="501"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceWelcomeDlg" Condition="AI_MAINT" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="RemoveButton" Event="NewDialog" Argument="VerifyRemoveDlg" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="601"/>
+    <ROW Dialog_="VerifyRemoveDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="RepairButton" Event="NewDialog" Argument="VerifyRepairDlg" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="601"/>
+    <ROW Dialog_="VerifyRepairDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="1"/>
+    <ROW Dialog_="VerifyRepairDlg" Control_="Repair" Event="EndDialog" Argument="Return" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="399" Options="1"/>
+    <ROW Dialog_="VerifyRemoveDlg" Control_="Remove" Event="EndDialog" Argument="Return" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="299" Options="1"/>
+    <ROW Dialog_="PatchWelcomeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_PATCH" Ordering="201"/>
+    <ROW Dialog_="ResumeDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_RESUME" Ordering="299"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_PATCH" Ordering="199"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="PatchWelcomeDlg" Condition="AI_PATCH" Ordering="203"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
+    <ROW Directory_="APPDIR" Component_="APPDIR" ManualDelete="true"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
+    <ROW Action="AI_DOWNGRADE" Type="19" Target="4010"/>
+    <ROW Action="AI_DpiContentScale" Type="1" Source="aicustact.dll" Target="DpiContentScale"/>
+    <ROW Action="AI_EnableDebugLog" Type="321" Source="aicustact.dll" Target="EnableDebugLog"/>
+    <ROW Action="AI_InstallModeCheck" Type="1" Source="aicustact.dll" Target="UpdateInstallMode" WithoutSeq="true"/>
+    <ROW Action="AI_PREPARE_UPGRADE" Type="65" Source="aicustact.dll" Target="PrepareUpgrade"/>
+    <ROW Action="AI_PRESERVE_INSTALL_TYPE" Type="65" Source="aicustact.dll" Target="PreserveInstallType"/>
+    <ROW Action="AI_RESTORE_LOCATION" Type="65" Source="aicustact.dll" Target="RestoreLocation"/>
+    <ROW Action="AI_ResolveKnownFolders" Type="1" Source="aicustact.dll" Target="AI_ResolveKnownFolders"/>
+    <ROW Action="AI_SHOW_LOG" Type="65" Source="aicustact.dll" Target="LaunchLogFile" WithoutSeq="true"/>
+    <ROW Action="AI_STORE_LOCATION" Type="51" Source="ARPINSTALLLOCATION" Target="[APPDIR]"/>
+    <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]" MultiBuildTarget="DefaultBuild:[ProgramFiles64Folder][Manufacturer]\[ProductName]"/>
+    <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]"/>
+    <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatCompsComponent">
+    <ROW Feature_="MainFeature" Component_="APPDIR"/>
+    <ROW Feature_="MainFeature" Component_="ProductInformation"/>
+    <ROW Feature_="MainFeature" Component_="libopenblas.dll"/>
+    <ROW Feature_="MainFeature" Component_="ModelShellExtension.dll"/>
+    <ROW Feature_="MainFeature" Component_="Open3D.dll"/>
+    <ROW Feature_="MainFeature" Component_="brightday_ibl.ktx"/>
+    <ROW Feature_="MainFeature" Component_="Buggy.gltf"/>
+    <ROW Feature_="MainFeature" Component_="Buggy.glb"/>
+    <ROW Feature_="MainFeature" Component_="tbb.dll"/>
+    <ROW Feature_="MainFeature" Component_="CLSID"/>
+    <ROW Feature_="MainFeature" Component_="CB7B16EE63F0498AAD7E857BD1B560C6"/>
+    <ROW Feature_="MainFeature" Component_="ThreadingModel"/>
+    <ROW Feature_="MainFeature" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_1"/>
+    <ROW Feature_="MainFeature" Component_="C6D56CF1C574BE187365A3D02A68187"/>
+    <ROW Feature_="MainFeature" Component_="C6D56CF1C574BE187365A3D02A68187_1"/>
+    <ROW Feature_="MainFeature" Component_="_"/>
+    <ROW Feature_="MainFeature" Component_="__1"/>
+    <ROW Feature_="MainFeature" Component_="ThreadingModel_2"/>
+    <ROW Feature_="MainFeature" Component_="InProcServer32"/>
+    <ROW Feature_="MainFeature" Component_="InProcServer32_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft"/>
+    <ROW Feature_="MainFeature" Component_="Windows"/>
+    <ROW Feature_="MainFeature" Component_="CurrentVersion"/>
+    <ROW Feature_="MainFeature" Component_="ShellEx"/>
+    <ROW Feature_="MainFeature" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
+    <ROW Feature_="MainFeature" Component_="C6D56CF1C574BE187365A3D02A68187_2"/>
+    <ROW Feature_="MainFeature" Component_="__13"/>
+    <ROW Feature_="MainFeature" Component_="__14"/>
+    <ROW Feature_="MainFeature" Component_="Approved"/>
+    <ROW Feature_="MainFeature" Component_="__4"/>
+    <ROW Feature_="MainFeature" Component_="__2"/>
+    <ROW Feature_="MainFeature" Component_="ContextMenuHandlers_4"/>
+    <ROW Feature_="MainFeature" Component_="__16"/>
+    <ROW Feature_="MainFeature" Component_="__7"/>
+    <ROW Feature_="MainFeature" Component_="PreviewTitle_1"/>
+    <ROW Feature_="MainFeature" Component_="InfoTip_1"/>
+    <ROW Feature_="MainFeature" Component_="EditFlags_1"/>
+    <ROW Feature_="MainFeature" Component_="PreviewDetails_1"/>
+    <ROW Feature_="MainFeature" Component_="FriendlyTypeName_1"/>
+    <ROW Feature_="MainFeature" Component_="FullDetails_1"/>
+    <ROW Feature_="MainFeature" Component_="__10"/>
+    <ROW Feature_="MainFeature" Component_="__11"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
+    <ROW Name="samples_Dir.exe" SourcePath="Release\ModelShellExtension\resources\NCraft.ico" Index="0"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
+    <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="210"/>
+    <ROW Action="AI_RESTORE_LOCATION" Condition="APPDIR=&quot;&quot;" Sequence="749"/>
+    <ROW Action="AI_STORE_LOCATION" Condition="(Not Installed) OR REINSTALL" Sequence="1501"/>
+    <ROW Action="AI_PREPARE_UPGRADE" Condition="AI_UPGRADE=&quot;No&quot; AND (Not Installed)" Sequence="1399"/>
+    <ROW Action="AI_ResolveKnownFolders" Sequence="52"/>
+    <ROW Action="AI_EnableDebugLog" Sequence="51"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiInstallUISequenceComponent">
+    <ROW Action="AI_PRESERVE_INSTALL_TYPE" Sequence="199"/>
+    <ROW Action="AI_RESTORE_LOCATION" Condition="APPDIR=&quot;&quot;" Sequence="749"/>
+    <ROW Action="AI_ResolveKnownFolders" Sequence="53"/>
+    <ROW Action="AI_DpiContentScale" Sequence="52"/>
+    <ROW Action="AI_EnableDebugLog" Sequence="51"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiLaunchConditionsComponent">
+    <ROW Condition="((VersionNT &lt;&gt; 501) AND (VersionNT &lt;&gt; 502))" Description="[ProductName] cannot be installed on [WindowsTypeNT5XDisplay]." DescriptionLocId="AI.LaunchCondition.NoNT5X" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="(VersionNT &lt;&gt; 400)" Description="[ProductName] cannot be installed on [WindowsTypeNT40Display]." DescriptionLocId="AI.LaunchCondition.NoNT40" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="(VersionNT &lt;&gt; 500)" Description="[ProductName] cannot be installed on [WindowsTypeNT50Display]." DescriptionLocId="AI.LaunchCondition.NoNT50" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="(VersionNT &lt;&gt; 600)" Description="[ProductName] cannot be installed on [WindowsTypeNT60Display]." DescriptionLocId="AI.LaunchCondition.NoNT60" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]." DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="DefaultBuild"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
+    <ROW Registry="Approved" Root="2" Key="Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved" Name="+" Component_="Approved"/>
+    <ROW Registry="C6D56CF1C574BE187365A3D02A68187" Root="1" Key="Software" Name="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Value="[#ModelShellExtension.dll]" Component_="C6D56CF1C574BE187365A3D02A68187"/>
+    <ROW Registry="C6D56CF1C574BE187365A3D02A68187_1" Root="1" Key="Software\Classes\CLSID\{0C6D56CF-1C57-4BE1-8736-5A3D02A68187}" Name="*" Component_="C6D56CF1C574BE187365A3D02A68187_1"/>
+    <ROW Registry="C6D56CF1C574BE187365A3D02A68187_2" Root="2" Key="Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved" Name="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Value="[#ModelShellExtension.dll]" Component_="C6D56CF1C574BE187365A3D02A68187_2"/>
+    <ROW Registry="CB7B16EE63F0498AAD7E857BD1B560C6" Root="1" Key="Software\Classes\CLSID\{CB7B16EE-63F0-498A-AD7E-857BD1B560C6}" Name="*" Component_="CB7B16EE63F0498AAD7E857BD1B560C6"/>
+    <ROW Registry="CB7B16EE63F0498AAD7E857BD1B560C6_1" Root="1" Key="Software" Name="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Value="[#ModelShellExtension.dll]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_1"/>
+    <ROW Registry="CB7B16EE63F0498AAD7E857BD1B560C6_2" Root="2" Key="Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved" Name="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Value="[#ModelShellExtension.dll]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
+    <ROW Registry="CLSID" Root="1" Key="Software\Classes\CLSID" Name="+" Component_="CLSID"/>
+    <ROW Registry="Classes_1" Root="1" Key="Software\Classes" Name="\"/>
+    <ROW Registry="ContextMenuHandlers" Root="1" Key="Software\Classes\glb_auto_file\ShellEx\ContextMenuHandlers" Name="\"/>
+    <ROW Registry="ContextMenuHandlers_2" Root="1" Key="Software\Classes\.glb\ShellEx\ContextMenuHandlers" Name="\"/>
+    <ROW Registry="ContextMenuHandlers_6" Root="1" Key="Software\Classes\Directory\shellex\ContextMenuHandlers" Name="+" Component_="ContextMenuHandlers_4"/>
+    <ROW Registry="ContextMenuHandlers_7" Root="1" Key="Software\Classes\.gltf\ShellEx\ContextMenuHandlers" Name="\"/>
+    <ROW Registry="ContextMenuHandlers_8" Root="1" Key="Software\Classes\gltf_auto_file\ShellEx\ContextMenuHandlers" Name="\"/>
+    <ROW Registry="CurrentVersion" Root="2" Key="Software\Microsoft\Windows\CurrentVersion" Name="+" Component_="CurrentVersion"/>
+    <ROW Registry="Directory_1" Root="1" Key="Software\Classes\Directory" Name="\"/>
+    <ROW Registry="E357FCCDA9954576B01F234630154E96" Root="1" Key="Software\Classes\glb_auto_file\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Name="\"/>
+    <ROW Registry="E357FCCDA9954576B01F234630154E96_1" Root="1" Key="Software\Classes\.glb\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Name="\"/>
+    <ROW Registry="EditFlags_1" Root="1" Key="Software\Classes\Directory" Name="EditFlags" Value="#xd2010000" Component_="EditFlags_1" VirtualValue="#x"/>
+    <ROW Registry="FriendlyTypeName_1" Root="1" Key="Software\Classes\Directory" Name="FriendlyTypeName" Value="#%@%SystemRoot%\system32\windows.storage.dll,-10152" Component_="FriendlyTypeName_1" VirtualValue="#%"/>
+    <ROW Registry="FullDetails_1" Root="1" Key="Software\Classes\Directory" Name="FullDetails" Value="prop:System.PropGroup.Description;System.DateCreated;System.FileCount;System.TotalFileSize" Component_="FullDetails_1"/>
+    <ROW Registry="InProcServer32" Root="1" Key="Software\Classes\CLSID\{CB7B16EE-63F0-498A-AD7E-857BD1B560C6}\InProcServer32" Name="*" Component_="InProcServer32_1"/>
+    <ROW Registry="InProcServer32_1" Root="1" Key="Software\Classes\CLSID\{0C6D56CF-1C57-4BE1-8736-5A3D02A68187}\InProcServer32" Name="*" Component_="InProcServer32"/>
+    <ROW Registry="InfoTip_1" Root="1" Key="Software\Classes\Directory" Name="InfoTip" Value="prop:System.Comment;System.DateCreated" Component_="InfoTip_1"/>
+    <ROW Registry="Manufacturer" Root="-1" Key="Software\[Manufacturer]" Name="\"/>
+    <ROW Registry="Microsoft" Root="2" Key="Software\Microsoft" Name="+" Component_="Microsoft"/>
+    <ROW Registry="ModelShellExtension" Root="1" Key="Software\Classes\glb_auto_file\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
+    <ROW Registry="ModelShellExtension_2" Root="1" Key="Software\Classes\.glb\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
+    <ROW Registry="ModelShellExtension_6" Root="1" Key="Software\Classes\Directory\shellex\ContextMenuHandlers\ModelShellExtension" Name="\"/>
+    <ROW Registry="ModelShellExtension_7" Root="1" Key="Software\Classes\.gltf\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
+    <ROW Registry="ModelShellExtension_8" Root="1" Key="Software\Classes\gltf_auto_file\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
+    <ROW Registry="Path" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Path" Value="[APPDIR]" Component_="ProductInformation"/>
+    <ROW Registry="PreviewDetails_1" Root="1" Key="Software\Classes\Directory" Name="PreviewDetails" Value="prop:System.DateModified;*System.SharedWith;*System.StorageProviderState;*System.OfflineAvailability;*System.OfflineStatus" Component_="PreviewDetails_1"/>
+    <ROW Registry="PreviewTitle_1" Root="1" Key="Software\Classes\Directory" Name="PreviewTitle" Value="prop:System.ItemNameDisplay;System.ItemTypeText" Component_="PreviewTitle_1"/>
+    <ROW Registry="ProductName" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="\"/>
+    <ROW Registry="ShellEx" Root="1" Key="Software\Classes\glb_auto_file\ShellEx" Name="\"/>
+    <ROW Registry="ShellEx_2" Root="2" Key="Software\Microsoft\Windows\CurrentVersion\Shell Extensions" Name="+" Component_="ShellEx"/>
+    <ROW Registry="ShellEx_3" Root="1" Key="Software\Classes\.glb\ShellEx" Name="\"/>
+    <ROW Registry="ShellEx_4" Root="1" Key="Software\Classes\.gltf\ShellEx" Name="\"/>
+    <ROW Registry="ShellEx_5" Root="1" Key="Software\Classes\gltf_auto_file\ShellEx" Name="\"/>
+    <ROW Registry="Software" Root="-1" Key="Software" Name="\"/>
+    <ROW Registry="Software_2" Root="1" Key="Software" Name="\"/>
+    <ROW Registry="Software_4" Root="2" Key="Software" Name="\"/>
+    <ROW Registry="ThreadingModel" Root="1" Key="Software\Classes\CLSID\{CB7B16EE-63F0-498A-AD7E-857BD1B560C6}\InProcServer32" Name="ThreadingModel" Value="Apartment" Component_="ThreadingModel"/>
+    <ROW Registry="ThreadingModel_2" Root="1" Key="Software\Classes\CLSID\{0C6D56CF-1C57-4BE1-8736-5A3D02A68187}\InProcServer32" Name="ThreadingModel" Value="Apartment" Component_="ThreadingModel_2"/>
+    <ROW Registry="Version" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Version" Value="[ProductVersion]" Component_="ProductInformation"/>
+    <ROW Registry="Windows" Root="2" Key="Software\Microsoft\Windows" Name="+" Component_="Windows"/>
+    <ROW Registry="_" Root="1" Key="Software\Classes\CLSID\{0C6D56CF-1C57-4BE1-8736-5A3D02A68187}\InProcServer32" Value="[#ModelShellExtension.dll]" Component_="_"/>
+    <ROW Registry="__1" Root="1" Key="Software\Classes\CLSID\{CB7B16EE-63F0-498A-AD7E-857BD1B560C6}\InProcServer32" Value="[#ModelShellExtension.dll]" Component_="__1"/>
+    <ROW Registry="__10" Root="1" Key="Software\Classes\Directory\shellex\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__10"/>
+    <ROW Registry="__11" Root="1" Key="Software\Classes\.gltf\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__11"/>
+    <ROW Registry="__13" Root="1" Key="Software\Classes\glb_auto_file\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__13"/>
+    <ROW Registry="__14" Root="1" Key="Software\Classes\glb_auto_file\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="__14"/>
+    <ROW Registry="__16" Root="1" Key="Software\Classes\gltf_auto_file\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__16"/>
+    <ROW Registry="__2" Root="1" Key="Software\Classes\.glb\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__2"/>
+    <ROW Registry="__4" Root="1" Key="Software\Classes\.glb\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="__4"/>
+    <ROW Registry="__7" Root="1" Key="Software\Classes\Directory" Value="File Folder" Component_="__7"/>
+    <ROW Registry="glb_1" Root="1" Key="Software\Classes\.glb" Name="\"/>
+    <ROW Registry="glb_auto_file" Root="1" Key="Software\Classes\glb_auto_file" Name="\"/>
+    <ROW Registry="gltf_1" Root="1" Key="Software\Classes\.gltf" Name="\"/>
+    <ROW Registry="gltf_auto_file" Root="1" Key="Software\Classes\gltf_auto_file" Name="\"/>
+    <ROW Registry="shellex_3" Root="1" Key="Software\Classes\Directory\shellex" Name="\"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
+    <ROW Shortcut="GLTFsamples" Directory_="DesktopFolder" Name="GLTFSA~1|GLTF samples" Component_="brightday_ibl.ktx" Target="[samples_Dir]" Hotkey="0" Icon_="samples_Dir.exe" IconIndex="0" ShowCmd="1" WkDir="samples_Dir"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiThemeComponent">
+    <ATTRIBUTE name="UsedTheme" value="classic"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiUpgradeComponent">
+    <ROW UpgradeCode="[|UpgradeCode]" VersionMin="0.0.1" VersionMax="[|ProductVersion]" Attributes="257" ActionProperty="OLDPRODUCTS"/>
+    <ROW UpgradeCode="[|UpgradeCode]" VersionMin="[|ProductVersion]" Attributes="2" ActionProperty="AI_NEWERPRODUCTFOUND"/>
+  </COMPONENT>
+</DOCUMENT>

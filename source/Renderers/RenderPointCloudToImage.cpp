@@ -41,18 +41,9 @@ UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::file
     const int width = 2048;
     const int height = 1640;
     std::filesystem::path resourcePath = appPath;
-    resourcePath += "resources";
+    resourcePath += L"resources";
 
     EngineInstance::SetResourcePath(resourcePath.string().c_str());
-
-    FilamentRenderer* renderer =
-        new FilamentRenderer(EngineInstance::GetInstance(), width, height,
-                             EngineInstance::GetResourceManager());
-
-    if (!renderer)
-    {
-        return 0;
-    }
 
     std::vector<std::filesystem::path> batchModeFilenames;
 
@@ -73,6 +64,11 @@ UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::file
                 }
             }
         }
+    }
+
+    if (batchModeFilenames.empty())
+    {
+        return 0;
     }
 
     if (batchModeFilenames.size() > 5)
@@ -135,6 +131,15 @@ UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::file
     {
         int pntsPerSec = (int)(pointCountTotal / exeTime);
         utility::LogInfo("==>Loaded {} Total Points, Total Loading Process Duration: {} seconds, pnts/sec = {}\n", pointCountTotal, exeTime, pntsPerSec);
+    }
+
+    FilamentRenderer* renderer =
+        new FilamentRenderer(EngineInstance::GetInstance(), width, height,
+                             EngineInstance::GetResourceManager());
+
+    if (!renderer)
+    {
+        return 0;
     }
 
     for (int sz = 0; sz < outRenderResults.size(); ++sz)
@@ -262,6 +267,8 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
                     cv::putText(imgWithText2, infoText, cv::Point(horOffset, nextTextRow),
                                 cv::FONT_HERSHEY_SIMPLEX, textScale, textColor);
 
+                    textScale = 1.0;
+
                     infoText = "Source file name: " + fileInfo.m_FileName.filename().string();
                     nextTextRow += ts.height + rowSpacing;
                     cv::putText(imgWithText2, infoText, cv::Point(horOffset, nextTextRow),
@@ -333,6 +340,12 @@ UINT LoadPointCloudFile(NCraftImageGen::ImageGenResult& outLoadResults)
     int pointCount = 0;
     double execExecTotal = 0.0;
     double exeTime = 0.0;
+
+    if (outLoadResults.m_fileSize < 10)
+    {
+        return pointCount;
+    }
+
 
     utility::Timer timer2;
     timer2.Start();
@@ -535,7 +548,16 @@ UINT LoadLASorLAZToO3DCloud(std::filesystem::path& fileName, geometry::PointClou
         pointStep = lsHeader.pointCount() / pointToPixel;
     }
 
-//    utility::LogInfo("LAS...Point cloud points {}, thinning factor: {}, \n", lsHeader.pointCount(), pointStep);
+    pdal::BOX3D bnds = lsHeader.getBounds();
+    double deltaElev = bnds.maxz - bnds.minz;
+    double greyScaleFactor = 0.75;
+
+    if (deltaElev < 0.001 || deltaElev > 100.0)
+    {
+        deltaElev = 100.0;
+    }
+
+    utility::LogInfo("LAS...Point cloud min z {}, max z {}, \n", bnds.minz, bnds.maxz);
 
     for (PointViewPtr point_view : point_views)
     {
@@ -574,12 +596,25 @@ UINT LoadLASorLAZToO3DCloud(std::filesystem::path& fileName, geometry::PointClou
             {
                 double testVal = point_view->getFieldAs<int>(pdal::Dimension::Id::Intensity, idx);
 
-                o3dColor[0] = (double)testVal * cfactor;
-                o3dColor[1] = (double)testVal * cfactor;
-                o3dColor[2] = (double)testVal * cfactor;
+                if (testVal < 0.001)
+                {
+                //    utility::LogInfo("No intensity, grey scaling");
+                    double normalizedElevation = 1.0f - (bnds.maxz - pz) / (bnds.maxz - bnds.minz);
+                    o3dColor[0] = normalizedElevation * greyScaleFactor;
+                    o3dColor[1] = normalizedElevation * greyScaleFactor;
+                    o3dColor[2] = normalizedElevation * greyScaleFactor;
+                }
+                else
+                {
+                //    utility::LogInfo("using intensity");
+                    o3dColor[0] = (double)testVal * cfactor;
+                    o3dColor[1] = (double)testVal * cfactor;
+                    o3dColor[2] = (double)testVal * cfactor;
+                }
             }
             else
             {
+                //utility::LogInfo("using color");
                 o3dColor[0] = (double)(pclPoint.r / 255.f);
                 o3dColor[1] = (double)(pclPoint.g / 255.f);
                 o3dColor[2] = (double)(pclPoint.b / 255.f);

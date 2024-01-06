@@ -398,3 +398,5 @@ FodyWeavers.xsd
 *.sln.iml
 /build/int/RelWithDebInfo
 /build/RelWithDebInfo
+/build/GLTF Windows Shell Extension-cache
+/build/NCraft Point Cloud Extension-cache

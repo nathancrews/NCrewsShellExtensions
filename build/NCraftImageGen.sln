@@ -3,13 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34322.80
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NCraftImageGen", "NCraftImageGen.vcxproj", "{68403E9F-0C89-4FE9-A3EE-AE4ADA3B650B}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CloudShellExtension", "CloudShellExtension.vcxproj", "{E1983CAA-BE72-4F4A-B2E9-857109AB24A5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModelShellExtension", "ModelShellExtension.vcxproj", "{2E7F05D1-89D7-4028-8C63-5606D35ECA69}"
-EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "DLTFShellExtSetup", "..\DLTFShellExtSetup\DLTFShellExtSetup.vdproj", "{6F04FF1D-1D65-4056-8CB3-7D67DA2F74FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,18 +17,6 @@ Global
 		RelWithDebInfo|x86 = RelWithDebInfo|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{68403E9F-0C89-4FE9-A3EE-AE4ADA3B650B}.Debug|x64.ActiveCfg = Debug|x64
-		{68403E9F-0C89-4FE9-A3EE-AE4ADA3B650B}.Debug|x64.Build.0 = Debug|x64
-		{68403E9F-0C89-4FE9-A3EE-AE4ADA3B650B}.Debug|x86.ActiveCfg = Debug|Win32
-		{68403E9F-0C89-4FE9-A3EE-AE4ADA3B650B}.Debug|x86.Build.0 = Debug|Win32
-		{68403E9F-0C89-4FE9-A3EE-AE4ADA3B650B}.Release|x64.ActiveCfg = Release|x64
-		{68403E9F-0C89-4FE9-A3EE-AE4ADA3B650B}.Release|x64.Build.0 = Release|x64
-		{68403E9F-0C89-4FE9-A3EE-AE4ADA3B650B}.Release|x86.ActiveCfg = Release|Win32
-		{68403E9F-0C89-4FE9-A3EE-AE4ADA3B650B}.Release|x86.Build.0 = Release|Win32
-		{68403E9F-0C89-4FE9-A3EE-AE4ADA3B650B}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
-		{68403E9F-0C89-4FE9-A3EE-AE4ADA3B650B}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
-		{68403E9F-0C89-4FE9-A3EE-AE4ADA3B650B}.RelWithDebInfo|x86.ActiveCfg = RelWithDebInfo|Win32
-		{68403E9F-0C89-4FE9-A3EE-AE4ADA3B650B}.RelWithDebInfo|x86.Build.0 = RelWithDebInfo|Win32
 		{E1983CAA-BE72-4F4A-B2E9-857109AB24A5}.Debug|x64.ActiveCfg = Debug|x64
 		{E1983CAA-BE72-4F4A-B2E9-857109AB24A5}.Debug|x64.Build.0 = Debug|x64
 		{E1983CAA-BE72-4F4A-B2E9-857109AB24A5}.Debug|x86.ActiveCfg = Debug|Win32
@@ -57,12 +41,6 @@ Global
 		{2E7F05D1-89D7-4028-8C63-5606D35ECA69}.RelWithDebInfo|x64.Build.0 = Release|x64
 		{2E7F05D1-89D7-4028-8C63-5606D35ECA69}.RelWithDebInfo|x86.ActiveCfg = Release|Win32
 		{2E7F05D1-89D7-4028-8C63-5606D35ECA69}.RelWithDebInfo|x86.Build.0 = Release|Win32
-		{6F04FF1D-1D65-4056-8CB3-7D67DA2F74FB}.Debug|x64.ActiveCfg = Debug
-		{6F04FF1D-1D65-4056-8CB3-7D67DA2F74FB}.Debug|x86.ActiveCfg = Debug
-		{6F04FF1D-1D65-4056-8CB3-7D67DA2F74FB}.Release|x64.ActiveCfg = Release
-		{6F04FF1D-1D65-4056-8CB3-7D67DA2F74FB}.Release|x86.ActiveCfg = Release
-		{6F04FF1D-1D65-4056-8CB3-7D67DA2F74FB}.RelWithDebInfo|x64.ActiveCfg = Release
-		{6F04FF1D-1D65-4056-8CB3-7D67DA2F74FB}.RelWithDebInfo|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
