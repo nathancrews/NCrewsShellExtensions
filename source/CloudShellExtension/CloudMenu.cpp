@@ -337,8 +337,6 @@ void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenRes
             templ.setDuration(WinToastLib::WinToastTemplate::Short);
             templ.setExpiration(50000);
 
-            templ.setTextField(imageResults[0].m_ImageName.filename(), WinToastLib::WinToastTemplate::FirstLine);
-
             if (std::filesystem::exists(imageResults[0].m_ImageName))
             {
                 templ.setImagePath(imageResults[0].m_ImageName);
@@ -361,37 +359,7 @@ void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenRes
                 _swprintf(fileSizeStr, L"Total File size: %0.2f KB", (double)(totalFileSize / (double)1048));
             }
 
-            if (totalProcessingTime > 1.0)
-            {
-                _swprintf(timeStr, L"%0.2fs", totalProcessingTime);
-            }
-            else
-            {
-                _swprintf(timeStr, L"%0.2fms", totalProcessingTime * 1000);
-            }
-
-            if (totalPointsProcessed > millionVal)
-            {
-                _swprintf(pointCountStr, L"%0.2f M", (double)(totalPointsProcessed) / (double)millionVal);
-            }
-            else if (totalPointsProcessed > kVal)
-            {
-                _swprintf(pointCountStr, L"%0.2f K", (double)(totalPointsProcessed) / (double)kVal);
-            }
-            else
-            {
-                _swprintf(pointCountStr, L"%zd", totalPointsProcessed);
-            }
-
-            infoText = L"Total Points: " + std::wstring(pointCountStr);
-
-            templ.setTextField(infoText, WinToastLib::WinToastTemplate::SecondLine);
-
-            templ.setTextField(fileSizeStr, WinToastLib::WinToastTemplate::ThirdLine);
-
-            infoText = L"Total Process time: " + std::wstring(timeStr);
-
-            templ.setAttributionText(infoText);
+            templ.setTextField(fileSizeStr, WinToastLib::WinToastTemplate::SecondLine);
 
             if (WinToastLib::WinToast::instance()->showToast(templ, new CloudCustomHandler()) < 0)
             {
@@ -405,6 +373,7 @@ void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenRes
                 WinToastLib::WinToastTemplate templ(WinToastLib::WinToastTemplate::ImageAndText04);
 
                 templ.setDuration(WinToastLib::WinToastTemplate::Short);
+                templ.setExpiration(50000);
 
                 templ.setTextField(result.m_ImageName.filename(), WinToastLib::WinToastTemplate::FirstLine);
                 templ.setTextField(result.m_FileName.filename(), WinToastLib::WinToastTemplate::SecondLine);
@@ -427,36 +396,7 @@ void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenRes
                     _swprintf(fileSizeStr, L"File size: %0.2f KB", (double)result.m_fileSize / (double)1048);
                 }
 
-                if (result.m_pointCount > 0)
-                {
-                    if (result.m_processTimeSeconds > 1.0)
-                    {
-                        _swprintf(timeStr, L"%0.2fs", result.m_processTimeSeconds);
-                    }
-                    else
-                    {
-                        _swprintf(timeStr, L"%0.2fms", result.m_processTimeSeconds * 1000);
-                    }
-
-                    if (result.m_pointCount > millionVal)
-                    {
-                        _swprintf(pointCountStr, L"%0.2f M", (double)(result.m_pointCount) / (double)millionVal);
-                    }
-                    else if (result.m_pointCount > kVal)
-                    {
-                        _swprintf(pointCountStr, L"%0.2f K", (double)(result.m_pointCount) / (double)kVal);
-                    }
-                    else
-                    {
-                        _swprintf(pointCountStr, L"%zd", result.m_pointCount);
-                    }
-
-                    infoText = L"Points: " + std::wstring(pointCountStr) + L", Time: " + timeStr;
-
-                    templ.setTextField(infoText, WinToastLib::WinToastTemplate::ThirdLine);
-                }
-
-                templ.setAttributionText(fileSizeStr);
+                templ.setTextField(fileSizeStr, WinToastLib::WinToastTemplate::ThirdLine);
 
                 if (WinToastLib::WinToast::instance()->showToast(templ, new CloudCustomHandler()) < 0)
                 {

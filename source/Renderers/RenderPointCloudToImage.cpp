@@ -40,10 +40,14 @@ UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::file
 {
     const int width = 2048;
     const int height = 1640;
+    UINT pointsTotal = 0;
     std::filesystem::path resourcePath = appPath;
     resourcePath += L"resources";
 
     EngineInstance::SetResourcePath(resourcePath.string().c_str());
+
+    SYSTEM_INFO siSysInfo;
+    GetSystemInfo(&siSysInfo);
 
     std::vector<std::filesystem::path> batchModeFilenames;
 
@@ -68,7 +72,7 @@ UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::file
 
     if (batchModeFilenames.empty())
     {
-        return 0;
+        return pointsTotal;
     }
 
     if (batchModeFilenames.size() > 5)
@@ -77,9 +81,16 @@ UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::file
 
         if (retval != 6)
         {
-            return 0;
+            return pointsTotal;
         }
     }
+
+    utility::Timer timer;
+    double exeTime = 0.0;
+
+    std::list<NCraftImageGen::ImageGenResult> sortedLoadResults;
+
+    timer.Start();
 
     for (std::filesystem::path reqPath : batchModeFilenames)
     {
@@ -103,76 +114,98 @@ UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::file
 
             if (sourceFiletime <= imageFiletime)
             {
-                utility::LogInfo("Skipping image, cache file up to date: {}", imagePath.string().c_str());
                 toAddResult.m_imageFileCacheOk = true;
             }
         }
 
-        outRenderResults.push_back(toAddResult);
+        sortedLoadResults.push_back(toAddResult);
     }
 
-    utility::LogInfo("processing {} files....\n", outRenderResults.size());
-
-    utility::Timer timer;
-    int pointCountTotal = 0;
-    double exeTime = 0.0, execExecTotal = 0.0;
-
-    tbb::concurrent_vector<std::shared_ptr<geometry::PointCloud>> cloudPtrs;
-
-    timer.Start();
-
-    pointCountTotal = LoadPointCloudFilesParallel(outRenderResults);
-
-    timer.Stop();
-    exeTime = timer.GetDurationInSecond();
-    execExecTotal += exeTime;
-
-    if (pointCountTotal > 0)
-    {
-        int pntsPerSec = (int)(pointCountTotal / exeTime);
-        utility::LogInfo("==>Loaded {} Total Points, Total Loading Process Duration: {} seconds, pnts/sec = {}\n", pointCountTotal, exeTime, pntsPerSec);
-    }
-
-    FilamentRenderer* renderer =
-        new FilamentRenderer(EngineInstance::GetInstance(), width, height,
-                             EngineInstance::GetResourceManager());
-
-    if (!renderer)
-    {
-        return 0;
-    }
-
-    for (int sz = 0; sz < outRenderResults.size(); ++sz)
-    {
-        timer.Start();
-
-        if ((outRenderResults[sz].m_imageFileCacheOk == false) &&
-            outRenderResults[sz].m_cloudPtr.get() && outRenderResults[sz].m_pointCount > 0)
+    std::function<bool(NCraftImageGen::ImageGenResult&, NCraftImageGen::ImageGenResult&)> sort
+        = [](NCraftImageGen::ImageGenResult& x, NCraftImageGen::ImageGenResult& y)
         {
-            RenderPointcloudToImage(renderer, outRenderResults[sz]);
-            outRenderResults[sz].m_cloudPtr->Clear();
+            return (x.m_fileSize < y.m_fileSize);
+        };
 
-            timer.Stop();
+    // sort files by file size
+    sortedLoadResults.sort(sort);
 
-            exeTime = timer.GetDurationInSecond();
-            execExecTotal += exeTime;
+    outRenderResults.clear();
 
-            if (exeTime > 0.0)
+    for (NCraftImageGen::ImageGenResult res : sortedLoadResults)
+    {
+        outRenderResults.push_back(res);
+    }
+
+    int maxThreads = siSysInfo.dwNumberOfProcessors - (siSysInfo.dwNumberOfProcessors / 4);
+    utility::LogInfo("processing {} files, using {} threads....", outRenderResults.size(), maxThreads);
+
+    for (int outerCount = 0; outerCount < outRenderResults.size(); outerCount += maxThreads)
+    {
+        tbb::concurrent_vector<NCraftImageGen::ImageGenResult> innerRenderResults;
+
+        for (int innerCount = outerCount; innerCount < (outerCount + maxThreads); ++innerCount)
+        {
+            if (innerCount == outRenderResults.size())
             {
-                utility::LogInfo("Pointcloud Render Duration: {} seconds\n", exeTime);
+                outerCount = outRenderResults.size();
+                break;
+            }
+
+            innerRenderResults.push_back(outRenderResults[innerCount]);
+        }
+
+        utility::Timer timer2;
+        int pointCountTotal = 0;
+        double execExecTotal = 0.0;
+
+        timer2.Start();
+
+        pointCountTotal = LoadPointCloudFilesParallel(innerRenderResults);
+
+        pointsTotal += pointCountTotal;
+
+        timer2.Stop();
+        execExecTotal = timer2.GetDurationInSecond();
+
+        int pntsPerSec = (int)(pointCountTotal / execExecTotal);
+        utility::LogInfo("[INNER COUNT {}] ==>Loaded {} Total Points, Total Loading Process Duration: {} seconds, pnts/sec = {}", innerRenderResults.size(), pointCountTotal, execExecTotal, pntsPerSec);
+
+
+        FilamentRenderer* renderer =
+            new FilamentRenderer(EngineInstance::GetInstance(), width, height,
+                                 EngineInstance::GetResourceManager());
+
+        if (!renderer)
+        {
+            return pointsTotal;
+        }
+
+        for (int sz = 0; sz < innerRenderResults.size(); ++sz)
+        {
+            if ((innerRenderResults[sz].m_imageFileCacheOk == false) &&
+                innerRenderResults[sz].m_cloudPtr.get())
+            {
+                RenderPointcloudToImage(renderer, innerRenderResults[sz]);
+            }
+
+            if (innerRenderResults[sz].m_cloudPtr.get())
+            {
+                innerRenderResults[sz].m_cloudPtr->Clear();
             }
         }
-    }
 
-    if (pointCountTotal > 0)
-    {
-        int pntsPerSec = (int)(pointCountTotal / execExecTotal);
-        utility::LogInfo("Finished Loading {} Total Points, Total Loading Process Duration: {} seconds, pnts/sec = {}\n", pointCountTotal, execExecTotal, pntsPerSec);
-    }
+        delete renderer;
+     }
 
-    delete renderer;
+    timer.Stop();
 
-    return 1;
+    exeTime = timer.GetDurationInSecond();
+
+    utility::LogInfo("Finished Loading {} files, points {}, Total Loading Process Duration: {} seconds", 
+                     outRenderResults.size(), pointsTotal, exeTime);
+
+    return pointsTotal;
 }
 
 UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::ImageGenResult& fileInfo)
@@ -200,10 +233,8 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
 
             auto pointcloud_mat = visualization::rendering::MaterialRecord();
             pointcloud_mat.shader = "defaultUnlit";
-            pointcloud_mat.point_size = 4.0f;
-            pointcloud_mat.base_color = { 0.5f, 0.5f, 0.5f, 1.0f };
-            //pointcloud_mat.absorption_color = { 0.4f, 0.4f, 0.4f };
-            //pointcloud_mat.emissive_color = { 0.4f, 0.4f, 0.4f, 1.0f };
+            pointcloud_mat.point_size = 3.25f;
+            pointcloud_mat.base_color = { 0.55f, 0.55f, 0.55f, 1.0f };
             pointcloud_mat.sRGB_color = false;
             scene->SetLighting(Open3DScene::LightingProfile::NO_SHADOWS, { 0.5f, -0.5f, -0.5f });
             scene->GetScene()->EnableSunLight(true);
@@ -261,7 +292,7 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
 
                     infoText = "Produced by: NCraft Pointcloud Shell Extension 1.0";
                     cv::Size ts = cv::getTextSize(infoText, cv::FONT_HERSHEY_SIMPLEX, textScale, lineWidth, &bl);
-                    
+
                     unsigned int nextTextRow = ts.height + rowSpacing;
 
                     cv::putText(imgWithText2, infoText, cv::Point(horOffset, nextTextRow),
@@ -272,7 +303,7 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
                     infoText = "Source file name: " + fileInfo.m_FileName.filename().string();
                     nextTextRow += ts.height + rowSpacing;
                     cv::putText(imgWithText2, infoText, cv::Point(horOffset, nextTextRow),
-                                cv::FONT_HERSHEY_SIMPLEX, textScale, textColor);
+                                cv::FONT_HERSHEY_SIMPLEX, textScale * 0.75, textColor);
 
                     if (fileInfo.m_fileSize > 1048576 * 1000)
                     {
@@ -335,6 +366,7 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
     return 1;
 }
 
+
 UINT LoadPointCloudFile(NCraftImageGen::ImageGenResult& outLoadResults)
 {
     int pointCount = 0;
@@ -345,7 +377,6 @@ UINT LoadPointCloudFile(NCraftImageGen::ImageGenResult& outLoadResults)
     {
         return pointCount;
     }
-
 
     utility::Timer timer2;
     timer2.Start();
@@ -358,14 +389,11 @@ UINT LoadPointCloudFile(NCraftImageGen::ImageGenResult& outLoadResults)
         std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
         if (new_cloud_ptr)
         {
+
             pointCount = LoadLASorLAZToO3DCloud(outLoadResults.m_FileName, *new_cloud_ptr);
             outLoadResults.m_pointCount = pointCount;
-
-            if (pointCount > 0)
-            {
-                new_cloud_ptr->SetName(outLoadResults.m_FileName.string());
-                outLoadResults.m_cloudPtr = new_cloud_ptr;
-            }
+            new_cloud_ptr->SetName(outLoadResults.m_FileName.string());
+            outLoadResults.m_cloudPtr = new_cloud_ptr;
         }
     }
     else if (!outLoadResults.m_FileName.extension().compare(".ply"))
@@ -469,7 +497,6 @@ UINT LoadPointCloudFilesParallel(tbb::concurrent_vector<NCraftImageGen::ImageGen
     }
     else
     {
-
 #pragma omp parallel for
         for (int sz = 0; sz < outLoadResults.size(); ++sz)
         {
@@ -550,7 +577,7 @@ UINT LoadLASorLAZToO3DCloud(std::filesystem::path& fileName, geometry::PointClou
 
     pdal::BOX3D bnds = lsHeader.getBounds();
     double deltaElev = bnds.maxz - bnds.minz;
-    double greyScaleFactor = 0.75;
+    double greyScaleFactor = 0.90;
 
     if (deltaElev < 0.001 || deltaElev > 100.0)
     {
@@ -598,26 +625,27 @@ UINT LoadLASorLAZToO3DCloud(std::filesystem::path& fileName, geometry::PointClou
 
                 if (testVal < 0.001)
                 {
-                //    utility::LogInfo("No intensity, grey scaling");
                     double normalizedElevation = 1.0f - (bnds.maxz - pz) / (bnds.maxz - bnds.minz);
                     o3dColor[0] = normalizedElevation * greyScaleFactor;
                     o3dColor[1] = normalizedElevation * greyScaleFactor;
                     o3dColor[2] = normalizedElevation * greyScaleFactor;
+ 
                 }
                 else
                 {
-                //    utility::LogInfo("using intensity");
                     o3dColor[0] = (double)testVal * cfactor;
                     o3dColor[1] = (double)testVal * cfactor;
                     o3dColor[2] = (double)testVal * cfactor;
                 }
+
+                
             }
             else
             {
-                //utility::LogInfo("using color");
                 o3dColor[0] = (double)(pclPoint.r / 255.f);
                 o3dColor[1] = (double)(pclPoint.g / 255.f);
                 o3dColor[2] = (double)(pclPoint.b / 255.f);
+ 
             }
 
             pointcloud.points_.push_back(o3dPoint);
