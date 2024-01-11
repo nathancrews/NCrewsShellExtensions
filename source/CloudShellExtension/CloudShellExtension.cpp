@@ -31,6 +31,8 @@ BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
         g_hinst = hInstance;
         DisableThreadLibraryCalls(hInstance);
 
+        HRESULT comInitStat = CoInitializeEx(0, COINIT_APARTMENTTHREADED);
+
         DWORD strSize = MAX_PATH;
         GetModuleFileNameW(hInstance, g_DllModelName, strSize);
 
@@ -39,10 +41,17 @@ BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
 
         open3d::utility::Logger::GetInstance().SetPrintFunction(cloud_print_fcn);
 
-        std::wstring appName = L"NCraft Cloud Image Generator";
-        std::wstring appUserModelID = L"NCraft Cloud Image Message";
+        WCHAR appdata[MAX_PATH] = { 0 };
+        SHGetFolderPathW(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, appdata);
+
+        g_AppDataPath = appdata;
+        g_AppDataPath.append(L"NCraft Software\\CloudShellExtension\\");
+
+        utility::LogInfo("appdata = {}", g_AppDataPath.string());
+
+        std::wstring appUserModelID = L"NCraft Image Generator";
  
-        WinToastLib::WinToast::instance()->setAppName(appName);
+        WinToastLib::WinToast::instance()->setAppName(g_AppName);
         WinToastLib::WinToast::instance()->setAppUserModelId(appUserModelID);
 
         if (!WinToastLib::WinToast::instance()->initialize())
@@ -77,7 +86,6 @@ HRESULT DllCanUnloadNow(void)
 
         utility::LogInfo("DllCanUnloadNow calling GdiplusShutdown and unloading.");
         GdiplusShutdown(g_gpToken);
-
         return S_OK;
     }
 

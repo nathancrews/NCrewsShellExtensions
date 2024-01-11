@@ -8,10 +8,10 @@
     <ROW Property="ALLUSERS" Value="1"/>
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
     <ROW Property="ARPPRODUCTICON" Value="DesktopFolder.exe" Type="8"/>
-    <ROW Property="Manufacturer" Value="Ncraft Software"/>
+    <ROW Property="Manufacturer" Value="NCraft Software"/>
     <ROW Property="ProductCode" Value="1033:{578B5E68-C21A-4C72-BAB7-933F1854442E} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
-    <ROW Property="ProductName" Value="NCraft Point Cloud Extension"/>
+    <ROW Property="ProductName" Value="NCraft Point Cloud Shell Extension"/>
     <ROW Property="ProductVersion" Value="1.0.0" Options="32"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{D5367029-34E7-40AD-B5E7-62A76AE6685E}"/>
@@ -30,9 +30,15 @@
     <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR:." IsPseudoRoot="1"/>
     <ROW Directory="DesktopFolder" Directory_Parent="TARGETDIR" DefaultDir="DESKTO~1|DesktopFolder" IsPseudoRoot="1"/>
     <ROW Directory="LocalAppDataFolder" Directory_Parent="TARGETDIR" DefaultDir="LOCALA~1|LocalAppDataFolder" IsPseudoRoot="1"/>
+    <ROW Directory="NCraftSoftware_1_Dir" Directory_Parent="PersonalFolder" DefaultDir="NCRAFT~1|NCraft Software"/>
+    <ROW Directory="NCraftSoftware_2_Dir" Directory_Parent="ProgramMenuFolder" DefaultDir="NCRAFT~1|NCraft Software"/>
+    <ROW Directory="NCraftSoftware_Dir" Directory_Parent="LocalAppDataFolder" DefaultDir="NCRAFT~1|NCraft Software"/>
+    <ROW Directory="PersonalFolder" Directory_Parent="TARGETDIR" DefaultDir="PERSON~1|PersonalFolder" IsPseudoRoot="1"/>
+    <ROW Directory="PointcloudSampleFiles_Dir" Directory_Parent="NCraftSoftware_1_Dir" DefaultDir="POINTC~1|Pointcloud Sample Files"/>
+    <ROW Directory="ProductName_Dir" Directory_Parent="NCraftSoftware_Dir" DefaultDir="CLOUDS~1|CloudShellExtension"/>
+    <ROW Directory="ProgramMenuFolder" Directory_Parent="TARGETDIR" DefaultDir="PROGRA~1|ProgramMenuFolder" IsPseudoRoot="1"/>
     <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
     <ROW Directory="resources_1_Dir" Directory_Parent="APPDIR" DefaultDir="RESOUR~1|resources"/>
-    <ROW Directory="samples_Dir" Directory_Parent="LocalAppDataFolder" DefaultDir="samples"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
     <ROW Component="APPDIR" ComponentId="{0213DF95-04DE-4A81-9778-10960CED34AA}" Directory_="APPDIR" Attributes="0"/>
@@ -41,12 +47,15 @@
     <ROW Component="C6D56CF1C574BE187365A3D02A68187" ComponentId="{2AFDCDF5-3993-4D2F-94CA-28350E3ADA88}" Directory_="APPDIR" Attributes="260" KeyPath="C6D56CF1C574BE187365A3D02A68187"/>
     <ROW Component="CLSID" ComponentId="{F9E7CEC5-2DE8-4AF5-803B-1C8A4F336C67}" Directory_="APPDIR" Attributes="260" KeyPath="CLSID"/>
     <ROW Component="CLSID_1" ComponentId="{0BAEB04D-CB1C-481F-87DA-BC7AFFA489D0}" Directory_="APPDIR" Attributes="260" KeyPath="CLSID_1"/>
+    <ROW Component="CloudExtensionOptions.exe" ComponentId="{BBFA104E-4CAD-4C95-9B8E-B3E8295794F1}" Directory_="APPDIR" Attributes="0" KeyPath="CloudExtensionOptions.exe"/>
     <ROW Component="CloudShellExtension.dll_1" ComponentId="{2073349A-E606-417E-865F-A73C185A5DA9}" Directory_="APPDIR" Attributes="256" KeyPath="CloudShellExtension.dll"/>
     <ROW Component="CloudShellExtension.exp_1" ComponentId="{4273E4B5-C548-4398-A520-4DF2DBFCAA5D}" Directory_="APPDIR" Attributes="0" KeyPath="proj.db" Type="0"/>
     <ROW Component="Directory" ComponentId="{5A249A9C-F218-4F73-8C82-A81D666CF0A9}" Directory_="APPDIR" Attributes="260" KeyPath="Directory"/>
     <ROW Component="Directory_1" ComponentId="{55A9529E-848D-4F8D-89B4-4329B5F6E220}" Directory_="APPDIR" Attributes="260" KeyPath="Directory_1"/>
     <ROW Component="Lerc.dll" ComponentId="{E7652020-C160-4FA8-9D41-EDFA7AF23165}" Directory_="APPDIR" Attributes="256" KeyPath="Lerc.dll"/>
     <ROW Component="Microsoft" ComponentId="{CEFA8FE7-FA0A-46E6-869B-986E9C7947DE}" Directory_="APPDIR" Attributes="260" KeyPath="Microsoft"/>
+    <ROW Component="Microsoft.Win32.Registry.dll" ComponentId="{FA17E94D-5FC6-43E0-9D27-94815D0EF75A}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Win32.Registry.dll"/>
+    <ROW Component="NCraftSoftware" ComponentId="{41F92DED-93DC-44E3-84EC-E2958A4F7A1E}" Directory_="NCraftSoftware_2_Dir" Attributes="0"/>
     <ROW Component="New_Key" ComponentId="{6D5F2708-ED56-4D55-A281-A96B10740965}" Directory_="APPDIR" Attributes="260" KeyPath="New_Key"/>
     <ROW Component="Open3D.dll_1" ComponentId="{CEEFA860-1E18-43D7-81D3-A21741D461E6}" Directory_="APPDIR" Attributes="256" KeyPath="Open3D.dll_1"/>
     <ROW Component="OpenNI2.dll" ComponentId="{1E3EB828-2771-4A5B-838B-37035EFA3E2F}" Directory_="APPDIR" Attributes="256" KeyPath="OpenNI2.dll"/>
@@ -59,6 +68,7 @@
     <ROW Component="_" ComponentId="{F857EB57-167D-4F04-B0CE-2DF4C3480D86}" Directory_="APPDIR" Attributes="260" KeyPath="_"/>
     <ROW Component="__1" ComponentId="{6A1F112D-2956-4184-A425-23CF2382A679}" Directory_="APPDIR" Attributes="260" KeyPath="__1"/>
     <ROW Component="__10" ComponentId="{93223D0B-249B-4345-BF1F-2C20D303394B}" Directory_="APPDIR" Attributes="260" KeyPath="__10"/>
+    <ROW Component="__11" ComponentId="{48C10561-1A1D-4544-9409-BC3F14A40C25}" Directory_="APPDIR" Attributes="260" KeyPath="__11"/>
     <ROW Component="__2" ComponentId="{7C6527C1-62E4-4519-8AD2-56A9A2BF09C9}" Directory_="APPDIR" Attributes="260" KeyPath="__2"/>
     <ROW Component="__3" ComponentId="{10A8F6E7-1A46-4409-AB23-CE34E6E23631}" Directory_="APPDIR" Attributes="260" KeyPath="__3"/>
     <ROW Component="__33" ComponentId="{3A1B9FA3-F3C9-4B9B-9792-1B6458CED7B9}" Directory_="APPDIR" Attributes="260" KeyPath="__33"/>
@@ -91,7 +101,7 @@
     <ROW Component="concrt140.dll" ComponentId="{7B15FCB0-681D-49D4-A344-006A16647B23}" Directory_="APPDIR" Attributes="256" KeyPath="concrt140.dll"/>
     <ROW Component="crc32c.dll" ComponentId="{6AA34F31-F6D3-4398-B108-3BAA7BDBF818}" Directory_="APPDIR" Attributes="256" KeyPath="crc32c.dll"/>
     <ROW Component="cxsparse.dll" ComponentId="{76348D52-E78E-466D-BAEB-DCD6630B196D}" Directory_="APPDIR" Attributes="256" KeyPath="cxsparse.dll"/>
-    <ROW Component="dc.laz" ComponentId="{869E7793-B81F-4004-9637-1C09684A55DF}" Directory_="samples_Dir" Attributes="0" KeyPath="dc.laz" Type="0"/>
+    <ROW Component="dc.laz" ComponentId="{FD11A017-E7E7-4C37-83E0-3EEE3E6E6B00}" Directory_="PointcloudSampleFiles_Dir" Attributes="0" KeyPath="dc.laz" Type="0"/>
     <ROW Component="deflate.dll" ComponentId="{29A0157A-C3D6-4368-9C19-C97DA405EB10}" Directory_="APPDIR" Attributes="256" KeyPath="deflate.dll"/>
     <ROW Component="expat.dll" ComponentId="{DCEA9216-2AC4-4745-8A5B-77A96DC73601}" Directory_="APPDIR" Attributes="256" KeyPath="expat.dll"/>
     <ROW Component="ffi8.dll" ComponentId="{2C7F3164-86D9-4879-AB52-E9C0784064FF}" Directory_="APPDIR" Attributes="256" KeyPath="ffi8.dll"/>
@@ -214,6 +224,7 @@
     <ROW Component="popplerglib.dll" ComponentId="{B54F7220-0A65-4F39-B17E-4A315A1B0445}" Directory_="APPDIR" Attributes="256" KeyPath="popplerglib.dll"/>
     <ROW Component="proj_9_3.dll" ComponentId="{936AD407-DC33-4F3D-8311-C9E90A12424D}" Directory_="APPDIR" Attributes="256" KeyPath="proj_9_3.dll"/>
     <ROW Component="re2.dll" ComponentId="{625C1070-4E04-4EFA-82D8-EC97C1882D7D}" Directory_="APPDIR" Attributes="256" KeyPath="re2.dll"/>
+    <ROW Component="settings.xml" ComponentId="{E110DD1C-67F4-44C3-B7FC-4A19281117FA}" Directory_="ProductName_Dir" Attributes="0" KeyPath="settings.xml" Type="0"/>
     <ROW Component="snappy.dll" ComponentId="{C78FCB89-FA45-4177-979C-6240831C898D}" Directory_="APPDIR" Attributes="256" KeyPath="snappy.dll"/>
     <ROW Component="spatialite.dll" ComponentId="{2A920338-B749-460F-9030-48307ED497B2}" Directory_="APPDIR" Attributes="256" KeyPath="spatialite.dll"/>
     <ROW Component="spqr.dll" ComponentId="{2419F654-3D20-46AF-ACFF-EB35831E2E2D}" Directory_="APPDIR" Attributes="256" KeyPath="spqr.dll"/>
@@ -469,8 +480,12 @@
     <ROW File="zip.dll" Component_="zip.dll" FileName="zip.dll" Attributes="0" SourcePath="Release\zip.dll" SelfReg="false"/>
     <ROW File="zlib.dll" Component_="zlib.dll" FileName="zlib.dll" Attributes="0" SourcePath="Release\zlib.dll" SelfReg="false"/>
     <ROW File="zstd.dll" Component_="zstd.dll" FileName="zstd.dll" Attributes="0" SourcePath="Release\zstd.dll" SelfReg="false"/>
+    <ROW File="settings.xml" Component_="settings.xml" FileName="settings.xml" Attributes="0" SourcePath="..\CloudExtensionOptions\Settings\settings.xml" SelfReg="false"/>
     <ROW File="dc.laz" Component_="dc.laz" FileName="dc.laz" Attributes="0" SourcePath="..\sample\dc.laz" SelfReg="false"/>
     <ROW File="sample.laz" Component_="dc.laz" FileName="sample.laz" Attributes="0" SourcePath="..\sample\sample.laz" SelfReg="false"/>
+    <ROW File="CloudExtensionOptions.exe" Component_="CloudExtensionOptions.exe" FileName="CLOUDE~1.EXE|CloudExtensionOptions.exe" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\CloudExtensionOptions.exe" SelfReg="false" DigSign="true"/>
+    <ROW File="CloudExtensionOptions.exe.config" Component_="CloudShellExtension.exp_1" FileName="CLOUDE~1.CON|CloudExtensionOptions.exe.config" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\CloudExtensionOptions.exe.config" SelfReg="false"/>
+    <ROW File="Microsoft.Win32.Registry.dll" Component_="Microsoft.Win32.Registry.dll" FileName="MICROS~1.DLL|Microsoft.Win32.Registry.dll" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\Microsoft.Win32.Registry.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
     <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
@@ -526,6 +541,7 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
     <ROW Directory_="APPDIR" Component_="APPDIR" ManualDelete="true"/>
+    <ROW Directory_="NCraftSoftware_2_Dir" Component_="NCraftSoftware" ManualDelete="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
     <ROW Action="AI_DOWNGRADE" Type="19" Target="4010"/>
@@ -717,7 +733,6 @@
     <ROW Feature_="MainFeature" Component_="zlib.dll"/>
     <ROW Feature_="MainFeature" Component_="zstd.dll"/>
     <ROW Feature_="MainFeature" Component_="CloudShellExtension.dll_1"/>
-    <ROW Feature_="MainFeature" Component_="dc.laz"/>
     <ROW Feature_="MainFeature" Component_="CloudShellExtension.exp_1"/>
     <ROW Feature_="MainFeature" Component_="CLSID"/>
     <ROW Feature_="MainFeature" Component_="C2E79339590A4B13AFCF3A31FB39C7A8"/>
@@ -752,6 +767,12 @@
     <ROW Feature_="MainFeature" Component_="__9"/>
     <ROW Feature_="MainFeature" Component_="__10"/>
     <ROW Feature_="MainFeature" Component_="New_Key"/>
+    <ROW Feature_="MainFeature" Component_="settings.xml"/>
+    <ROW Feature_="MainFeature" Component_="dc.laz"/>
+    <ROW Feature_="MainFeature" Component_="CloudExtensionOptions.exe"/>
+    <ROW Feature_="MainFeature" Component_="NCraftSoftware"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Win32.Registry.dll"/>
+    <ROW Feature_="MainFeature" Component_="__11"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="DesktopFolder.exe" SourcePath="Release\resources\NCraft.ico" Index="0"/>
@@ -777,6 +798,10 @@
     <ROW Condition="(VersionNT &lt;&gt; 500)" Description="[ProductName] cannot be installed on [WindowsTypeNT50Display]." DescriptionLocId="AI.LaunchCondition.NoNT50" IsPredefined="true" Builds="DefaultBuild"/>
     <ROW Condition="(VersionNT &lt;&gt; 600)" Description="[ProductName] cannot be installed on [WindowsTypeNT60Display]." DescriptionLocId="AI.LaunchCondition.NoNT60" IsPredefined="true" Builds="DefaultBuild"/>
     <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]." DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="DefaultBuild"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiMergeModsComponent">
+    <ROW Module="Microsoft_VC143_CRT_x64.msm" Path="C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.38.33130\MergeModules\Microsoft_VC143_CRT_x64.msm" Feature="MainFeature" Directory="APPDIR" Order="2"/>
+    <ROW Module="Microsoft_VC143_OpenMP_x64.msm" Path="C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.38.33130\MergeModules\Microsoft_VC143_OpenMP_x64.msm" Feature="MainFeature" Directory="APPDIR" Order="1"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
     <ROW Registry="Approved" Root="2" Key="Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved" Name="\"/>
@@ -812,10 +837,12 @@
     <ROW Registry="InProcServer32" Root="1" Key="Software\Classes\CLSID\{C2E79339-590A-4B13-AFCF-3A31FB39C7A8}\InProcServer32" Name="\"/>
     <ROW Registry="InProcServer32_1" Root="0" Key="Software\Classes\CLSID\{C2E79339-590A-4B13-AFCF-3A31FB39C7A8}\InProcServer32" Name="\"/>
     <ROW Registry="Manufacturer" Root="-1" Key="Software\[Manufacturer]" Name="\"/>
+    <ROW Registry="Manufacturer_1" Root="1" Key="Software\[Manufacturer]" Name="\"/>
     <ROW Registry="Microsoft" Root="2" Key="Software\Microsoft" Name="+" Component_="Microsoft"/>
     <ROW Registry="New_Key" Root="2" Key="Software\Microsoft\Windows\CurrentVersion" Name="+" Component_="New_Key"/>
     <ROW Registry="Path" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Path" Value="[APPDIR]" Component_="ProductInformation"/>
     <ROW Registry="ProductName" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="\"/>
+    <ROW Registry="ProductName_1" Root="1" Key="Software\[Manufacturer]\[ProductName]" Name="\"/>
     <ROW Registry="ShellEx" Root="1" Key="Software\Classes\.las\ShellEx" Name="\"/>
     <ROW Registry="ShellEx_1" Root="1" Key="Software\Classes\.laz\ShellEx" Name="\"/>
     <ROW Registry="ShellEx_2" Root="1" Key="Software\Classes\.pcd\ShellEx" Name="\"/>
@@ -836,6 +863,7 @@
     <ROW Registry="_" Root="1" Key="Software\Classes\CLSID\{C2E79339-590A-4B13-AFCF-3A31FB39C7A8}\InProcServer32" Value="[#CloudShellExtension.dll]" Component_="_"/>
     <ROW Registry="__1" Root="0" Key="Software\Classes\CLSID\{C2E79339-590A-4B13-AFCF-3A31FB39C7A8}\InProcServer32" Value="[#CloudShellExtension.dll]" Component_="__1"/>
     <ROW Registry="__10" Root="0" Key="Software\Classes\.ply\ShellEx\ContextMenuHandlers\CloudShellExtension" Value="[\{]C2E79339-590A-4B13-AFCF-3A31FB39C7A8[\}]" Component_="__10"/>
+    <ROW Registry="__11" Root="1" Key="Software\[Manufacturer]\[ProductName]" Value="[#CloudShellExtension.dll]" Component_="__11"/>
     <ROW Registry="__2" Root="1" Key="Software\Classes\.las\ShellEx\ContextMenuHandlers\CloudShellExtension" Value="[\{]C2E79339-590A-4B13-AFCF-3A31FB39C7A8[\}]" Component_="__2"/>
     <ROW Registry="__3" Root="1" Key="Software\Classes\.laz\ShellEx\ContextMenuHandlers\CloudShellExtension" Value="[\{]C2E79339-590A-4B13-AFCF-3A31FB39C7A8[\}]" Component_="__3"/>
     <ROW Registry="__33" Root="1" Key="Software\Classes\Directory\shellex\ContextMenuHandlers\CloudShellExtension" Value="[\{]C2E79339-590A-4B13-AFCF-3A31FB39C7A8[\}]" Component_="__33"/>
@@ -857,7 +885,8 @@
     <ROW Registry="shellex_1" Root="1" Key="Software\Classes\Directory\shellex" Name="\"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
-    <ROW Shortcut="PointcloudSamples" Directory_="DesktopFolder" Name="POINTC~1|Pointcloud Samples" Component_="APPDIR" Target="[samples_Dir]" Hotkey="0" Icon_="DesktopFolder.exe" IconIndex="0" ShowCmd="1"/>
+    <ROW Shortcut="CloudExtensionOptions" Directory_="NCraftSoftware_2_Dir" Name="CLOUDE~1|CloudExtensionOptions" Component_="CloudExtensionOptions.exe" Target="[#CloudExtensionOptions.exe]" Hotkey="0" Icon_="DesktopFolder.exe" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
+    <ROW Shortcut="PointcloudSampleFiles" Directory_="DesktopFolder" Name="POINTC~2|Pointcloud Sample Files" Component_="CloudShellExtension.exp_1" Target="[PointcloudSampleFiles_Dir]" Hotkey="0" Icon_="DesktopFolder.exe" IconIndex="0" ShowCmd="1" WkDir="PointcloudSampleFiles_Dir"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiThemeComponent">
     <ATTRIBUTE name="UsedTheme" value="classic"/>

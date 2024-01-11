@@ -36,10 +36,9 @@ namespace NCraftImageGen
 {
 
 UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::filesystem::path>& filePaths,
+                           NCraftImageGen::ImageGenSettings& imageSettings,
                            tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& outRenderResults)
 {
-    const int width = 2048;
-    const int height = 1640;
     UINT pointsTotal = 0;
     std::filesystem::path resourcePath = appPath;
     resourcePath += L"resources";
@@ -104,7 +103,7 @@ UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::file
 
         std::filesystem::file_time_type sourceFiletime = std::filesystem::last_write_time(reqPath);
         std::filesystem::path imagePath = reqPath;
-        imagePath = imagePath.replace_extension("jpg");
+        imagePath = imagePath.replace_extension(imageSettings.imageFormat);
 
         toAddResult.m_ImageName = imagePath;
 
@@ -171,9 +170,8 @@ UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::file
         int pntsPerSec = (int)(pointCountTotal / execExecTotal);
         utility::LogInfo("[INNER COUNT {}] ==>Loaded {} Total Points, Total Loading Process Duration: {} seconds, pnts/sec = {}", innerRenderResults.size(), pointCountTotal, execExecTotal, pntsPerSec);
 
-
         FilamentRenderer* renderer =
-            new FilamentRenderer(EngineInstance::GetInstance(), width, height,
+            new FilamentRenderer(EngineInstance::GetInstance(), imageSettings.imageWidth, imageSettings.imageHeight,
                                  EngineInstance::GetResourceManager());
 
         if (!renderer)
@@ -186,7 +184,7 @@ UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::file
             if ((innerRenderResults[sz].m_imageFileCacheOk == false) &&
                 innerRenderResults[sz].m_cloudPtr.get())
             {
-                RenderPointcloudToImage(renderer, innerRenderResults[sz]);
+                RenderPointcloudToImage(renderer, imageSettings, innerRenderResults[sz]);
             }
 
             if (innerRenderResults[sz].m_cloudPtr.get())
@@ -196,22 +194,21 @@ UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::file
         }
 
         delete renderer;
-     }
+    }
 
     timer.Stop();
 
     exeTime = timer.GetDurationInSecond();
 
-    utility::LogInfo("Finished Loading {} files, points {}, Total Loading Process Duration: {} seconds", 
+    utility::LogInfo("Finished Loading {} files, points {}, Total Loading Process Duration: {} seconds",
                      outRenderResults.size(), pointsTotal, exeTime);
 
     return pointsTotal;
 }
 
-UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::ImageGenResult& fileInfo)
+UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::ImageGenSettings& imageSettings,
+                             NCraftImageGen::ImageGenResult& fileInfo)
 {
-    const int width = 1440;
-    const int height = 1080;
     UINT millionVal = 1000000;
     UINT kVal = 1000;
     char pointCountStr[MAX_PATH] = { 0 };
@@ -221,7 +218,7 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
 
     std::filesystem::path imagePath = fileInfo.m_FileName;
 
-    imagePath = imagePath.replace_extension("jpg");
+    imagePath = imagePath.replace_extension(imageSettings.imageFormat);
 
     fileInfo.m_ImageName = imagePath;
 
@@ -243,21 +240,44 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
             scene->SetBackground(color);
             scene->ShowAxes(false);
 
-            scene->AddGeometry(fileInfo.m_FileName.string(), fileInfo.m_cloudPtr.get(), pointcloud_mat, true);
+            scene->AddGeometry(fileInfo.m_FileName.string(), fileInfo.m_cloudPtr.get(), pointcloud_mat, false);
             auto& bounds = scene->GetBoundingBox();
 
             if (bounds.GetMaxExtent() > 0.0f)
             {
-                float max_dim = float(0.3 * bounds.GetMaxExtent());
-                Eigen::Vector3f center = bounds.GetCenter().cast<float>();
-                Eigen::Vector3f eye, up;
+                double max_dim = double(0.3 * bounds.GetMaxExtent());
 
-                eye = Eigen::Vector3f(center.x() + (max_dim / 1.2),
-                                      center.y() + (max_dim / 1.2),
-                                      center.z() + (max_dim / 1));
-                up = Eigen::Vector3f(0, 0, 1);
+                if (bounds.GetExtent().z() > std::max(bounds.GetExtent().x(), bounds.GetExtent().y()) / 3.0)
+                {
+                    utility::LogInfo("Using alternate Camera Z...");
 
-                scene->GetCamera()->LookAt(center, eye, up);
+                    Eigen::Vector3f center = bounds.GetCenter().cast<float>();
+                    Eigen::Vector3f eye, up;
+
+                    double zcamVec = std::max(bounds.GetExtent().x(), bounds.GetExtent().y()) * 0.20;
+
+                    eye = Eigen::Vector3f(center.x() + (max_dim / 1.0),
+                                          center.y() + (max_dim / 1.0),
+                                          bounds.min_bound_.z() + zcamVec);
+                    Eigen::Vector3f newCenter(center.x(), center.y(), bounds.min_bound_.z());
+                    up = Eigen::Vector3f(0, 0, 1);
+
+                    scene->GetCamera()->LookAt(newCenter, eye, up);
+                }
+                else
+                {
+                    Eigen::Vector3f center = bounds.GetCenter().cast<float>();
+                    Eigen::Vector3f eye, up;
+
+                    eye = Eigen::Vector3f(center.x() + (max_dim / 1.0),
+                                          center.y() + (max_dim / 1.0),
+                                          center.z() + (max_dim / 1.0));
+                    up = Eigen::Vector3f(0, 0, 1);
+
+                    Eigen::Vector3f newCenter(center.x(), center.y(), bounds.min_bound_.z());
+
+                    scene->GetCamera()->LookAt(newCenter, eye, up);
+                }
 
                 std::shared_ptr<geometry::Image> img;
                 auto callback = [&img](std::shared_ptr<geometry::Image> _img)
@@ -265,12 +285,12 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
                         img = _img;
                     };
 
-                scene->GetView()->SetViewport(0, 0, width, height);
+                scene->GetView()->SetViewport(0, 0, imageSettings.imageWidth, imageSettings.imageHeight);
                 modelRenderer->RenderToImage(scene->GetView(), scene->GetScene(), callback);
                 modelRenderer->BeginFrame();
                 modelRenderer->EndFrame();
 
-                io::WriteImage(imagePath.string(), *img, 100);
+                io::WriteImage(imagePath.string(), *img);
 
                 utility::LogInfo("Creating OpenCV image...");
 
@@ -280,7 +300,7 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
                 double lineWidth = 1.0;
                 unsigned int rowSpacing = 25, horOffset = 25;
 
-                imgWithText2.create(img->height_, img->width_, CV_8UC3);
+                imgWithText2.create(imageSettings.imageHeight, imageSettings.imageWidth, CV_8UC3);
 
                 if (imgWithText2.data)
                 {
@@ -340,10 +360,32 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
 
                     nextTextRow += ts.height + rowSpacing;
 
+                    utility::LogInfo("text scale {}, origin {}", textScale, nextTextRow);
+
                     infoText = "Number of points : " + std::string(pointCountStr);
 
                     cv::putText(imgWithText2, infoText, cv::Point(horOffset, nextTextRow),
                                 cv::FONT_HERSHEY_SIMPLEX, textScale, textColor);
+
+                    //*******************************************************************************************************
+                    // Check license and add watermark
+                    if (imageSettings.is_Licensed == false)
+                    {
+                        textColor[0] = 0;
+                        textColor[1] = 255;
+                        textColor[2] = 255;
+                        double lineWidth = 25.0;
+                        textScale = imageSettings.imageWidth / 75;
+
+                        cv::Size ts = cv::getTextSize(infoText, cv::FONT_HERSHEY_SIMPLEX, textScale, lineWidth, &bl);
+
+                        nextTextRow = ts.height + imageSettings.imageHeight / 3.0;
+
+                        infoText = "FREE";
+
+                        cv::putText(imgWithText2, infoText, cv::Point(0, nextTextRow),
+                                    cv::FONT_HERSHEY_SIMPLEX, textScale, textColor, lineWidth);
+                    }
 
                     //*******************************************************************************************************
                     utility::LogInfo("Writing image file with text: {}", fileInfo.m_ImageName.string());
@@ -354,7 +396,7 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
                 else
                 {
                     utility::LogInfo("Writing image file: {}", imagePath.string());
-                    io::WriteImage(imagePath.string(), *img, 100);
+                    io::WriteImage(imagePath.string(), *img);
                 }
 
             }
@@ -366,8 +408,341 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCraftImageGen::Im
     return 1;
 }
 
+UINT RenderPointcloudFilesToSingleImage(std::filesystem::path& appPath, std::vector<std::filesystem::path>& filePaths,
+                                        NCraftImageGen::ImageGenSettings& imageSettings,
+                                        tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& outRenderResults)
+{
 
-UINT LoadPointCloudFile(NCraftImageGen::ImageGenResult& outLoadResults)
+    UINT pointsTotal = 0;
+    std::filesystem::path resourcePath = appPath;
+    resourcePath += L"resources";
+
+    EngineInstance::SetResourcePath(resourcePath.string().c_str());
+
+    std::vector<std::filesystem::path> batchModeFilenames;
+
+    for (std::filesystem::path testPath : filePaths)
+    {
+        if (std::filesystem::is_directory(testPath))
+        {
+            GetFileNamesFromDirectory(testPath, PointcloudFileExtensions, batchModeFilenames);
+        }
+        else
+        {
+            for (std::string pcext : PointcloudFileExtensions)
+            {
+                if (!testPath.extension().compare(pcext))
+                {
+                    batchModeFilenames.push_back(testPath);
+                    break;
+                }
+            }
+        }
+    }
+
+    if (batchModeFilenames.empty())
+    {
+        return pointsTotal;
+    }
+
+    if (imageSettings.is_Licensed == false)
+    {
+        if (batchModeFilenames.size() > 3)
+        {
+            MessageBox(nullptr, L"Free version merge limit is three files.", L"NCraft Cloud Extension", MB_OK);
+
+            return pointsTotal;
+        }
+    }
+
+    if (batchModeFilenames.size() > 5)
+    {
+        int retval = MessageBox(nullptr, L"  Proceed to Generate Merged Image?", L"Info: Many files selected", MB_YESNO);
+
+        if (retval != 6)
+        {
+            return pointsTotal;
+        }
+    }
+
+    utility::Timer timer;
+    double exeTime = 0.0;
+
+    timer.Start();
+
+    for (std::filesystem::path reqPath : batchModeFilenames)
+    {
+        NCraftImageGen::ImageGenResult toAddResult(reqPath);
+
+        uintmax_t fsize = 0;
+        __std_win_error wep = std::filesystem::_File_size(reqPath, fsize);
+
+        toAddResult.m_fileSize = fsize;
+        toAddResult.m_modelType = 0;
+
+        std::filesystem::path imagePath = reqPath;
+        toAddResult.m_ImageName = imagePath.replace_extension(imageSettings.imageFormat);
+
+        outRenderResults.push_back(toAddResult);
+    }
+
+    utility::Timer timer2;
+    int pointCountTotal = 0;
+    double execExecTotal = 0.0;
+
+    timer2.Start();
+
+    pointCountTotal = LoadPointCloudFilesParallel(outRenderResults);
+
+    pointsTotal += pointCountTotal;
+
+    timer2.Stop();
+    execExecTotal = timer2.GetDurationInSecond();
+
+    utility::LogInfo("[Single Image Files: {}] ==>Total points {}, Loading Process Duration: {} seconds", outRenderResults.size(), pointCountTotal, execExecTotal);
+
+    FilamentRenderer* renderer =
+        new FilamentRenderer(EngineInstance::GetInstance(), imageSettings.imageWidth, imageSettings.imageHeight,
+                             EngineInstance::GetResourceManager());
+
+    if (renderer)
+    {
+        RenderPointcloudsToImage(renderer, imageSettings, outRenderResults);
+
+        for (NCraftImageGen::ImageGenResult res : outRenderResults)
+        {
+            if (res.m_cloudPtr)
+            {
+                res.m_cloudPtr->Clear();
+            }
+        }
+
+        delete renderer;
+    }
+
+    timer.Stop();
+
+    exeTime = timer.GetDurationInSecond();
+
+    utility::LogInfo("Single Image: finished Loading {} files, points {}, Total Loading Process Duration: {} seconds",
+                     outRenderResults.size(), pointsTotal, exeTime);
+
+    return pointsTotal;
+}
+
+UINT RenderPointcloudsToImage(FilamentRenderer* modelRenderer, NCraftImageGen::ImageGenSettings& imageSettings,
+                              tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& fileInfos)
+{
+    if (fileInfos.size() < 1)
+    {
+        return 0;
+    }
+
+    UINT millionVal = 1000000;
+    UINT kVal = 1000;
+    UINT totalPointCount = 0;
+    UINT totalFileSize = 0;
+    char pointCountStr[MAX_PATH] = { 0 };
+    char fileSizeStr[MAX_PATH] = { 0 };
+    std::string infoText;
+    auto* scene = new Open3DScene(*modelRenderer);
+
+    std::filesystem::path imagePath = fileInfos[0].m_FileName;
+    std::wstring imageName = fileInfos[0].m_FileName.filename();
+    std::wstring mergedImageName = L"Merged_" + imageName;
+
+    imagePath = imagePath.replace_filename(mergedImageName);
+    imagePath = imagePath.replace_extension(imageSettings.imageFormat);
+
+    fileInfos[0].m_ImageName = imagePath;
+
+    for (NCraftImageGen::ImageGenResult fileInfo : fileInfos)
+    {
+        totalPointCount += fileInfo.m_pointCount;
+        totalFileSize += fileInfo.m_fileSize;
+
+        if (fileInfo.m_cloudPtr)
+        {
+            auto pointcloud_mat = visualization::rendering::MaterialRecord();
+            pointcloud_mat.shader = "defaultUnlit";
+            pointcloud_mat.point_size = 3.25f;
+            pointcloud_mat.base_color = { 0.55f, 0.55f, 0.55f, 1.0f };
+            pointcloud_mat.sRGB_color = false;
+            scene->SetLighting(Open3DScene::LightingProfile::NO_SHADOWS, { 0.5f, -0.5f, -0.5f });
+            scene->GetScene()->EnableSunLight(true);
+            scene->GetScene()->SetSunLightIntensity(35000);
+            Eigen::Vector4f color = { 1.0, 1.0, 1.0, 1.0 };
+            scene->SetBackground(color);
+            scene->ShowAxes(true);
+
+            scene->AddGeometry(fileInfo.m_FileName.string(), fileInfo.m_cloudPtr.get(), pointcloud_mat, false);
+            utility::LogInfo("Added point cloud file: {}", fileInfo.m_FileName.string());
+        }
+    }
+
+    auto& bounds = scene->GetBoundingBox();
+    std::shared_ptr<geometry::Image> img;
+
+    if (bounds.GetMaxExtent() > 0.0f)
+    {
+        float max_dim = float(0.35 * bounds.GetMaxExtent());
+        if (bounds.GetExtent().z() > std::max(bounds.GetExtent().x(), bounds.GetExtent().y()) / 3.0)
+        {
+            utility::LogInfo("Using alternate Camera Z...");
+
+            Eigen::Vector3f center = bounds.GetCenter().cast<float>();
+            Eigen::Vector3f eye, up;
+
+            double zcamVec = std::max(bounds.GetExtent().x(), bounds.GetExtent().y()) * 0.20;
+
+            eye = Eigen::Vector3f(center.x() + (max_dim / 1.0),
+                                  center.y() + (max_dim / 1.0),
+                                  bounds.min_bound_.z() + zcamVec);
+            Eigen::Vector3f newCenter(center.x(), center.y(), bounds.min_bound_.z());
+            up = Eigen::Vector3f(0, 0, 1);
+
+            scene->GetCamera()->LookAt(newCenter, eye, up);
+        }
+        else
+        {
+            Eigen::Vector3f center = bounds.GetCenter().cast<float>();
+            Eigen::Vector3f eye, up;
+
+            eye = Eigen::Vector3f(center.x() + (max_dim / 1.0),
+                                  center.y() + (max_dim / 1.0),
+                                  center.z() + (max_dim / 1.0));
+            up = Eigen::Vector3f(0, 0, 1);
+
+            Eigen::Vector3f newCenter(center.x(), center.y(), bounds.min_bound_.z());
+
+            scene->GetCamera()->LookAt(newCenter, eye, up);
+        }
+
+        auto callback = [&img](std::shared_ptr<geometry::Image> _img)
+            {
+                img = _img;
+            };
+
+        scene->GetView()->SetViewport(0, 0, imageSettings.imageWidth, imageSettings.imageHeight);
+        modelRenderer->RenderToImage(scene->GetView(), scene->GetScene(), callback);
+        modelRenderer->BeginFrame();
+        modelRenderer->EndFrame();
+
+        scene->ClearGeometry();
+        delete scene;
+    }
+
+    io::WriteImage(imagePath.string(), *img);
+
+    utility::LogInfo("Creating OpenCV image...");
+
+    cv::Mat imgWithText2;
+    cv::Scalar textColor(255, 0, 0);
+    double textScale = 1.25;
+    double lineWidth = 1.0;
+    unsigned int rowSpacing = 25, horOffset = 25;
+
+    imgWithText2.create(imageSettings.imageHeight, imageSettings.imageWidth, CV_8UC3);
+
+    if (imgWithText2.data)
+    {
+        memcpy(imgWithText2.data, img->data_.data(), img->data_.size());
+
+        utility::LogInfo("Writing text to OpenCV image..");
+
+        int bl = 0;
+
+        infoText = "Produced by: NCraft Pointcloud Shell Extension 1.0";
+        cv::Size ts = cv::getTextSize(infoText, cv::FONT_HERSHEY_SIMPLEX, textScale, lineWidth, &bl);
+
+        unsigned int nextTextRow = ts.height + rowSpacing;
+
+        cv::putText(imgWithText2, infoText, cv::Point(horOffset, nextTextRow),
+                    cv::FONT_HERSHEY_SIMPLEX, textScale, textColor);
+
+        textScale = 1.0;
+
+        infoText = "Merged file reference: " + fileInfos[0].m_FileName.filename().string();
+        nextTextRow += ts.height + rowSpacing;
+        cv::putText(imgWithText2, infoText, cv::Point(horOffset, nextTextRow),
+                    cv::FONT_HERSHEY_SIMPLEX, textScale * 0.75, textColor);
+
+        if (totalFileSize > 1048576 * 1000)
+        {
+            sprintf(fileSizeStr, "Source files total size: %0.3f GB", (double)(totalFileSize) / (double)(1048576 * 1000));
+        }
+        else if (totalFileSize > 1048576)
+        {
+            sprintf(fileSizeStr, "Source files total size: %0.3f MB", (double)(totalFileSize) / (double)(1048576));
+        }
+        else
+        {
+            sprintf(fileSizeStr, "Source files total size: %0.2f KB", (double)(totalFileSize / (double)1048));
+        }
+
+        nextTextRow += ts.height + rowSpacing;
+
+        infoText = fileSizeStr;
+
+        cv::putText(imgWithText2, infoText, cv::Point(horOffset, nextTextRow),
+                    cv::FONT_HERSHEY_SIMPLEX, textScale, textColor);
+
+        if (totalPointCount > millionVal)
+        {
+            sprintf(pointCountStr, "%0.3f M", (double)(totalPointCount) / (double)millionVal);
+        }
+        else if (totalPointCount > kVal)
+        {
+            sprintf(pointCountStr, "%0.3f K", (double)(totalPointCount) / (double)kVal);
+        }
+        else
+        {
+            sprintf(pointCountStr, "%d", totalPointCount);
+        }
+
+        nextTextRow += ts.height + rowSpacing;
+
+        infoText = "Total points rendered : " + std::string(pointCountStr);
+
+        cv::putText(imgWithText2, infoText, cv::Point(horOffset, nextTextRow),
+                    cv::FONT_HERSHEY_SIMPLEX, textScale, textColor);
+
+        //*******************************************************************************************************
+        // Check license and add watermark
+        if (imageSettings.is_Licensed == false)
+        {
+            textColor[0] = 0;
+            textColor[1] = 255;
+            textColor[2] = 255;
+            double lineWidth = 25.0;
+            textScale = imageSettings.imageWidth / 75;
+
+            cv::Size ts = cv::getTextSize(infoText, cv::FONT_HERSHEY_SIMPLEX, textScale, lineWidth, &bl);
+
+            nextTextRow = ts.height + imageSettings.imageHeight / 3.0;
+
+            infoText = "FREE";
+
+            cv::putText(imgWithText2, infoText, cv::Point(0, nextTextRow),
+                        cv::FONT_HERSHEY_SIMPLEX, textScale, textColor, lineWidth);
+        }
+
+        //*******************************************************************************************************
+        utility::LogInfo("Writing image file with text: {}", imagePath.string());
+        cv::imwrite(imagePath.string().c_str(), imgWithText2);
+
+        imgWithText2.release();
+    }
+    else
+    {
+        utility::LogInfo("Writing image file: {}", imagePath.string());
+        io::WriteImage(imagePath.string(), *img);
+    }
+
+    return 1;
+}
+
+UINT LoadPointCloudFile(NCraftImageGen::ImageGenResult& outLoadResults, pcl::PointXYZRGB* mergedBasePoint)
 {
     int pointCount = 0;
     double execExecTotal = 0.0;
@@ -390,7 +765,7 @@ UINT LoadPointCloudFile(NCraftImageGen::ImageGenResult& outLoadResults)
         if (new_cloud_ptr)
         {
 
-            pointCount = LoadLASorLAZToO3DCloud(outLoadResults.m_FileName, *new_cloud_ptr);
+            pointCount = LoadLASorLAZToO3DCloud(outLoadResults.m_FileName, *new_cloud_ptr, mergedBasePoint);
             outLoadResults.m_pointCount = pointCount;
             new_cloud_ptr->SetName(outLoadResults.m_FileName.string());
             outLoadResults.m_cloudPtr = new_cloud_ptr;
@@ -482,6 +857,7 @@ UINT LoadPointCloudFilesParallel(tbb::concurrent_vector<NCraftImageGen::ImageGen
     double exeTime = 0.0;
 
     utility::Timer timer;
+    pcl::PointXYZRGB mergedBasePoint;
     omp_lock_t writelock;
     omp_init_lock(&writelock);
 
@@ -491,14 +867,23 @@ UINT LoadPointCloudFilesParallel(tbb::concurrent_vector<NCraftImageGen::ImageGen
     {
         if (outLoadResults[0].m_imageFileCacheOk == false)
         {
-            pointCount = LoadPointCloudFile(outLoadResults[0]);
+            pointCount = LoadPointCloudFile(outLoadResults[0], &mergedBasePoint);
             pointCountTotal = pointCount;
         }
     }
     else
     {
+        if (outLoadResults[0].m_imageFileCacheOk == false)
+        {
+            if (outLoadResults[0].m_imageFileCacheOk == false)
+            {
+                pointCount = LoadPointCloudFile(outLoadResults[0], &mergedBasePoint);
+                pointCountTotal = pointCount;
+            }
+        }
+
 #pragma omp parallel for
-        for (int sz = 0; sz < outLoadResults.size(); ++sz)
+        for (int sz = 1; sz < outLoadResults.size(); ++sz)
         {
             if (outLoadResults[sz].m_imageFileCacheOk == false)
             {
@@ -509,7 +894,7 @@ UINT LoadPointCloudFilesParallel(tbb::concurrent_vector<NCraftImageGen::ImageGen
                 utility::Timer timer2;
                 timer2.Start();
 
-                pointCount = LoadPointCloudFile(outLoadResults[sz]);
+                pointCount = LoadPointCloudFile(outLoadResults[sz], &mergedBasePoint);
 
                 timer2.Stop();
                 double exeTimeInner = timer2.GetDurationInSecond();
@@ -536,9 +921,8 @@ UINT LoadPointCloudFilesParallel(tbb::concurrent_vector<NCraftImageGen::ImageGen
 }
 
 
-UINT LoadLASorLAZToO3DCloud(std::filesystem::path& fileName, geometry::PointCloud& pointcloud)
+UINT LoadLASorLAZToO3DCloud(std::filesystem::path& fileName, geometry::PointCloud& pointcloud, pcl::PointXYZRGB* pCommonBasePoint)
 {
-    bool baseSet = false;
     double px = 0.0, py = 0.0, pz = 0.0;
     double pBasex = 0.0, pBasey = 0.0, pBasez = 0.0;
     int pointCount = 0;
@@ -579,9 +963,11 @@ UINT LoadLASorLAZToO3DCloud(std::filesystem::path& fileName, geometry::PointClou
     double deltaElev = bnds.maxz - bnds.minz;
     double greyScaleFactor = 0.90;
 
-    if (deltaElev < 0.001 || deltaElev > 100.0)
+    if (deltaElev < 0.001 || deltaElev > 200.0)
     {
-        deltaElev = 100.0;
+        deltaElev = 200.0;
+
+        bnds.maxz = bnds.minz + deltaElev;
     }
 
     utility::LogInfo("LAS...Point cloud min z {}, max z {}, \n", bnds.minz, bnds.maxz);
@@ -590,13 +976,26 @@ UINT LoadLASorLAZToO3DCloud(std::filesystem::path& fileName, geometry::PointClou
     {
         for (pdal::PointId idx = 0; idx < (point_view->size() - pointStep); idx += pointStep)
         {
-            if (!baseSet && (idx == 0))
+            if (pCommonBasePoint && (idx == 0))
             {
-                pBasex = point_view->getFieldAs<double>(pdal::Dimension::Id::X, idx);
-                pBasey = point_view->getFieldAs<double>(pdal::Dimension::Id::Y, idx);
-                pBasez = point_view->getFieldAs<double>(pdal::Dimension::Id::Z, idx);
+                if (pCommonBasePoint->x == 0.0 && pCommonBasePoint->y == 0.0)
+                {
+                    pBasex = point_view->getFieldAs<double>(pdal::Dimension::Id::X, idx);
+                    pBasey = point_view->getFieldAs<double>(pdal::Dimension::Id::Y, idx);
+                    pBasez = point_view->getFieldAs<double>(pdal::Dimension::Id::Z, idx);
 
-                baseSet = true;
+                    pCommonBasePoint->x = pBasex;
+                    pCommonBasePoint->y = pBasey;
+                    pCommonBasePoint->z = pBasez;
+                    //utility::LogInfo("LAS/LAZ::::Setting common base point {}, {}, {}", pBasex, pBasey, pBasez);
+                }
+                else
+                {
+                    pBasex = pCommonBasePoint->x;
+                    pBasey = pCommonBasePoint->y;
+                    pBasez = pCommonBasePoint->z;
+                    //utility::LogInfo("LAS/LAZ::::Using common base point {}, {}, {}", pBasex, pBasey, pBasez);
+                }
             }
 
             px = point_view->getFieldAs<double>(pdal::Dimension::Id::X, idx);
@@ -623,29 +1022,49 @@ UINT LoadLASorLAZToO3DCloud(std::filesystem::path& fileName, geometry::PointClou
             {
                 double testVal = point_view->getFieldAs<int>(pdal::Dimension::Id::Intensity, idx);
 
-                if (testVal < 0.001)
+                //if (testVal < 0.001)
+                //{
+                double normalizedElevation = 1.0 - (bnds.maxz - pz) / (bnds.maxz - bnds.minz);
+                double red = 1.0, green = 0.0, blue = 0.0;
+
+                if (normalizedElevation <= 0.5)
                 {
-                    double normalizedElevation = 1.0f - (bnds.maxz - pz) / (bnds.maxz - bnds.minz);
-                    o3dColor[0] = normalizedElevation * greyScaleFactor;
-                    o3dColor[1] = normalizedElevation * greyScaleFactor;
-                    o3dColor[2] = normalizedElevation * greyScaleFactor;
- 
+                    // Interpolate between 0f, 0f, 1f and 0f, 1f, 0f
+                    red = 0.0;
+                    green = normalizedElevation / 0.5;
+                    blue = 1.0 - green;
                 }
                 else
                 {
-                    o3dColor[0] = (double)testVal * cfactor;
-                    o3dColor[1] = (double)testVal * cfactor;
-                    o3dColor[2] = (double)testVal * cfactor;
+                    // Interpolate between 0f, 1f, 0f and 1f, 0f, 0f
+                    red = (normalizedElevation - 0.5) / 0.5;
+                    green = 1.0 - red;
+                    blue = 0.0;
                 }
 
-                
+//                    utility::LogInfo("Normalized Elev: {}, rgb ={},{},{}", normalizedElevation, red, green, blue);
+
+                o3dColor[0] = red;
+                o3dColor[1] = green;
+                o3dColor[2] = blue;
+
+                //o3dColor[0] = normalizedElevation * greyScaleFactor;
+                //o3dColor[1] = normalizedElevation * greyScaleFactor;
+                //o3dColor[2] = normalizedElevation * greyScaleFactor;
+            //}
+            //else
+            //{
+                //o3dColor[0] = (double)testVal * cfactor;
+                //o3dColor[1] = (double)testVal * cfactor;
+                //o3dColor[2] = (double)testVal * cfactor;
+            //}
             }
             else
             {
                 o3dColor[0] = (double)(pclPoint.r / 255.f);
                 o3dColor[1] = (double)(pclPoint.g / 255.f);
                 o3dColor[2] = (double)(pclPoint.b / 255.f);
- 
+
             }
 
             pointcloud.points_.push_back(o3dPoint);

@@ -16,3 +16,5 @@ extern std::wstring g_AppName;
 extern long g_DllModuleRefCount;
 extern TCHAR g_DllModelName[MAX_PATH];
 extern std::filesystem::path g_AppPath;
+extern std::filesystem::path g_SettingsFileName;
+extern std::vector<std::string> g_Settings_ImageImageSizes;

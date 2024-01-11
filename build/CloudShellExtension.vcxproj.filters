@@ -30,10 +30,10 @@
     <ClInclude Include="..\inc\CloudShellExtension\CloudMenuGUID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\Renderers\RenderGLTFToImage.h">
+    <ClInclude Include="..\inc\Renderers\RenderToImageCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\Renderers\RenderToImageCommon.h">
+    <ClInclude Include="..\..\..\3rdpartylibs\TinyXML\Inc\tinyxml2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -54,6 +54,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\source\Renderers\RenderToImageCommon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\3rdpartylibs\TinyXML\Source\tinyxml2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -36,6 +36,14 @@ using namespace open3d::visualization::rendering;
 namespace NCraftImageGen
 {
 
+struct ImageGenSettings
+{
+    UINT imageWidth = 1440;
+    UINT imageHeight = 1024;
+    std::string imageFormat = "png";
+    UINT is_Licensed = false;
+};
+
 struct ImageGenResult
 {
     ImageGenResult() {};
@@ -52,8 +60,13 @@ struct ImageGenResult
     std::shared_ptr<geometry::PointCloud> m_cloudPtr;
 };
 
+NCRAFTIMAGEGENAPI bool ReadImageGenSettings(std::filesystem::path& appDataPath, ImageGenSettings& outSettings);
+
 NCRAFTIMAGEGENAPI UINT GetFileNamesFromDirectory(std::filesystem::path& filePath, std::vector<std::string>& allowedFileExtensions, 
                                                  std::vector<std::filesystem::path>& outDirectoryFilenames);
+NCRAFTIMAGEGENAPI UINT GetCloudFileNamesFromDirectory(std::filesystem::path& filePath, std::vector<std::string>& allowedFileExtensions,
+                                                      std::vector<std::filesystem::path>& outDirectoryFilenames);
+
 NCRAFTIMAGEGENAPI int GetEncoderClsid(const WCHAR* format, CLSID* pClsid);
 
 NCRAFTIMAGEGENAPI extern std::vector<std::string> ModelFileExtensions;

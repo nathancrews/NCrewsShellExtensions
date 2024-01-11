@@ -1,6 +1,6 @@
 #include "NCraftImageGen.h"
 #include "NCraftImageGenDll.h"
-#include "Renderers/RenderToImageCommon.h"
+//#include "Renderers/RenderToImageCommon.h"
 
 // Standard DLL functions
 BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
