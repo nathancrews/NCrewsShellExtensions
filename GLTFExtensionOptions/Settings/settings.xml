@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CloudShellExtension>
+  <Settings>
+    <ImageFormat>png</ImageFormat>
+    <ImageSize>1440x1024</ImageSize>
+    <LicenseKey></LicenseKey>
+  </Settings>
+</CloudShellExtension>

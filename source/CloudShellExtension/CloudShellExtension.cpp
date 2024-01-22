@@ -43,27 +43,24 @@ BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
 
         WCHAR appdata[MAX_PATH] = { 0 };
         SHGetFolderPathW(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, appdata);
-
         g_AppDataPath = appdata;
-        g_AppDataPath.append(L"NCraft Software\\CloudShellExtension\\");
+
+        g_AppDataPath.concat(L"\\");
+        g_AppDataPath.concat(g_ProducerName);
+        g_AppDataPath.concat(L"\\");
+        g_AppDataPath.concat(g_AppDirectoryName);
+        g_AppDataPath.concat(L"\\");
 
         utility::LogInfo("appdata = {}", g_AppDataPath.string());
 
-        std::wstring appUserModelID = L"NCraft Image Generator";
+        
  
         WinToastLib::WinToast::instance()->setAppName(g_AppName);
-        WinToastLib::WinToast::instance()->setAppUserModelId(appUserModelID);
+        WinToastLib::WinToast::instance()->setAppUserModelId(g_appUserModelID);
 
         if (!WinToastLib::WinToast::instance()->initialize())
         {
             utility::LogInfo("WinToast Error, your system in not compatible!");
-        }
-
-        GdiplusStartupInput gpStartupInput;
-        Gdiplus::Status mstat = GdiplusStartup(&g_gpToken, &gpStartupInput, NULL);
-        if (mstat != Gdiplus::Status::Ok)
-        {
-            utility::LogInfo("Error: GdiplusStartup");
         }
 
     }
@@ -85,7 +82,7 @@ HRESULT DllCanUnloadNow(void)
         WinToastLib::WinToast::instance()->clear();
 
         utility::LogInfo("DllCanUnloadNow calling GdiplusShutdown and unloading.");
-        GdiplusShutdown(g_gpToken);
+
         return S_OK;
     }
 

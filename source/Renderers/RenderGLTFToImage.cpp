@@ -4,10 +4,11 @@ namespace NCraftImageGen
 {
 
 UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::filesystem::path>& filePaths,
+                          NCraftImageGen::ImageGenSettings& imageSettings,
                           tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& outRenderResults)
 {
-    const int width = 1024;
-    const int height = 768;
+    const int width = imageSettings.imageWidth;
+    const int height = imageSettings.imageHeight;
 
     std::filesystem::path resourcePath = appPath;
     resourcePath += L"resources";
@@ -51,15 +52,6 @@ UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::files
 
     utility::LogInfo("processing {} files....", batchModeFilenames.size());
 
-    FilamentRenderer* renderer =
-        new FilamentRenderer(EngineInstance::GetInstance(), width, height,
-                             EngineInstance::GetResourceManager());
-
-    if (!renderer)
-    {
-        return 0;
-    }
-
     for (std::filesystem::path reqPath : batchModeFilenames)
     {
         utility::LogInfo("Checking image cache for {}", reqPath.string().c_str());
@@ -75,7 +67,7 @@ UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::files
 
         std::filesystem::file_time_type sourceFiletime = std::filesystem::last_write_time(reqPath);
         std::filesystem::path imagePath = reqPath;
-        imagePath = imagePath.replace_extension("jpg");
+        imagePath = imagePath.replace_extension(imageSettings.imageFormat);
 
         toAddResult.m_ImageName = imagePath;
 
@@ -96,34 +88,51 @@ UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::files
     utility::Timer timer;
     double exeTime = 0.0, execExecTotal = 0.0;
 
-    for (int sz = 0; sz < outRenderResults.size(); ++sz)
+    try
     {
-        if (outRenderResults[sz].m_imageFileCacheOk == false)
+        FilamentRenderer* renderer =
+            new FilamentRenderer(EngineInstance::GetInstance(), width, height,
+                                 EngineInstance::GetResourceManager());
+
+        if (!renderer)
         {
-            timer.Start();
-            RenderModelToImage(renderer, outRenderResults[sz]);
-            timer.Stop();
-
-            exeTime = timer.GetDurationInSecond();
-            execExecTotal += exeTime;
-
-            outRenderResults[sz].m_processTimeSeconds = exeTime;
+            return 0;
         }
-        utility::LogInfo("{} Load/Render Process Duration: {}s", outRenderResults[sz].m_FileName.string().c_str(), exeTime);
+
+        for (int sz = 0; sz < outRenderResults.size(); ++sz)
+        {
+            if (outRenderResults[sz].m_imageFileCacheOk == false)
+            {
+                timer.Start();
+                RenderModelToImage(renderer, imageSettings, outRenderResults[sz]);
+                timer.Stop();
+
+                exeTime = timer.GetDurationInSecond();
+                execExecTotal += exeTime;
+
+                outRenderResults[sz].m_processTimeSeconds = exeTime;
+            }
+            utility::LogInfo("Load/Render process duration for {}, {}s", outRenderResults[sz].m_FileName.string(), exeTime);
+        }
+
+        utility::LogInfo("Finished rendering {} files, Total Process Duration: {} seconds", outRenderResults.size(), execExecTotal);
+
+        delete renderer;
     }
-
-    utility::LogInfo("Finished rendering {} files, Total Process Duration: {} seconds", outRenderResults.size(), execExecTotal);
-
-    delete renderer;
+    catch (...)
+    {
+        utility::LogInfo("Load/Render process crashed..");
+    }
 
     return 1;
 }
 
 
-UINT RenderModelToImage(FilamentRenderer* modelRenderer, NCraftImageGen::ImageGenResult& fileInfo)
+UINT RenderModelToImage(FilamentRenderer* modelRenderer,
+                        NCraftImageGen::ImageGenSettings& imageSettings, NCraftImageGen::ImageGenResult& fileInfo)
 {
-    const int width = 1024;
-    const int height = 768;
+    const int width = imageSettings.imageWidth;
+    const int height = imageSettings.imageHeight;
     bool model_success = false;
     visualization::rendering::TriangleMeshModel loaded_model;
 
@@ -188,7 +197,8 @@ UINT RenderModelToImage(FilamentRenderer* modelRenderer, NCraftImageGen::ImageGe
     return 1;
 }
 
-HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath, std::filesystem::path& filePath)
+HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath,
+                             NCraftImageGen::ImageGenSettings& imageSettings, std::filesystem::path& filePath)
 {
     HBITMAP result = NULL;
     const int width = 1024;
@@ -289,5 +299,38 @@ HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath, std::filesystem::pa
 
     return result;
 }
+
+
+int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
+{
+    UINT  num = 0;          // number of image encoders
+    UINT  size = 0;         // size of the image encoder array in bytes
+
+    ImageCodecInfo* pImageCodecInfo = NULL;
+
+    GetImageEncodersSize(&num, &size);
+    if (size == 0)
+        return -1;  // Failure
+
+    pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
+    if (pImageCodecInfo == NULL)
+        return -1;  // Failure
+
+    GetImageEncoders(num, size, pImageCodecInfo);
+
+    for (UINT j = 0; j < num; ++j)
+    {
+        if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0)
+        {
+            *pClsid = pImageCodecInfo[j].Clsid;
+            free(pImageCodecInfo);
+            return j;  // Success
+        }
+    }
+
+    free(pImageCodecInfo);
+    return -1;  // Failure
+}
+
 
 }

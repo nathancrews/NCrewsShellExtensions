@@ -50,25 +50,39 @@
     <ROW Component="CloudExtensionOptions.exe" ComponentId="{BBFA104E-4CAD-4C95-9B8E-B3E8295794F1}" Directory_="APPDIR" Attributes="0" KeyPath="CloudExtensionOptions.exe"/>
     <ROW Component="CloudShellExtension.dll_1" ComponentId="{2073349A-E606-417E-865F-A73C185A5DA9}" Directory_="APPDIR" Attributes="256" KeyPath="CloudShellExtension.dll"/>
     <ROW Component="CloudShellExtension.exp_1" ComponentId="{4273E4B5-C548-4398-A520-4DF2DBFCAA5D}" Directory_="APPDIR" Attributes="0" KeyPath="proj.db" Type="0"/>
+    <ROW Component="Cryptolens.Licensing.dll" ComponentId="{67B3F32D-B620-4E72-B2A5-AAA9AD5EA8E8}" Directory_="APPDIR" Attributes="0" KeyPath="Cryptolens.Licensing.dll"/>
     <ROW Component="Directory" ComponentId="{5A249A9C-F218-4F73-8C82-A81D666CF0A9}" Directory_="APPDIR" Attributes="260" KeyPath="Directory"/>
     <ROW Component="Directory_1" ComponentId="{55A9529E-848D-4F8D-89B4-4329B5F6E220}" Directory_="APPDIR" Attributes="260" KeyPath="Directory_1"/>
     <ROW Component="Lerc.dll" ComponentId="{E7652020-C160-4FA8-9D41-EDFA7AF23165}" Directory_="APPDIR" Attributes="256" KeyPath="Lerc.dll"/>
     <ROW Component="Microsoft" ComponentId="{CEFA8FE7-FA0A-46E6-869B-986E9C7947DE}" Directory_="APPDIR" Attributes="260" KeyPath="Microsoft"/>
+    <ROW Component="Microsoft.Bcl.AsyncInterfaces.dll" ComponentId="{4C59D271-0AD9-49BD-AEFB-415A69619580}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Bcl.AsyncInterfaces.dll"/>
     <ROW Component="Microsoft.Win32.Registry.dll" ComponentId="{FA17E94D-5FC6-43E0-9D27-94815D0EF75A}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Win32.Registry.dll"/>
     <ROW Component="NCraftSoftware" ComponentId="{41F92DED-93DC-44E3-84EC-E2958A4F7A1E}" Directory_="NCraftSoftware_2_Dir" Attributes="0"/>
     <ROW Component="New_Key" ComponentId="{6D5F2708-ED56-4D55-A281-A96B10740965}" Directory_="APPDIR" Attributes="260" KeyPath="New_Key"/>
+    <ROW Component="Newtonsoft.Json.dll" ComponentId="{B39E3F37-4D34-4C46-B79A-810C0F17E990}" Directory_="APPDIR" Attributes="0" KeyPath="Newtonsoft.Json.dll"/>
     <ROW Component="Open3D.dll_1" ComponentId="{CEEFA860-1E18-43D7-81D3-A21741D461E6}" Directory_="APPDIR" Attributes="256" KeyPath="Open3D.dll_1"/>
     <ROW Component="OpenNI2.dll" ComponentId="{1E3EB828-2771-4A5B-838B-37035EFA3E2F}" Directory_="APPDIR" Attributes="256" KeyPath="OpenNI2.dll"/>
     <ROW Component="OpenNI2.jni.dll" ComponentId="{6305B18D-1F6F-460B-ADBC-1563A6F4BA15}" Directory_="APPDIR" Attributes="256" KeyPath="OpenNI2.jni.dll"/>
+    <ROW Component="Path" ComponentId="{E44EE5E2-E625-4513-B709-4FF76CF6B72B}" Directory_="APPDIR" Attributes="260" KeyPath="Path_1"/>
     <ROW Component="ProductInformation" ComponentId="{01E9D6BF-D77E-490B-91A0-BE27021BB6AF}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
     <ROW Component="ShellExtensions" ComponentId="{6F0D2CB4-0DEC-4086-BB8D-1C2AD1E5479F}" Directory_="APPDIR" Attributes="260" KeyPath="ShellExtensions"/>
+    <ROW Component="System.Buffers.dll" ComponentId="{2D6B2ABB-6334-4B93-ADA6-0E07E10C930E}" Directory_="APPDIR" Attributes="0" KeyPath="System.Buffers.dll"/>
+    <ROW Component="System.Memory.dll" ComponentId="{92AF80A5-B02E-440E-A17C-C376ADC6ED54}" Directory_="APPDIR" Attributes="0" KeyPath="System.Memory.dll"/>
+    <ROW Component="System.Numerics.Vectors.dll" ComponentId="{D1B475EA-7314-4253-B364-2B3724A894CC}" Directory_="APPDIR" Attributes="0" KeyPath="System.Numerics.Vectors.dll"/>
+    <ROW Component="System.Runtime.CompilerServices.Unsafe.dll" ComponentId="{1311B32B-E90C-49A4-A1E0-9ED62B9DF5C9}" Directory_="APPDIR" Attributes="0" KeyPath="System.Runtime.CompilerServices.Unsafe.dll"/>
+    <ROW Component="System.Text.Encodings.Web.dll" ComponentId="{8AF3FD04-E17D-4F51-ABCF-2552DA7AC190}" Directory_="APPDIR" Attributes="0" KeyPath="System.Text.Encodings.Web.dll"/>
+    <ROW Component="System.Text.Json.dll" ComponentId="{0AA04198-512B-4835-AC67-47B903E6E194}" Directory_="APPDIR" Attributes="0" KeyPath="System.Text.Json.dll"/>
+    <ROW Component="System.Threading.Tasks.Extensions.dll" ComponentId="{12D5755D-FC5A-4AB2-A707-AD269BF3BB54}" Directory_="APPDIR" Attributes="0" KeyPath="System.Threading.Tasks.Extensions.dll"/>
+    <ROW Component="System.ValueTuple.dll" ComponentId="{32EA51AB-8D5E-4F78-B952-EEC193095F97}" Directory_="APPDIR" Attributes="0" KeyPath="System.ValueTuple.dll"/>
     <ROW Component="ThreadingModel" ComponentId="{CE35CF97-12C9-479A-A7C7-865C3A8EDA75}" Directory_="APPDIR" Attributes="260" KeyPath="ThreadingModel"/>
     <ROW Component="ThreadingModel_1" ComponentId="{182D1695-2817-46BE-AA25-9B175AC49B25}" Directory_="APPDIR" Attributes="260" KeyPath="ThreadingModel_1"/>
+    <ROW Component="Version" ComponentId="{737DF17D-9499-4312-B241-4EA0ED280D22}" Directory_="APPDIR" Attributes="260" KeyPath="Version_1"/>
     <ROW Component="Windows" ComponentId="{3A1D953F-F2BD-41E2-9C7F-73CB93D9EE92}" Directory_="APPDIR" Attributes="260" KeyPath="Windows"/>
     <ROW Component="_" ComponentId="{F857EB57-167D-4F04-B0CE-2DF4C3480D86}" Directory_="APPDIR" Attributes="260" KeyPath="_"/>
     <ROW Component="__1" ComponentId="{6A1F112D-2956-4184-A425-23CF2382A679}" Directory_="APPDIR" Attributes="260" KeyPath="__1"/>
     <ROW Component="__10" ComponentId="{93223D0B-249B-4345-BF1F-2C20D303394B}" Directory_="APPDIR" Attributes="260" KeyPath="__10"/>
     <ROW Component="__11" ComponentId="{48C10561-1A1D-4544-9409-BC3F14A40C25}" Directory_="APPDIR" Attributes="260" KeyPath="__11"/>
+    <ROW Component="__12" ComponentId="{40012986-1209-4F61-B33C-AC16CF2FC8C9}" Directory_="APPDIR" Attributes="260" KeyPath="__12"/>
     <ROW Component="__2" ComponentId="{7C6527C1-62E4-4519-8AD2-56A9A2BF09C9}" Directory_="APPDIR" Attributes="260" KeyPath="__2"/>
     <ROW Component="__3" ComponentId="{10A8F6E7-1A46-4409-AB23-CE34E6E23631}" Directory_="APPDIR" Attributes="260" KeyPath="__3"/>
     <ROW Component="__33" ComponentId="{3A1B9FA3-F3C9-4B9B-9792-1B6458CED7B9}" Directory_="APPDIR" Attributes="260" KeyPath="__33"/>
@@ -486,6 +500,26 @@
     <ROW File="CloudExtensionOptions.exe" Component_="CloudExtensionOptions.exe" FileName="CLOUDE~1.EXE|CloudExtensionOptions.exe" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\CloudExtensionOptions.exe" SelfReg="false" DigSign="true"/>
     <ROW File="CloudExtensionOptions.exe.config" Component_="CloudShellExtension.exp_1" FileName="CLOUDE~1.CON|CloudExtensionOptions.exe.config" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\CloudExtensionOptions.exe.config" SelfReg="false"/>
     <ROW File="Microsoft.Win32.Registry.dll" Component_="Microsoft.Win32.Registry.dll" FileName="MICROS~1.DLL|Microsoft.Win32.Registry.dll" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\Microsoft.Win32.Registry.dll" SelfReg="false"/>
+    <ROW File="Cryptolens.Licensing.dll" Component_="Cryptolens.Licensing.dll" FileName="CRYPTO~1.DLL|Cryptolens.Licensing.dll" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\Cryptolens.Licensing.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Bcl.AsyncInterfaces.dll" Component_="Microsoft.Bcl.AsyncInterfaces.dll" FileName="MICROS~2.DLL|Microsoft.Bcl.AsyncInterfaces.dll" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\Microsoft.Bcl.AsyncInterfaces.dll" SelfReg="false"/>
+    <ROW File="Newtonsoft.Json.dll" Component_="Newtonsoft.Json.dll" FileName="NEWTON~1.DLL|Newtonsoft.Json.dll" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\Newtonsoft.Json.dll" SelfReg="false"/>
+    <ROW File="Newtonsoft.Json.xml" Component_="CloudShellExtension.exp_1" FileName="NEWTON~1.XML|Newtonsoft.Json.xml" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\Newtonsoft.Json.xml" SelfReg="false"/>
+    <ROW File="System.Buffers.dll" Component_="System.Buffers.dll" FileName="SYSTEM~1.DLL|System.Buffers.dll" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\System.Buffers.dll" SelfReg="false"/>
+    <ROW File="System.Buffers.xml" Component_="CloudShellExtension.exp_1" FileName="SYSTEM~1.XML|System.Buffers.xml" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\System.Buffers.xml" SelfReg="false"/>
+    <ROW File="System.Memory.dll" Component_="System.Memory.dll" FileName="SYSTEM~2.DLL|System.Memory.dll" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\System.Memory.dll" SelfReg="false"/>
+    <ROW File="System.Memory.xml" Component_="CloudShellExtension.exp_1" FileName="SYSTEM~2.XML|System.Memory.xml" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\System.Memory.xml" SelfReg="false"/>
+    <ROW File="System.Numerics.Vectors.dll" Component_="System.Numerics.Vectors.dll" FileName="SYSTEM~3.DLL|System.Numerics.Vectors.dll" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\System.Numerics.Vectors.dll" SelfReg="false"/>
+    <ROW File="System.Numerics.Vectors.xml" Component_="CloudShellExtension.exp_1" FileName="SYSTEM~3.XML|System.Numerics.Vectors.xml" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\System.Numerics.Vectors.xml" SelfReg="false"/>
+    <ROW File="System.Runtime.CompilerServices.Unsafe.dll" Component_="System.Runtime.CompilerServices.Unsafe.dll" FileName="SYSTEM~4.DLL|System.Runtime.CompilerServices.Unsafe.dll" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\System.Runtime.CompilerServices.Unsafe.dll" SelfReg="false"/>
+    <ROW File="System.Runtime.CompilerServices.Unsafe.xml" Component_="CloudShellExtension.exp_1" FileName="SYSTEM~4.XML|System.Runtime.CompilerServices.Unsafe.xml" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\System.Runtime.CompilerServices.Unsafe.xml" SelfReg="false"/>
+    <ROW File="System.Text.Encodings.Web.dll" Component_="System.Text.Encodings.Web.dll" FileName="SYSTEM~5.DLL|System.Text.Encodings.Web.dll" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\System.Text.Encodings.Web.dll" SelfReg="false"/>
+    <ROW File="System.Text.Encodings.Web.xml" Component_="CloudShellExtension.exp_1" FileName="SYSTEM~5.XML|System.Text.Encodings.Web.xml" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\System.Text.Encodings.Web.xml" SelfReg="false"/>
+    <ROW File="System.Text.Json.dll" Component_="System.Text.Json.dll" FileName="SYSTEM~6.DLL|System.Text.Json.dll" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\System.Text.Json.dll" SelfReg="false"/>
+    <ROW File="System.Text.Json.xml" Component_="CloudShellExtension.exp_1" FileName="SYSTEM~6.XML|System.Text.Json.xml" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\System.Text.Json.xml" SelfReg="false"/>
+    <ROW File="System.Threading.Tasks.Extensions.dll" Component_="System.Threading.Tasks.Extensions.dll" FileName="SYSTEM~7.DLL|System.Threading.Tasks.Extensions.dll" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\System.Threading.Tasks.Extensions.dll" SelfReg="false"/>
+    <ROW File="System.Threading.Tasks.Extensions.xml" Component_="CloudShellExtension.exp_1" FileName="SYSTEM~7.XML|System.Threading.Tasks.Extensions.xml" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\System.Threading.Tasks.Extensions.xml" SelfReg="false"/>
+    <ROW File="System.ValueTuple.dll" Component_="System.ValueTuple.dll" FileName="SYSTEM~8.DLL|System.ValueTuple.dll" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\System.ValueTuple.dll" SelfReg="false"/>
+    <ROW File="System.ValueTuple.xml" Component_="CloudShellExtension.exp_1" FileName="SYSTEM~8.XML|System.ValueTuple.xml" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\System.ValueTuple.xml" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
     <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
@@ -773,6 +807,20 @@
     <ROW Feature_="MainFeature" Component_="NCraftSoftware"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.Win32.Registry.dll"/>
     <ROW Feature_="MainFeature" Component_="__11"/>
+    <ROW Feature_="MainFeature" Component_="Path"/>
+    <ROW Feature_="MainFeature" Component_="Version"/>
+    <ROW Feature_="MainFeature" Component_="__12"/>
+    <ROW Feature_="MainFeature" Component_="Cryptolens.Licensing.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Bcl.AsyncInterfaces.dll"/>
+    <ROW Feature_="MainFeature" Component_="Newtonsoft.Json.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Buffers.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Memory.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Numerics.Vectors.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Runtime.CompilerServices.Unsafe.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Text.Encodings.Web.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Text.Json.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Threading.Tasks.Extensions.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.ValueTuple.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="DesktopFolder.exe" SourcePath="Release\resources\NCraft.ico" Index="0"/>
@@ -841,6 +889,7 @@
     <ROW Registry="Microsoft" Root="2" Key="Software\Microsoft" Name="+" Component_="Microsoft"/>
     <ROW Registry="New_Key" Root="2" Key="Software\Microsoft\Windows\CurrentVersion" Name="+" Component_="New_Key"/>
     <ROW Registry="Path" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Path" Value="[APPDIR]" Component_="ProductInformation"/>
+    <ROW Registry="Path_1" Root="1" Key="Software\[Manufacturer]\[ProductName]" Name="Path" Value="[APPDIR]" Component_="Path"/>
     <ROW Registry="ProductName" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="\"/>
     <ROW Registry="ProductName_1" Root="1" Key="Software\[Manufacturer]\[ProductName]" Name="\"/>
     <ROW Registry="ShellEx" Root="1" Key="Software\Classes\.las\ShellEx" Name="\"/>
@@ -859,11 +908,13 @@
     <ROW Registry="ThreadingModel" Root="1" Key="Software\Classes\CLSID\{C2E79339-590A-4B13-AFCF-3A31FB39C7A8}\InProcServer32" Name="ThreadingModel" Value="Apartment" Component_="ThreadingModel"/>
     <ROW Registry="ThreadingModel_1" Root="0" Key="Software\Classes\CLSID\{C2E79339-590A-4B13-AFCF-3A31FB39C7A8}\InProcServer32" Name="ThreadingModel" Value="Apartment" Component_="ThreadingModel_1"/>
     <ROW Registry="Version" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Version" Value="[ProductVersion]" Component_="ProductInformation"/>
+    <ROW Registry="Version_1" Root="1" Key="Software\[Manufacturer]\[ProductName]" Name="Version" Value="[ProductVersion]" Component_="Version"/>
     <ROW Registry="Windows" Root="2" Key="Software\Microsoft\Windows" Name="+" Component_="Windows"/>
     <ROW Registry="_" Root="1" Key="Software\Classes\CLSID\{C2E79339-590A-4B13-AFCF-3A31FB39C7A8}\InProcServer32" Value="[#CloudShellExtension.dll]" Component_="_"/>
     <ROW Registry="__1" Root="0" Key="Software\Classes\CLSID\{C2E79339-590A-4B13-AFCF-3A31FB39C7A8}\InProcServer32" Value="[#CloudShellExtension.dll]" Component_="__1"/>
     <ROW Registry="__10" Root="0" Key="Software\Classes\.ply\ShellEx\ContextMenuHandlers\CloudShellExtension" Value="[\{]C2E79339-590A-4B13-AFCF-3A31FB39C7A8[\}]" Component_="__10"/>
     <ROW Registry="__11" Root="1" Key="Software\[Manufacturer]\[ProductName]" Value="[#CloudShellExtension.dll]" Component_="__11"/>
+    <ROW Registry="__12" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Value="[#CloudShellExtension.dll]" Component_="__12"/>
     <ROW Registry="__2" Root="1" Key="Software\Classes\.las\ShellEx\ContextMenuHandlers\CloudShellExtension" Value="[\{]C2E79339-590A-4B13-AFCF-3A31FB39C7A8[\}]" Component_="__2"/>
     <ROW Registry="__3" Root="1" Key="Software\Classes\.laz\ShellEx\ContextMenuHandlers\CloudShellExtension" Value="[\{]C2E79339-590A-4B13-AFCF-3A31FB39C7A8[\}]" Component_="__3"/>
     <ROW Registry="__33" Root="1" Key="Software\Classes\Directory\shellex\ContextMenuHandlers\CloudShellExtension" Value="[\{]C2E79339-590A-4B13-AFCF-3A31FB39C7A8[\}]" Component_="__33"/>

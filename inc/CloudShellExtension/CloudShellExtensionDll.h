@@ -7,7 +7,13 @@ HINSTANCE g_hinst = NULL;
 long g_DllModuleRefCount = 0;
 TCHAR g_DllModelName[MAX_PATH] = { 0 };
 std::filesystem::path g_AppPath;
-std::wstring g_AppName = L"NCraft Point Cloud Shell Extension";
+
+std::wstring g_AppName = L"Point Cloud Shell Extension";
+std::wstring g_appUserModelID = L"NCraft Image Generator";
+std::wstring g_ProducerName = L"NCraft Software";
+std::wstring g_AppDirectoryName = L"CloudShellExtension";
+std::wstring g_RegAppName = L"CloudShellExtension";
+
 ULONG_PTR g_gpToken;
 
 std::filesystem::path g_AppDataPath;

@@ -7,7 +7,6 @@ HINSTANCE g_hinst = NULL;
 long g_DllModuleRefCount = 0;
 TCHAR g_DllModelName[MAX_PATH] = { 0 };
 std::filesystem::path g_AppPath;
-std::wstring g_AppName = L"NCraft Image Generator";
 ULONG_PTR g_gpToken;
 
 void print_fcn(const std::string& logString)

@@ -5,8 +5,9 @@
 #include "thumbcache.h"
 #include "propsys.h"
 #include "ocidl.h"
+#include "Renderers/RenderToImageCommon.h"
 
-class ModelThumbnail : public IThumbnailProvider, IInitializeWithStream, IObjectWithSite
+class ModelThumbnail : public IThumbnailProvider, IInitializeWithStream
 {
 public:
 
@@ -81,9 +82,6 @@ public:
     //  IThumbnailProvider methods
     STDMETHOD(GetThumbnail)(UINT, HBITMAP*, WTS_ALPHATYPE*);
 
-    STDMETHOD(GetSite)(REFIID, void**);
-    STDMETHOD(SetSite)(IUnknown*);
-
 private:
     ~ModelThumbnail();
 
@@ -91,4 +89,5 @@ private:
     std::filesystem::path  m_filePath;
     UINT m_idCmdFirst = 0;
     IUnknown* m_pSite = nullptr;
+    NCraftImageGen::ImageGenSettings m_imageGenSettings;
 };

@@ -373,6 +373,10 @@ void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenRes
         UINT millionVal = 1000000;
         UINT kVal = 1000;
 
+        WinToastLib::WinToast::instance()->setAppName(g_AppName);
+        WinToastLib::WinToast::instance()->setAppUserModelId(g_AppName);
+
+
         if (imageResults.size() > 4)
         {
             for (NCraftImageGen::ImageGenResult& result : imageResults)

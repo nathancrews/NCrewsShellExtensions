@@ -68,6 +68,9 @@
     <ClCompile Include="..\source\Renderers\RenderToImageCommon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\3rdpartylibs\TinyXML\Source\tinyxml2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\ModelShellExtension\ModelShellExtension.def">

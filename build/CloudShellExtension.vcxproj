@@ -25,6 +25,7 @@
     <ClInclude Include="..\inc\CloudShellExtension\CloudMenuGUID.h" />
     <ClInclude Include="..\inc\CloudShellExtension\CloudShellExtension.h" />
     <ClInclude Include="..\inc\CloudShellExtension\CloudShellExtensionDll.h" />
+    <ClInclude Include="..\inc\Renderers\RenderPointCloudToImage.h" />
     <ClInclude Include="..\inc\Renderers\RenderToImageCommon.h" />
   </ItemGroup>
   <ItemGroup>

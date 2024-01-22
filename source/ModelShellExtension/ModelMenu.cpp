@@ -1,12 +1,13 @@
 #include "priv.h"
 #include "ModelShellExtension.h"
-#include "ModelMenu.h"
 #include <filesystem>
 #include <iostream>
 #include <fstream>
 #include <process.h>
 #include "wintoastlib.h"
 #include "Renderers/RenderGLTFToImage.h"
+#include "NCraftImageGen.h"
+#include "ModelMenu.h"
 
 void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& imageResults);
 
@@ -102,9 +103,9 @@ HRESULT ModelMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj,
             return hr;
         }
 
-        m_filePaths.clear();
-
         utility::LogInfo("Model: Initialize Context Menu...");
+
+        m_filePaths.clear();
 
         DWORD fcount = 0;
         items->GetCount(&fcount);
@@ -132,7 +133,7 @@ HRESULT ModelMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj,
 
                     if (std::filesystem::is_directory(testPath))
                     {
-                        NCraftImageGen::GetFileNamesFromDirectory(testPath, NCraftImageGen::ModelFileExtensions, m_filePaths);
+                        m_filePaths.push_back(testPath);
                     }
                     else
                     {
@@ -165,6 +166,7 @@ HRESULT ModelMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj,
     catch (...)
     {
         utility::LogInfo("Model: Initialize Context Menu....catch!");
+        hr = E_FAIL;
     }
 
     return hr;
@@ -205,14 +207,6 @@ HRESULT ModelMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst
             {
                 MAKE_HRESULT(SEVERITY_ERROR, 0, (USHORT)(0));
             }
-
-
-            //MENUITEMINFO menuInfoSep = {};
-            //menuInfoSep.cbSize = sizeof(MENUITEMINFO);
-            //menuInfoSep.fMask = MIIM_FTYPE;
-            //menuInfoSep.fType = MFT_SEPARATOR;
-
-            //InsertMenuItem(hmenu, 0, TRUE, &menuInfoSep);
 
             wcscpy(menuItemNameStr, menuItemName.c_str());
 
@@ -286,18 +280,18 @@ HRESULT ModelMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
         tbb::concurrent_vector<NCraftImageGen::ImageGenResult> renderResults;
 
         hr = S_OK;
-        try
-        {
-            NCraftImageGen::RenderModelsToImages(g_AppPath, filesToImage, renderResults);
-            SendNotificationMessages(renderResults);
+        std::filesystem::path settingsFilePath = g_AppDataPath;
+        settingsFilePath = settingsFilePath.concat(g_SettingsFileName.c_str());
 
-            m_filePaths.clear();
-        }
-        catch (/*CMemoryException* e*/...)
+        if (!NCraftImageGen::ReadImageGenSettings(settingsFilePath, m_imageGenSettings))
         {
-            utility::LogInfo("Model: Error: RenderToImage crashed...\n");
-            hr = E_FAIL;
+            utility::LogInfo("Error loading settings");
         }
+
+        NCraftImageGen::RenderModelsToImages(g_AppPath, filesToImage, m_imageGenSettings, renderResults);
+        SendNotificationMessages(renderResults);
+
+        m_filePaths.clear();
 
         utility::LogInfo("Model: Menu Invoke Command called....Finished");
     }
@@ -325,6 +319,8 @@ void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenRes
         WCHAR fileSizeStr[MAX_PATH] = { 0 };
         UINT millionVal = 1000000;
         UINT kVal = 1000;
+
+        WinToastLib::WinToast::instance()->setAppName(g_AppName);
 
         if (imageResults.size() > 5)
         {

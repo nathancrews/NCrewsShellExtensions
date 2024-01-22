@@ -2,6 +2,7 @@
 
 #include "priv.h"
 #include "ModelClassFactory.h"
+#include "Renderers/RenderToImageCommon.h"
 
 class ModelMenu : public IContextMenu,  public IShellExtInit
 {
@@ -73,5 +74,6 @@ private:
     long        m_ObjRefCount = 0;
     std::vector<std::filesystem::path>  m_filePaths;
     UINT m_idCmdFirst = 0;
+    NCraftImageGen::ImageGenSettings m_imageGenSettings;
 
 };

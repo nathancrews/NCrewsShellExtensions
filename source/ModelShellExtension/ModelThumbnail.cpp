@@ -14,89 +14,78 @@ ModelThumbnail::~ModelThumbnail()
     DllRelease();
 }
 
-STDMETHODIMP ModelThumbnail::GetSite(REFIID riid, void** ppvSite)
-{
-    if (m_pSite)
-    {
-        return m_pSite->QueryInterface(riid, ppvSite);
-    }
-    return E_NOINTERFACE;
-}
-
-STDMETHODIMP ModelThumbnail::SetSite(IUnknown* pUnkSite)
-{
-    if (m_pSite)
-    {
-        m_pSite->Release();
-        m_pSite = NULL;
-    }
-
-    m_pSite = pUnkSite;
-    if (m_pSite)
-    {
-        m_pSite->AddRef();
-    }
-    return S_OK;
-}
-
-
 STDMETHODIMP ModelThumbnail::Initialize(IStream* pstream, DWORD grfMode)
 {
     ULONG len = 0;
     STATSTG stat;
     WCHAR  tempFileName[MAX_PATH] = { 0 };
 
-    m_filePath = std::filesystem::temp_directory_path();
-
-    if (pstream->Stat(&stat, STATFLAG_DEFAULT) != S_OK)
+    try
     {
-        utility::LogInfo("bad Stat, returning early....");
-        return S_FALSE;
-    }
+        m_filePath = std::filesystem::temp_directory_path();
 
-    if ((stat.cbSize.QuadPart == 0))
-    {
-        utility::LogInfo("bad file size....");
-        return S_FALSE;
-    }
-
-    // get the file contents
-    char* data = nullptr;
-
-    data = new char[stat.cbSize.QuadPart];
-
-    if (data)
-    {
-        if (pstream->Read(data, stat.cbSize.QuadPart, &len) == S_OK)
+        if (pstream->Stat(&stat, STATFLAG_DEFAULT) != S_OK)
         {
-            FILE* myfile = nullptr;
+            utility::LogInfo("bad Stat, returning early....");
+            return S_FALSE;
+        }
 
-            if (GetTempFileNameW(m_filePath.c_str(), L"thumb", 0, tempFileName))
+        if ((stat.cbSize.QuadPart == 0))
+        {
+            utility::LogInfo("bad file size....");
+            return S_FALSE;
+        }
+
+        // get the file contents
+        char* data = nullptr;
+
+        data = new char[stat.cbSize.QuadPart];
+
+        if (data)
+        {
+            if (pstream->Read(data, stat.cbSize.QuadPart, &len) == S_OK)
             {
-                DeleteFile(tempFileName);
+                FILE* myfile = nullptr;
 
-                m_filePath = m_filePath.append(tempFileName);
-                m_filePath = m_filePath.replace_extension(L".glb");
-
-                myfile = fopen(m_filePath.string().c_str(), "wb+");
-
-                if (myfile)
+                if (GetTempFileNameW(m_filePath.c_str(), L"thumb", 0, tempFileName))
                 {
-                    int byteOut = fwrite(data, len, 1, myfile);
+                    DeleteFile(tempFileName);
 
-                    fclose(myfile);
+                    m_filePath = m_filePath.append(tempFileName);
+                    m_filePath = m_filePath.replace_extension(L".glb");
+
+                    myfile = fopen(m_filePath.string().c_str(), "wb+");
+
+                    if (myfile)
+                    {
+                        int byteOut = fwrite(data, len, 1, myfile);
+
+                        fclose(myfile);
+                    }
                 }
             }
+            else
+            {
+                utility::LogInfo("read failed....");
+            }
+
+            delete[] data;
         }
-        else
+
+        std::filesystem::path settingsFilePath = g_AppDataPath;
+        settingsFilePath = settingsFilePath.concat(g_SettingsFileName.c_str());
+
+        if (!NCraftImageGen::ReadImageGenSettings(settingsFilePath, m_imageGenSettings))
         {
-            utility::LogInfo("read failed....");
+            utility::LogInfo("Error loading settings");
         }
 
-        delete[] data;
+        return S_OK;
     }
-
-    return S_OK;
+    catch (...)
+    {
+        return E_FAIL;
+    }
 }
 
 STDMETHODIMP ModelThumbnail::GetThumbnail(UINT flag, HBITMAP* outHBITMAP, WTS_ALPHATYPE* alphaType)
@@ -104,19 +93,25 @@ STDMETHODIMP ModelThumbnail::GetThumbnail(UINT flag, HBITMAP* outHBITMAP, WTS_AL
     HRESULT res = E_FAIL;
 
     utility::LogInfo("GetThumbnail called...");
-
-    HBITMAP localBMP = nullptr;
-
-    localBMP = NCraftImageGen::RenderModelToHBITMAP(g_AppPath, m_filePath);
-
-    if (localBMP)
+    try
     {
-        *outHBITMAP = localBMP;
+        HBITMAP localBMP = nullptr;
 
-        res = S_OK;
+        localBMP = NCraftImageGen::RenderModelToHBITMAP(g_AppPath, m_imageGenSettings, m_filePath);
+
+        if (localBMP)
+        {
+            *outHBITMAP = localBMP;
+
+            res = S_OK;
+        }
+
+        std::filesystem::remove(m_filePath);
     }
-
-    std::filesystem::remove(m_filePath);
+    catch (...)
+    {
+        res = E_FAIL;
+    }
 
     return res;
 }

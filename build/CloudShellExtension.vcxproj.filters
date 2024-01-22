@@ -36,6 +36,9 @@
     <ClInclude Include="..\..\..\3rdpartylibs\TinyXML\Inc\tinyxml2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\Renderers\RenderPointCloudToImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\CloudShellExtension\CloudClassFactory.cpp">

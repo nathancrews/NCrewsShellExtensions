@@ -28,23 +28,27 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiDirsComponent">
     <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR:." IsPseudoRoot="1"/>
-    <ROW Directory="AppDataFolder" Directory_Parent="TARGETDIR" DefaultDir="APPDAT~1|AppDataFolder" IsPseudoRoot="1"/>
     <ROW Directory="Buggy_Dir" Directory_Parent="samples_Dir" DefaultDir="Buggy"/>
     <ROW Directory="DesktopFolder" Directory_Parent="TARGETDIR" DefaultDir="DESKTO~1|DesktopFolder" IsPseudoRoot="1"/>
+    <ROW Directory="GLTFShellExtension_Dir" Directory_Parent="NCraftSoftware_1_Dir" DefaultDir="GLTFSH~1|GLTFShellExtension"/>
+    <ROW Directory="LocalAppDataFolder" Directory_Parent="TARGETDIR" DefaultDir="LOCALA~1|LocalAppDataFolder" IsPseudoRoot="1"/>
+    <ROW Directory="NCraftSoftware_1_Dir" Directory_Parent="LocalAppDataFolder" DefaultDir="NCRAFT~1|NCraft Software"/>
+    <ROW Directory="NCraftSoftware_2_Dir" Directory_Parent="ProgramMenuFolder" DefaultDir="NCRAFT~1|NCraft Software"/>
+    <ROW Directory="NCraftSoftware_Dir" Directory_Parent="PersonalFolder" DefaultDir="NCRAFT~1|NCraft Software"/>
+    <ROW Directory="PersonalFolder" Directory_Parent="TARGETDIR" DefaultDir="PERSON~1|PersonalFolder" IsPseudoRoot="1"/>
+    <ROW Directory="ProgramMenuFolder" Directory_Parent="TARGETDIR" DefaultDir="PROGRA~1|ProgramMenuFolder" IsPseudoRoot="1"/>
     <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
     <ROW Directory="resources_Dir" Directory_Parent="APPDIR" DefaultDir="RESOUR~1|resources"/>
-    <ROW Directory="samples_Dir" Directory_Parent="AppDataFolder" DefaultDir="GLTFSA~1|GLTF Samples"/>
+    <ROW Directory="samples_Dir" Directory_Parent="NCraftSoftware_Dir" DefaultDir="GLTFSA~1|GLTF Samples"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
     <ROW Component="APPDIR" ComponentId="{311DDFE9-59F2-40CC-994F-0B8AD056D9BD}" Directory_="APPDIR" Attributes="0"/>
     <ROW Component="Approved" ComponentId="{AB7B634E-1BAB-4407-A280-5909789B21C9}" Directory_="APPDIR" Attributes="260" KeyPath="Approved"/>
     <ROW Component="Buggy.glb" ComponentId="{C18F28AE-D377-4EFE-B62E-09312CEC6B60}" Directory_="samples_Dir" Attributes="0" KeyPath="Buggy.glb" Type="0"/>
     <ROW Component="Buggy.gltf" ComponentId="{CD98E60C-FF15-4A84-B001-7F8CAD09D095}" Directory_="Buggy_Dir" Attributes="0" KeyPath="Buggy.gltf" Type="0"/>
-    <ROW Component="C6D56CF1C574BE187365A3D02A68187" ComponentId="{230739E6-AACC-46EB-8810-4E81E69DB8A3}" Directory_="APPDIR" Attributes="260" KeyPath="C6D56CF1C574BE187365A3D02A68187"/>
     <ROW Component="C6D56CF1C574BE187365A3D02A68187_1" ComponentId="{D998E089-432E-4780-87B5-35CBB9511623}" Directory_="APPDIR" Attributes="260" KeyPath="C6D56CF1C574BE187365A3D02A68187_1"/>
     <ROW Component="C6D56CF1C574BE187365A3D02A68187_2" ComponentId="{E06E5569-1A12-42EB-9502-206E74AED5E3}" Directory_="APPDIR" Attributes="260" KeyPath="C6D56CF1C574BE187365A3D02A68187_2"/>
     <ROW Component="CB7B16EE63F0498AAD7E857BD1B560C6" ComponentId="{5D1F35B4-270C-4796-A1AA-27BEB60111D5}" Directory_="APPDIR" Attributes="260" KeyPath="CB7B16EE63F0498AAD7E857BD1B560C6"/>
-    <ROW Component="CB7B16EE63F0498AAD7E857BD1B560C6_1" ComponentId="{011E3D2D-4351-47AA-9C29-77758E8228E5}" Directory_="APPDIR" Attributes="260" KeyPath="CB7B16EE63F0498AAD7E857BD1B560C6_1"/>
     <ROW Component="CB7B16EE63F0498AAD7E857BD1B560C6_2" ComponentId="{10809881-F27D-48F0-A77C-CCEDFA7D94BB}" Directory_="APPDIR" Attributes="260" KeyPath="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
     <ROW Component="CLSID" ComponentId="{5AE57BA5-C45D-4AEB-82E6-B9F4AB96C683}" Directory_="APPDIR" Attributes="260" KeyPath="CLSID"/>
     <ROW Component="ContextMenuHandlers_4" ComponentId="{1B471459-7DE4-4594-9C9B-C200DE9DF83E}" Directory_="APPDIR" Attributes="260" KeyPath="ContextMenuHandlers_6"/>
@@ -52,18 +56,23 @@
     <ROW Component="EditFlags_1" ComponentId="{034FBAD4-3EEB-40D4-A7CE-3F832E22A227}" Directory_="APPDIR" Attributes="260" KeyPath="EditFlags_1"/>
     <ROW Component="FriendlyTypeName_1" ComponentId="{4A5C1644-662D-48A7-84BC-9BDCD57868F0}" Directory_="APPDIR" Attributes="260" KeyPath="FriendlyTypeName_1"/>
     <ROW Component="FullDetails_1" ComponentId="{C998655F-5E49-4EC6-B2A8-1CFB94105205}" Directory_="APPDIR" Attributes="260" KeyPath="FullDetails_1"/>
+    <ROW Component="GLTFExtensionOptions.exe" ComponentId="{4BB59FEC-3538-417C-83CC-9D9D82D0AFA6}" Directory_="APPDIR" Attributes="0" KeyPath="GLTFExtensionOptions.exe"/>
     <ROW Component="InProcServer32" ComponentId="{402477EA-A869-4C7B-A815-1C4ED6239DE2}" Directory_="APPDIR" Attributes="260" KeyPath="InProcServer32_1"/>
     <ROW Component="InProcServer32_1" ComponentId="{2D6B3963-F866-4CE3-B393-C77372516118}" Directory_="APPDIR" Attributes="260" KeyPath="InProcServer32"/>
     <ROW Component="InfoTip_1" ComponentId="{10FF1A8A-E2D2-417D-BDD9-404FC4C4D07E}" Directory_="APPDIR" Attributes="260" KeyPath="InfoTip_1"/>
     <ROW Component="Microsoft" ComponentId="{1CF6AE86-1FC6-449F-B126-81B0C6AF20B0}" Directory_="APPDIR" Attributes="260" KeyPath="Microsoft"/>
     <ROW Component="ModelShellExtension.dll" ComponentId="{9831ACB7-3921-41A9-AE8A-A122F18587A6}" Directory_="APPDIR" Attributes="256" KeyPath="ModelShellExtension.dll"/>
+    <ROW Component="NCraftSoftware" ComponentId="{DFF0A54D-D476-4156-B0CF-811E0A14779E}" Directory_="NCraftSoftware_2_Dir" Attributes="0"/>
     <ROW Component="Open3D.dll" ComponentId="{453D62AA-3E10-4864-8D78-98E5F6A9D7CD}" Directory_="APPDIR" Attributes="256" KeyPath="Open3D.dll"/>
+    <ROW Component="Path" ComponentId="{41B69DE0-564C-42A1-8686-4EF00EE85F7E}" Directory_="APPDIR" Attributes="260" KeyPath="Path_1"/>
     <ROW Component="PreviewDetails_1" ComponentId="{EB29C321-D91A-4B85-81B8-41CA0F57D76F}" Directory_="APPDIR" Attributes="260" KeyPath="PreviewDetails_1"/>
     <ROW Component="PreviewTitle_1" ComponentId="{6CD23FFE-4C12-441E-A543-20FD4B585135}" Directory_="APPDIR" Attributes="260" KeyPath="PreviewTitle_1"/>
     <ROW Component="ProductInformation" ComponentId="{52408035-0660-44E2-A512-46080183C2FB}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
     <ROW Component="ShellEx" ComponentId="{46A79AA5-3D95-4FF1-9F69-874DC36AD2E7}" Directory_="APPDIR" Attributes="260" KeyPath="ShellEx_2"/>
+    <ROW Component="Software" ComponentId="{6D9B8642-3FBB-4DDF-884C-244A3609DD9D}" Directory_="APPDIR" Attributes="260" KeyPath="Software_2"/>
     <ROW Component="ThreadingModel" ComponentId="{B330A725-FCFD-4AB0-9BE5-571193B619D2}" Directory_="APPDIR" Attributes="260" KeyPath="ThreadingModel"/>
     <ROW Component="ThreadingModel_2" ComponentId="{D3086D37-38FD-4B19-87CF-0C2BA3A6F28C}" Directory_="APPDIR" Attributes="260" KeyPath="ThreadingModel_2"/>
+    <ROW Component="Version" ComponentId="{D43DC00F-34FE-476D-AFB6-CD5A56C8C5B0}" Directory_="APPDIR" Attributes="260" KeyPath="Version_1"/>
     <ROW Component="Windows" ComponentId="{7B504763-5DB8-426C-9720-DB8E40F31A2C}" Directory_="APPDIR" Attributes="260" KeyPath="Windows"/>
     <ROW Component="_" ComponentId="{3A2BC902-68CF-40A6-8C28-D0DF0030DC29}" Directory_="APPDIR" Attributes="260" KeyPath="_"/>
     <ROW Component="__1" ComponentId="{5A8901E3-3524-4F08-B375-BA39B82A277E}" Directory_="APPDIR" Attributes="260" KeyPath="__1"/>
@@ -73,10 +82,13 @@
     <ROW Component="__14" ComponentId="{312C035C-38CF-4984-B65C-DE0BB5CDF366}" Directory_="APPDIR" Attributes="260" KeyPath="__14"/>
     <ROW Component="__16" ComponentId="{39E0FEE5-DDD7-4904-8CA1-20CE5CF45A9E}" Directory_="APPDIR" Attributes="260" KeyPath="__16"/>
     <ROW Component="__2" ComponentId="{6D7604A4-E622-4230-ADED-F5B0F3D0E0AF}" Directory_="APPDIR" Attributes="260" KeyPath="__2"/>
+    <ROW Component="__3" ComponentId="{AE783FAC-D34C-450E-B8E4-F88F1F04E8EE}" Directory_="APPDIR" Attributes="260" KeyPath="__3"/>
     <ROW Component="__4" ComponentId="{405205D5-CF80-4217-9ADF-86A6AFEA4AD5}" Directory_="APPDIR" Attributes="260" KeyPath="__4"/>
+    <ROW Component="__5" ComponentId="{C928E4A9-DA60-4631-A39E-56D0F67374BB}" Directory_="APPDIR" Attributes="260" KeyPath="__5"/>
     <ROW Component="__7" ComponentId="{31D17358-7EB4-410F-AD82-3F1F4D56EABF}" Directory_="APPDIR" Attributes="260" KeyPath="__7"/>
     <ROW Component="brightday_ibl.ktx" ComponentId="{A57650F6-D288-4350-86F4-575BADF040FE}" Directory_="resources_Dir" Attributes="0" KeyPath="brightday_ibl.ktx" Type="0"/>
     <ROW Component="libopenblas.dll" ComponentId="{4D3BD59F-66E2-4243-AF3A-6EF15B14C09E}" Directory_="APPDIR" Attributes="256" KeyPath="libopenblas.dll"/>
+    <ROW Component="settings.xml" ComponentId="{C06CE59B-6218-4F6E-8F54-DBC342E40310}" Directory_="GLTFShellExtension_Dir" Attributes="0" KeyPath="settings.xml" Type="0"/>
     <ROW Component="tbb.dll" ComponentId="{D7CBD31D-6665-41E9-8F91-A5BDC3EF788F}" Directory_="APPDIR" Attributes="256" KeyPath="tbb.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
@@ -138,6 +150,8 @@
     <ROW File="Buggy.glb" Component_="Buggy.glb" FileName="Buggy.glb" Attributes="0" SourcePath="Release\ModelShellExtension\samples\Buggy.glb" SelfReg="false"/>
     <ROW File="tbb.dll" Component_="tbb.dll" FileName="tbb.dll" Attributes="0" SourcePath="Release\ModelShellExtension\tbb.dll" SelfReg="false"/>
     <ROW File="NCraft.ico" Component_="brightday_ibl.ktx" FileName="NCraft.ico" Attributes="0" SourcePath="Release\ModelShellExtension\resources\NCraft.ico" SelfReg="false"/>
+    <ROW File="settings.xml" Component_="settings.xml" FileName="settings.xml" Attributes="0" SourcePath="..\CloudExtensionOptions\Settings\settings.xml" SelfReg="false"/>
+    <ROW File="GLTFExtensionOptions.exe" Component_="GLTFExtensionOptions.exe" FileName="GLTFEX~1.EXE|GLTFExtensionOptions.exe" Attributes="0" SourcePath="..\GLTFExtensionOptions\bin\Release\GLTFExtensionOptions.exe" SelfReg="false" DigSign="true"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
     <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
@@ -193,6 +207,7 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
     <ROW Directory_="APPDIR" Component_="APPDIR" ManualDelete="true"/>
+    <ROW Directory_="NCraftSoftware_2_Dir" Component_="NCraftSoftware" ManualDelete="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
     <ROW Action="AI_DOWNGRADE" Type="19" Target="4010"/>
@@ -222,8 +237,6 @@
     <ROW Feature_="MainFeature" Component_="CLSID"/>
     <ROW Feature_="MainFeature" Component_="CB7B16EE63F0498AAD7E857BD1B560C6"/>
     <ROW Feature_="MainFeature" Component_="ThreadingModel"/>
-    <ROW Feature_="MainFeature" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_1"/>
-    <ROW Feature_="MainFeature" Component_="C6D56CF1C574BE187365A3D02A68187"/>
     <ROW Feature_="MainFeature" Component_="C6D56CF1C574BE187365A3D02A68187_1"/>
     <ROW Feature_="MainFeature" Component_="_"/>
     <ROW Feature_="MainFeature" Component_="__1"/>
@@ -252,6 +265,14 @@
     <ROW Feature_="MainFeature" Component_="FullDetails_1"/>
     <ROW Feature_="MainFeature" Component_="__10"/>
     <ROW Feature_="MainFeature" Component_="__11"/>
+    <ROW Feature_="MainFeature" Component_="settings.xml"/>
+    <ROW Feature_="MainFeature" Component_="Path"/>
+    <ROW Feature_="MainFeature" Component_="Version"/>
+    <ROW Feature_="MainFeature" Component_="Software"/>
+    <ROW Feature_="MainFeature" Component_="__3"/>
+    <ROW Feature_="MainFeature" Component_="__5"/>
+    <ROW Feature_="MainFeature" Component_="NCraftSoftware"/>
+    <ROW Feature_="MainFeature" Component_="GLTFExtensionOptions.exe"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="samples_Dir.exe" SourcePath="Release\ModelShellExtension\resources\NCraft.ico" Index="0"/>
@@ -280,11 +301,9 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
     <ROW Registry="Approved" Root="2" Key="Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved" Name="+" Component_="Approved"/>
-    <ROW Registry="C6D56CF1C574BE187365A3D02A68187" Root="1" Key="Software" Name="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Value="[#ModelShellExtension.dll]" Component_="C6D56CF1C574BE187365A3D02A68187"/>
     <ROW Registry="C6D56CF1C574BE187365A3D02A68187_1" Root="1" Key="Software\Classes\CLSID\{0C6D56CF-1C57-4BE1-8736-5A3D02A68187}" Name="*" Component_="C6D56CF1C574BE187365A3D02A68187_1"/>
     <ROW Registry="C6D56CF1C574BE187365A3D02A68187_2" Root="2" Key="Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved" Name="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Value="[#ModelShellExtension.dll]" Component_="C6D56CF1C574BE187365A3D02A68187_2"/>
     <ROW Registry="CB7B16EE63F0498AAD7E857BD1B560C6" Root="1" Key="Software\Classes\CLSID\{CB7B16EE-63F0-498A-AD7E-857BD1B560C6}" Name="*" Component_="CB7B16EE63F0498AAD7E857BD1B560C6"/>
-    <ROW Registry="CB7B16EE63F0498AAD7E857BD1B560C6_1" Root="1" Key="Software" Name="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Value="[#ModelShellExtension.dll]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_1"/>
     <ROW Registry="CB7B16EE63F0498AAD7E857BD1B560C6_2" Root="2" Key="Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved" Name="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Value="[#ModelShellExtension.dll]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
     <ROW Registry="CLSID" Root="1" Key="Software\Classes\CLSID" Name="+" Component_="CLSID"/>
     <ROW Registry="Classes_1" Root="1" Key="Software\Classes" Name="\"/>
@@ -304,6 +323,7 @@
     <ROW Registry="InProcServer32_1" Root="1" Key="Software\Classes\CLSID\{0C6D56CF-1C57-4BE1-8736-5A3D02A68187}\InProcServer32" Name="*" Component_="InProcServer32"/>
     <ROW Registry="InfoTip_1" Root="1" Key="Software\Classes\Directory" Name="InfoTip" Value="prop:System.Comment;System.DateCreated" Component_="InfoTip_1"/>
     <ROW Registry="Manufacturer" Root="-1" Key="Software\[Manufacturer]" Name="\"/>
+    <ROW Registry="Manufacturer_1" Root="1" Key="Software\[Manufacturer]" Name="\"/>
     <ROW Registry="Microsoft" Root="2" Key="Software\Microsoft" Name="+" Component_="Microsoft"/>
     <ROW Registry="ModelShellExtension" Root="1" Key="Software\Classes\glb_auto_file\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
     <ROW Registry="ModelShellExtension_2" Root="1" Key="Software\Classes\.glb\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
@@ -311,20 +331,23 @@
     <ROW Registry="ModelShellExtension_7" Root="1" Key="Software\Classes\.gltf\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
     <ROW Registry="ModelShellExtension_8" Root="1" Key="Software\Classes\gltf_auto_file\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
     <ROW Registry="Path" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Path" Value="[APPDIR]" Component_="ProductInformation"/>
+    <ROW Registry="Path_1" Root="1" Key="Software\[Manufacturer]\[ProductName]" Name="Path" Value="[APPDIR]" Component_="Path"/>
     <ROW Registry="PreviewDetails_1" Root="1" Key="Software\Classes\Directory" Name="PreviewDetails" Value="prop:System.DateModified;*System.SharedWith;*System.StorageProviderState;*System.OfflineAvailability;*System.OfflineStatus" Component_="PreviewDetails_1"/>
     <ROW Registry="PreviewTitle_1" Root="1" Key="Software\Classes\Directory" Name="PreviewTitle" Value="prop:System.ItemNameDisplay;System.ItemTypeText" Component_="PreviewTitle_1"/>
     <ROW Registry="ProductName" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="\"/>
+    <ROW Registry="ProductName_1" Root="1" Key="Software\[Manufacturer]\[ProductName]" Name="\"/>
     <ROW Registry="ShellEx" Root="1" Key="Software\Classes\glb_auto_file\ShellEx" Name="\"/>
     <ROW Registry="ShellEx_2" Root="2" Key="Software\Microsoft\Windows\CurrentVersion\Shell Extensions" Name="+" Component_="ShellEx"/>
     <ROW Registry="ShellEx_3" Root="1" Key="Software\Classes\.glb\ShellEx" Name="\"/>
     <ROW Registry="ShellEx_4" Root="1" Key="Software\Classes\.gltf\ShellEx" Name="\"/>
     <ROW Registry="ShellEx_5" Root="1" Key="Software\Classes\gltf_auto_file\ShellEx" Name="\"/>
     <ROW Registry="Software" Root="-1" Key="Software" Name="\"/>
-    <ROW Registry="Software_2" Root="1" Key="Software" Name="\"/>
+    <ROW Registry="Software_2" Root="1" Key="Software" Name="+" Component_="Software"/>
     <ROW Registry="Software_4" Root="2" Key="Software" Name="\"/>
     <ROW Registry="ThreadingModel" Root="1" Key="Software\Classes\CLSID\{CB7B16EE-63F0-498A-AD7E-857BD1B560C6}\InProcServer32" Name="ThreadingModel" Value="Apartment" Component_="ThreadingModel"/>
     <ROW Registry="ThreadingModel_2" Root="1" Key="Software\Classes\CLSID\{0C6D56CF-1C57-4BE1-8736-5A3D02A68187}\InProcServer32" Name="ThreadingModel" Value="Apartment" Component_="ThreadingModel_2"/>
     <ROW Registry="Version" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Version" Value="[ProductVersion]" Component_="ProductInformation"/>
+    <ROW Registry="Version_1" Root="1" Key="Software\[Manufacturer]\[ProductName]" Name="Version" Value="[ProductVersion]" Component_="Version"/>
     <ROW Registry="Windows" Root="2" Key="Software\Microsoft\Windows" Name="+" Component_="Windows"/>
     <ROW Registry="_" Root="1" Key="Software\Classes\CLSID\{0C6D56CF-1C57-4BE1-8736-5A3D02A68187}\InProcServer32" Value="[#ModelShellExtension.dll]" Component_="_"/>
     <ROW Registry="__1" Root="1" Key="Software\Classes\CLSID\{CB7B16EE-63F0-498A-AD7E-857BD1B560C6}\InProcServer32" Value="[#ModelShellExtension.dll]" Component_="__1"/>
@@ -334,7 +357,9 @@
     <ROW Registry="__14" Root="1" Key="Software\Classes\glb_auto_file\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="__14"/>
     <ROW Registry="__16" Root="1" Key="Software\Classes\gltf_auto_file\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__16"/>
     <ROW Registry="__2" Root="1" Key="Software\Classes\.glb\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__2"/>
+    <ROW Registry="__3" Root="1" Key="Software\[Manufacturer]\[ProductName]" Value="[#ModelShellExtension.dll]" Component_="__3"/>
     <ROW Registry="__4" Root="1" Key="Software\Classes\.glb\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="__4"/>
+    <ROW Registry="__5" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Value="[#ModelShellExtension.dll]" Component_="__5"/>
     <ROW Registry="__7" Root="1" Key="Software\Classes\Directory" Value="File Folder" Component_="__7"/>
     <ROW Registry="glb_1" Root="1" Key="Software\Classes\.glb" Name="\"/>
     <ROW Registry="glb_auto_file" Root="1" Key="Software\Classes\glb_auto_file" Name="\"/>
@@ -343,7 +368,8 @@
     <ROW Registry="shellex_3" Root="1" Key="Software\Classes\Directory\shellex" Name="\"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
-    <ROW Shortcut="GLTFsamples" Directory_="DesktopFolder" Name="GLTFSA~1|GLTF samples" Component_="brightday_ibl.ktx" Target="[samples_Dir]" Hotkey="0" Icon_="samples_Dir.exe" IconIndex="0" ShowCmd="1" WkDir="samples_Dir"/>
+    <ROW Shortcut="GLTFExtensionOptions" Directory_="NCraftSoftware_2_Dir" Name="GLTFEX~1|GLTFExtensionOptions" Component_="GLTFExtensionOptions.exe" Target="[#GLTFExtensionOptions.exe]" Hotkey="0" Icon_="samples_Dir.exe" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
+    <ROW Shortcut="GLTFSamples" Directory_="DesktopFolder" Name="GLTFSA~1|GLTF Samples" Component_="Approved" Target="[samples_Dir]" Hotkey="0" Icon_="samples_Dir.exe" IconIndex="0" ShowCmd="1"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiThemeComponent">
     <ATTRIBUTE name="UsedTheme" value="classic"/>

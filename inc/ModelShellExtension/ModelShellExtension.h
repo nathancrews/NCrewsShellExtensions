@@ -16,3 +16,8 @@ extern std::wstring g_AppName;
 extern long g_DllModuleRefCount;
 extern TCHAR g_DllModelName[MAX_PATH];
 extern std::filesystem::path g_AppPath;
+extern std::wstring g_appUserModelID;
+extern std::wstring g_ProducerName;
+extern std::wstring g_AppDirectoryName;
+extern std::filesystem::path g_AppDataPath;
+extern std::filesystem::path g_SettingsFileName;

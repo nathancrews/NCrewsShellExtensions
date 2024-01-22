@@ -5,11 +5,6 @@
 #include <thread>
 #include <filesystem>
 
-#include <objidl.h>
-#include <gdiplus.h>
-using namespace Gdiplus;
-#pragma comment (lib,"Gdiplus.lib")
-
 #ifdef NCRAFTIMAGEGENAPI_EXPORT
 #define NCRAFTIMAGEGENAPI __declspec(dllexport)
 #elif defined(NCRAFTIMAGEGENAPI_IMPORT)
@@ -41,6 +36,7 @@ struct ImageGenSettings
     UINT imageWidth = 1440;
     UINT imageHeight = 1024;
     std::string imageFormat = "png";
+    std::string licenseKey;
     UINT is_Licensed = false;
 };
 
@@ -66,8 +62,6 @@ NCRAFTIMAGEGENAPI UINT GetFileNamesFromDirectory(std::filesystem::path& filePath
                                                  std::vector<std::filesystem::path>& outDirectoryFilenames);
 NCRAFTIMAGEGENAPI UINT GetCloudFileNamesFromDirectory(std::filesystem::path& filePath, std::vector<std::string>& allowedFileExtensions,
                                                       std::vector<std::filesystem::path>& outDirectoryFilenames);
-
-NCRAFTIMAGEGENAPI int GetEncoderClsid(const WCHAR* format, CLSID* pClsid);
 
 NCRAFTIMAGEGENAPI extern std::vector<std::string> ModelFileExtensions;
 NCRAFTIMAGEGENAPI extern std::vector<std::string> PointcloudFileExtensions;

@@ -11,10 +11,14 @@ using System.IO;
 using System.Web;
 using System.Xml;
 using Microsoft.Win32;
-
 using static System.Environment;
 using System.Diagnostics;
-using System.Security.Claims;
+
+using SKM.V3;
+using SKM.V3.Methods;
+using SKM.V3.Models;
+using System.Xml.Linq;
+
 
 
 namespace CloudExtensionOptions
@@ -25,50 +29,71 @@ namespace CloudExtensionOptions
         {
             InitializeComponent();
 
+            StartPosition = FormStartPosition.CenterScreen;
+
+            ImageFormatComboBox.SelectedIndex = 0;
+            ImageSizeComboBox.SelectedIndex = 0;
+
             String dataPath = GetFolderPath(SpecialFolder.LocalApplicationData);
 
             dataPath = Path.Combine(dataPath, "NCraft Software\\CloudShellExtension");
             m_settingsFilename = "settings.xml";
             m_settingsPathname = Path.Combine(dataPath, m_settingsFilename);
 
-            this.ImageFormatComboBox.SelectedIndex = 0;
-            this.ImageSizeComboBox.SelectedIndex = 0;
-
-            m_xmlSettingsDoc = new XmlDocument();
-            m_xmlSettingsDoc.Load(m_settingsPathname);
-
-            XmlElement rootElem = m_xmlSettingsDoc.DocumentElement;
-
-            XmlNode imageFormatElem = rootElem.SelectSingleNode("descendant::ImageFormat");
-            if (imageFormatElem != null && imageFormatElem.FirstChild != null)
+            if (File.Exists(m_settingsPathname))
             {
-                m_imageFormat = imageFormatElem.FirstChild.Value;
-                if (m_imageFormat.Length > 0)
-                {
-                    ImageFormatComboBox.Text = m_imageFormat;
+                m_xmlSettingsDoc = new XmlDocument();
 
-                    int indexVal = ImageFormatComboBox.FindString(m_imageFormat);
-                    if (indexVal > -1)
+                if (m_xmlSettingsDoc != null)
+                {
+                    m_xmlSettingsDoc.Load(m_settingsPathname);
+
+                    XmlElement rootElem = m_xmlSettingsDoc.DocumentElement;
+
+                    if (rootElem != null)
                     {
-                        ImageFormatComboBox.SelectedIndex = indexVal;
+                        XmlNode imageFormatElem = rootElem.SelectSingleNode("descendant::ImageFormat");
+                        if (imageFormatElem != null && imageFormatElem.FirstChild != null)
+                        {
+                            m_imageFormat = imageFormatElem.FirstChild.Value;
+                            if (m_imageFormat.Length > 0)
+                            {
+                                ImageFormatComboBox.Text = m_imageFormat;
+
+                                int indexVal = ImageFormatComboBox.FindString(m_imageFormat);
+                                if (indexVal > -1)
+                                {
+                                    ImageFormatComboBox.SelectedIndex = indexVal;
+                                }
+                            }
+                        }
+
+                        XmlNode imageSizeElem = rootElem.SelectSingleNode("descendant::ImageSize");
+                        if (imageSizeElem != null && imageFormatElem.FirstChild != null)
+                        {
+                            m_imageSize = imageSizeElem.FirstChild.Value;
+                            if (m_imageSize.Length > 0)
+                            {
+                                ImageSizeComboBox.Text = m_imageSize;
+                                int indexVal = ImageSizeComboBox.FindString(m_imageSize);
+                                if (indexVal > -1)
+                                {
+                                    ImageSizeComboBox.SelectedIndex = indexVal;
+                                }
+                            }
+                        }
+
+                        XmlNode keyElem = rootElem.SelectSingleNode("descendant::LicenseKey");
+                        if (keyElem != null && keyElem.FirstChild != null)
+                        {
+                            m_keyValue = keyElem.FirstChild.Value;
+                            if (m_imageSize.Length > 0)
+                            {
+                                LicenseKeyTextBox.Text = m_keyValue;
+                            }
+                        }
                     }
                 }
-            }
-
-            XmlNode imageSizeElem = rootElem.SelectSingleNode("descendant::ImageSize");
-            if (imageSizeElem != null && imageFormatElem.FirstChild != null)
-            {
-                m_imageSize = imageSizeElem.FirstChild.Value;
-                if (m_imageSize.Length > 0)
-                {
-                    ImageSizeComboBox.Text = m_imageSize;
-                    int indexVal = ImageSizeComboBox.FindString(m_imageSize);
-                    if (indexVal > -1)
-                    {
-                        ImageSizeComboBox.SelectedIndex = indexVal;
-                    }
-                }
-
             }
 
         }
@@ -93,7 +118,7 @@ namespace CloudExtensionOptions
 
                     if (File.Exists(extensionDLLPathStr))
                     {
-                        Process.Start("Regsvr32.exe", extensionDLLPathStr);
+                        Process.Start("Regsvr32.exe", "\"" + extensionDLLPathStr + "\"");
                     }
                 }
             }
@@ -114,7 +139,7 @@ namespace CloudExtensionOptions
 
                     if (File.Exists(extensionDLLPathStr))
                     {
-                        Process.Start("Regsvr32.exe", "/u " + extensionDLLPathStr);
+                        Process.Start("Regsvr32.exe", "/u " + "\"" + extensionDLLPathStr + "\"");
                     }
                 }
             }
@@ -123,7 +148,9 @@ namespace CloudExtensionOptions
 
         private void PurchaseButton_Click(object sender, EventArgs e)
         {
-            Process.Start("https://www.sourceforge.net");
+
+            //   Process.Start("https://www.sourceforge.net");
+
         }
 
         private void ImageFormatComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -138,37 +165,58 @@ namespace CloudExtensionOptions
 
         private void LicenseKeyTextBox_TextChanged(object sender, EventArgs e)
         {
-
+            m_keyValue = LicenseKeyTextBox.Text;
         }
 
         private void OkButton_Click(object sender, EventArgs e)
         {
-            XmlElement rootElem = m_xmlSettingsDoc.DocumentElement;
-
-            XmlNode imageFormatElem = rootElem.SelectSingleNode("descendant::ImageFormat");
-            if (imageFormatElem != null && imageFormatElem.FirstChild != null)
+            if (m_xmlSettingsDoc != null && m_xmlSettingsDoc.DocumentElement != null)
             {
-                m_imageFormat = ImageFormatComboBox.Text;
 
-                if (m_imageFormat.Length > 0)
+                XmlElement rootElem = m_xmlSettingsDoc.DocumentElement;
+
+                XmlNode imageFormatElem = rootElem.SelectSingleNode("descendant::ImageFormat");
+                if (imageFormatElem != null && imageFormatElem.FirstChild != null)
                 {
-                    imageFormatElem.FirstChild.Value = m_imageFormat;
+                    m_imageFormat = ImageFormatComboBox.Text;
+
+                    if (m_imageFormat.Length > 0)
+                    {
+                        imageFormatElem.FirstChild.Value = m_imageFormat;
+                    }
                 }
+
+                XmlNode imageSizeElem = rootElem.SelectSingleNode("descendant::ImageSize");
+                if (imageSizeElem != null && imageSizeElem.FirstChild != null)
+                {
+                    m_imageFormat = ImageSizeComboBox.Text;
+
+                    if (m_imageSize.Length > 0)
+                    {
+                        imageSizeElem.FirstChild.Value = m_imageSize;
+                    }
+                }
+
+                XmlNode keyElem = rootElem.SelectSingleNode("descendant::LicenseKey");
+                if (keyElem != null)
+                {
+                    if (m_isLicensed == true)
+                    {
+                        if (m_keyValue.Length > 0)
+                        {
+                            keyElem.InnerText = m_keyValue;
+                        }
+                    }
+                    else
+                    {
+                        keyElem.InnerText = "";
+                    }
+                }
+
+                m_xmlSettingsDoc.Save(m_settingsPathname);
             }
 
-            XmlNode imageSizeElem = rootElem.SelectSingleNode("descendant::ImageSize");
-            if (imageSizeElem != null && imageSizeElem.FirstChild != null)
-            {
-                m_imageFormat = ImageSizeComboBox.Text;
 
-                if (m_imageSize.Length > 0)
-                {
-                    imageSizeElem.FirstChild.Value = m_imageSize;
-                }
-            }
-
-
-            m_xmlSettingsDoc.Save(m_settingsPathname);
             this.Close();
         }
 
@@ -183,7 +231,39 @@ namespace CloudExtensionOptions
         String m_keyValue;
         String m_imageFormat = "png";
         String m_imageSize = "1440x1024";
-    }
+        bool m_isLicensed = false;
 
+        private void ValidateButton_Click(object sender, EventArgs e)
+        {
+            // var licenseKey = "JJVRT-LBIZO-ZFNJN-LMYLV"; // <--  remember to change this to your license key
+            var RSAPubKey = "<RSAKeyValue><Modulus>k8EvVN6X4dfoNdSXJNvwPYOM3qsldRYXBDRnWJH4ptmVgFX3unlQ53EdYu2cDxbSR9MMonpvmq2Dgs7WOM0Q4U8WVMNcexzxyTIoeImULzerPGQPN6UIZaGulUiPkFSSVXqD/cgYdlkzqro+x2hMExNMJB97ISsBy3aqYGdCtoUP8i0yjdbFcZKOns7ZaPYJE24MiYaIKp4dXNceWZ8w8SXWlxtvnqPe8KeXHRpf+/SrdoBd1IU6TXknLpL5gYpywfsQb8tk9rLtWFJLQEhkzID1KYwfSnBVXVn95u+OZI7h8CyQVl9sAmxAk0ETCQHE1hgesHwreSYA0X4KYBs0gw==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
+
+            var auth = "WyI3MTg2OTc5OSIsInR4UkVKd2RhU2dUcG9vU091cHljNUZDWHY0TWltVmpDaFBERVFjdEwiXQ==";
+            var result = Key.Activate(token: auth, parameters: new ActivateModel()
+            {
+                Key = m_keyValue,
+                ProductId = 23571,  // <--  remember to change this to your Product Id
+                Sign = true,
+                MachineCode = Helpers.GetMachineCodePI(v: 2)
+            });
+
+            if (result == null || result.Result == ResultType.Error ||
+                !result.LicenseKey.HasValidSignature(RSAPubKey).IsValid())
+            {
+                const string message = "Invalid License";
+                const string caption = "Point Cloud Shell Extension";
+                MessageBox.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                // everything went fine if we are here!
+                this.m_isLicensed = true;
+
+                const string message = "License Validation Successful";
+                const string caption = "Point Cloud Shell Extension";
+                MessageBox.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+    }
 
 }

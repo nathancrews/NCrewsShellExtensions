@@ -4,7 +4,7 @@
 #include "ModelThumbnailGUID.h"
 #include "ModelClassFactory.h"
 #include "wintoastlib.h"
-#include "Renderers/RenderToImageCommon.h"
+#include "Renderers/RenderGLTFToImage.h"
 
 void model_print_fcn(const std::string& logString)
 {
@@ -39,11 +39,23 @@ BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
 
         open3d::utility::Logger::GetInstance().SetPrintFunction(model_print_fcn);
         
-        std::wstring appName = L"NCraft Model Image Generator";
-        std::wstring appUserModelID = L"NCraft Model Image Message";
- 
-        WinToastLib::WinToast::instance()->setAppName(appName);
-        WinToastLib::WinToast::instance()->setAppUserModelId(appUserModelID);
+        WCHAR appdata[MAX_PATH] = { 0 };
+        SHGetFolderPathW(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, appdata);
+        g_AppDataPath = appdata;
+
+        g_AppDataPath.concat(L"\\");
+        g_AppDataPath.concat(g_ProducerName);
+        g_AppDataPath.concat(L"\\");
+        g_AppDataPath.concat(g_AppDirectoryName);
+        g_AppDataPath.concat(L"\\");
+
+        utility::LogInfo("appdata = {}", g_AppDataPath.string());
+
+
+        utility::LogInfo("appdata = {}", g_AppDataPath.string());
+
+         WinToastLib::WinToast::instance()->setAppName(g_AppName);
+        WinToastLib::WinToast::instance()->setAppUserModelId(g_appUserModelID);
 
         if (!WinToastLib::WinToast::instance()->initialize())
         {

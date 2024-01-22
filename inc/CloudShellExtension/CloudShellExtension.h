@@ -13,8 +13,11 @@ HRESULT __stdcall  DllRegisterServer();
 HRESULT __stdcall  DllUnregisterServer();
 
 extern std::wstring g_AppName;
+extern std::wstring g_appUserModelID;
 extern long g_DllModuleRefCount;
 extern TCHAR g_DllModelName[MAX_PATH];
 extern std::filesystem::path g_AppPath;
+extern std::wstring g_ProducerName;
+extern std::wstring g_AppDirectoryName;
 extern std::filesystem::path g_SettingsFileName;
 extern std::vector<std::string> g_Settings_ImageImageSizes;
