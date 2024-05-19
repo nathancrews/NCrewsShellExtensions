@@ -13,6 +13,24 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Tools">
+      <UniqueIdentifier>{c6f3f990-4b03-46f3-ac18-ef78692f4095}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Readers">
+      <UniqueIdentifier>{376c648d-8e00-4916-a723-e8721fafafbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Renders">
+      <UniqueIdentifier>{3f75b7ec-c8a1-4eff-aaa2-dfe0ef5cf86c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Tools">
+      <UniqueIdentifier>{79402bab-86ea-4612-be62-8b5b012534ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Renders">
+      <UniqueIdentifier>{01cc8557-9a3d-4ef4-9061-4d9e548aecb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Readers">
+      <UniqueIdentifier>{84249ad7-196f-4412-beb0-88b052878af9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\inc\CloudShellExtension\CloudClassFactory.h">
@@ -30,14 +48,20 @@
     <ClInclude Include="..\inc\CloudShellExtension\CloudMenuGUID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\Renderers\RenderToImageCommon.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\inc\Tools\MathHelper.h">
+      <Filter>Header Files\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\3rdpartylibs\TinyXML\Inc\tinyxml2.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\inc\Readers\PointCloudIO.h">
+      <Filter>Header Files\Readers</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\Renderers\RenderPointCloudToImage.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Renders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\Renderers\RenderToImageCommon.h">
+      <Filter>Header Files\Renders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\3rdpartylibs\TinyXML\Inc\tinyxml2.h">
+      <Filter>Header Files\Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -50,17 +74,17 @@
     <ClCompile Include="..\source\CloudShellExtension\CloudMenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\wintoastlib.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\Renderers\RenderPointCloudToImage.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Renders</Filter>
     </ClCompile>
     <ClCompile Include="..\source\Renderers\RenderToImageCommon.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Renders</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\3rdpartylibs\TinyXML\Source\tinyxml2.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Readers\PointCloudIO.cpp">
+      <Filter>Source Files\Readers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

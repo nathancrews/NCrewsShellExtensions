@@ -21,3 +21,6 @@ extern std::wstring g_ProducerName;
 extern std::wstring g_AppDirectoryName;
 extern std::filesystem::path g_SettingsFileName;
 extern std::vector<std::string> g_Settings_ImageImageSizes;
+extern std::filesystem::path g_AppDataPath;
+
+extern void cloud_print_fcn(const std::string& logString);

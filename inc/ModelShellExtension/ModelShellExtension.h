@@ -21,3 +21,4 @@ extern std::wstring g_ProducerName;
 extern std::wstring g_AppDirectoryName;
 extern std::filesystem::path g_AppDataPath;
 extern std::filesystem::path g_SettingsFileName;
+extern void model_print_fcn(const std::string& logString);

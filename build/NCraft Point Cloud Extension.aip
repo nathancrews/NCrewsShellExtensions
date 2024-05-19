@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="21.3.1" version="21.3.1" Modules="simple" RootPath="." Language="en" Id="{FF3B5636-10A6-46E4-A34E-363C375FC5DC}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="21.3.1" version="21.7.1" Modules="simple" RootPath="." Language="en" Id="{FF3B5636-10A6-46E4-A34E-363C375FC5DC}">
   <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
     <ROW Name="HiddenItems" Value="AppXProductDetailsComponent;AppXDependenciesComponent;AppXAppDetailsComponent;AppXVisualAssetsComponent;AppXCapabilitiesComponent;AppXAppDeclarationsComponent;AppXUriRulesComponent;FixupComponent;MsiXDiffComponent;MsixManifestEditorComponent"/>
   </COMPONENT>
@@ -8,10 +8,10 @@
     <ROW Property="ALLUSERS" Value="1"/>
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
     <ROW Property="ARPPRODUCTICON" Value="DesktopFolder.exe" Type="8"/>
-    <ROW Property="Manufacturer" Value="NCraft Software"/>
+    <ROW Property="Manufacturer" Value="NCrews Software"/>
     <ROW Property="ProductCode" Value="1033:{578B5E68-C21A-4C72-BAB7-933F1854442E} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
-    <ROW Property="ProductName" Value="NCraft Point Cloud Shell Extension"/>
+    <ROW Property="ProductName" Value="NCrews Point Cloud Shell Extension"/>
     <ROW Property="ProductVersion" Value="1.0.0" Options="32"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{D5367029-34E7-40AD-B5E7-62A76AE6685E}"/>
@@ -30,9 +30,9 @@
     <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR:." IsPseudoRoot="1"/>
     <ROW Directory="DesktopFolder" Directory_Parent="TARGETDIR" DefaultDir="DESKTO~1|DesktopFolder" IsPseudoRoot="1"/>
     <ROW Directory="LocalAppDataFolder" Directory_Parent="TARGETDIR" DefaultDir="LOCALA~1|LocalAppDataFolder" IsPseudoRoot="1"/>
-    <ROW Directory="NCraftSoftware_1_Dir" Directory_Parent="PersonalFolder" DefaultDir="NCRAFT~1|NCraft Software"/>
-    <ROW Directory="NCraftSoftware_2_Dir" Directory_Parent="ProgramMenuFolder" DefaultDir="NCRAFT~1|NCraft Software"/>
-    <ROW Directory="NCraftSoftware_Dir" Directory_Parent="LocalAppDataFolder" DefaultDir="NCRAFT~1|NCraft Software"/>
+    <ROW Directory="NCraftSoftware_1_Dir" Directory_Parent="PersonalFolder" DefaultDir="NCREWS~1|NCrews Software"/>
+    <ROW Directory="NCraftSoftware_2_Dir" Directory_Parent="ProgramMenuFolder" DefaultDir="NCREWS~1|NCrews Software"/>
+    <ROW Directory="NCraftSoftware_Dir" Directory_Parent="LocalAppDataFolder" DefaultDir="NCREWS~1|NCrews Software"/>
     <ROW Directory="PersonalFolder" Directory_Parent="TARGETDIR" DefaultDir="PERSON~1|PersonalFolder" IsPseudoRoot="1"/>
     <ROW Directory="PointcloudSampleFiles_Dir" Directory_Parent="NCraftSoftware_1_Dir" DefaultDir="POINTC~1|Pointcloud Sample Files"/>
     <ROW Directory="ProductName_Dir" Directory_Parent="NCraftSoftware_Dir" DefaultDir="CLOUDS~1|CloudShellExtension"/>
@@ -49,20 +49,16 @@
     <ROW Component="CLSID_1" ComponentId="{0BAEB04D-CB1C-481F-87DA-BC7AFFA489D0}" Directory_="APPDIR" Attributes="260" KeyPath="CLSID_1"/>
     <ROW Component="CloudExtensionOptions.exe" ComponentId="{BBFA104E-4CAD-4C95-9B8E-B3E8295794F1}" Directory_="APPDIR" Attributes="0" KeyPath="CloudExtensionOptions.exe"/>
     <ROW Component="CloudShellExtension.dll_1" ComponentId="{2073349A-E606-417E-865F-A73C185A5DA9}" Directory_="APPDIR" Attributes="256" KeyPath="CloudShellExtension.dll"/>
-    <ROW Component="CloudShellExtension.exp_1" ComponentId="{4273E4B5-C548-4398-A520-4DF2DBFCAA5D}" Directory_="APPDIR" Attributes="0" KeyPath="proj.db" Type="0"/>
+    <ROW Component="CloudShellExtension.exp_1" ComponentId="{4273E4B5-C548-4398-A520-4DF2DBFCAA5D}" Directory_="APPDIR" Attributes="0" KeyPath="CloudExtensionOptions.exe.config" Type="0"/>
     <ROW Component="Cryptolens.Licensing.dll" ComponentId="{67B3F32D-B620-4E72-B2A5-AAA9AD5EA8E8}" Directory_="APPDIR" Attributes="0" KeyPath="Cryptolens.Licensing.dll"/>
     <ROW Component="Directory" ComponentId="{5A249A9C-F218-4F73-8C82-A81D666CF0A9}" Directory_="APPDIR" Attributes="260" KeyPath="Directory"/>
     <ROW Component="Directory_1" ComponentId="{55A9529E-848D-4F8D-89B4-4329B5F6E220}" Directory_="APPDIR" Attributes="260" KeyPath="Directory_1"/>
-    <ROW Component="Lerc.dll" ComponentId="{E7652020-C160-4FA8-9D41-EDFA7AF23165}" Directory_="APPDIR" Attributes="256" KeyPath="Lerc.dll"/>
     <ROW Component="Microsoft" ComponentId="{CEFA8FE7-FA0A-46E6-869B-986E9C7947DE}" Directory_="APPDIR" Attributes="260" KeyPath="Microsoft"/>
-    <ROW Component="Microsoft.Bcl.AsyncInterfaces.dll" ComponentId="{4C59D271-0AD9-49BD-AEFB-415A69619580}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Bcl.AsyncInterfaces.dll"/>
     <ROW Component="Microsoft.Win32.Registry.dll" ComponentId="{FA17E94D-5FC6-43E0-9D27-94815D0EF75A}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Win32.Registry.dll"/>
     <ROW Component="NCraftSoftware" ComponentId="{41F92DED-93DC-44E3-84EC-E2958A4F7A1E}" Directory_="NCraftSoftware_2_Dir" Attributes="0"/>
     <ROW Component="New_Key" ComponentId="{6D5F2708-ED56-4D55-A281-A96B10740965}" Directory_="APPDIR" Attributes="260" KeyPath="New_Key"/>
     <ROW Component="Newtonsoft.Json.dll" ComponentId="{B39E3F37-4D34-4C46-B79A-810C0F17E990}" Directory_="APPDIR" Attributes="0" KeyPath="Newtonsoft.Json.dll"/>
     <ROW Component="Open3D.dll_1" ComponentId="{CEEFA860-1E18-43D7-81D3-A21741D461E6}" Directory_="APPDIR" Attributes="256" KeyPath="Open3D.dll_1"/>
-    <ROW Component="OpenNI2.dll" ComponentId="{1E3EB828-2771-4A5B-838B-37035EFA3E2F}" Directory_="APPDIR" Attributes="256" KeyPath="OpenNI2.dll"/>
-    <ROW Component="OpenNI2.jni.dll" ComponentId="{6305B18D-1F6F-460B-ADBC-1563A6F4BA15}" Directory_="APPDIR" Attributes="256" KeyPath="OpenNI2.jni.dll"/>
     <ROW Component="Path" ComponentId="{E44EE5E2-E625-4513-B709-4FF76CF6B72B}" Directory_="APPDIR" Attributes="260" KeyPath="Path_1"/>
     <ROW Component="ProductInformation" ComponentId="{01E9D6BF-D77E-490B-91A0-BE27021BB6AF}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
     <ROW Component="ShellExtensions" ComponentId="{6F0D2CB4-0DEC-4086-BB8D-1C2AD1E5479F}" Directory_="APPDIR" Attributes="260" KeyPath="ShellExtensions"/>
@@ -92,332 +88,29 @@
     <ROW Component="__7" ComponentId="{95F5476A-82C3-45BC-A01E-3C886C25DD8E}" Directory_="APPDIR" Attributes="260" KeyPath="__7"/>
     <ROW Component="__8" ComponentId="{81381828-B55B-4F6C-8B24-25041CCD1ABA}" Directory_="APPDIR" Attributes="260" KeyPath="__8"/>
     <ROW Component="__9" ComponentId="{3554C2AE-3AD4-43B3-9738-2210DF520F0C}" Directory_="APPDIR" Attributes="260" KeyPath="__9"/>
-    <ROW Component="abseil_dll.dll" ComponentId="{9971C7E9-7926-45A5-B9B0-0CC777D7E3BC}" Directory_="APPDIR" Attributes="256" KeyPath="abseil_dll.dll"/>
-    <ROW Component="aec.dll" ComponentId="{EA9D4271-0732-410B-B8D0-32CBD067E8BA}" Directory_="APPDIR" Attributes="256" KeyPath="aec.dll"/>
-    <ROW Component="archive.dll" ComponentId="{32E2FCA8-9578-448C-BB76-7A7D107E5CAD}" Directory_="APPDIR" Attributes="256" KeyPath="archive.dll"/>
-    <ROW Component="asprintf0.dll" ComponentId="{82F34334-89F5-4356-9133-6C8EEC10BF35}" Directory_="APPDIR" Attributes="256" KeyPath="asprintf0.dll"/>
-    <ROW Component="blosc.dll" ComponentId="{BFB7CE8A-E05D-4E4B-9B05-C51F9F1EE3A8}" Directory_="APPDIR" Attributes="256" KeyPath="blosc.dll"/>
     <ROW Component="brightday_ibl.ktx_1" ComponentId="{25EC1678-A91C-49FE-B3D8-BF90732BF445}" Directory_="resources_1_Dir" Attributes="0" KeyPath="brightday_ibl.ktx_1" Type="0"/>
-    <ROW Component="btf.dll" ComponentId="{A2CDFB84-82B1-4E8C-8EDA-75ACF8E85FA9}" Directory_="APPDIR" Attributes="256" KeyPath="btf.dll"/>
-    <ROW Component="bzip2.dll" ComponentId="{6BE32270-B1A4-4B7E-A5C0-C5D38246755F}" Directory_="APPDIR" Attributes="256" KeyPath="bzip2.dll"/>
-    <ROW Component="cairo.dll" ComponentId="{B1A72466-C32F-466D-AF2C-616F7C909231}" Directory_="APPDIR" Attributes="256" KeyPath="cairo.dll"/>
-    <ROW Component="cairogobject.dll" ComponentId="{34B25FF7-D7F7-4CB4-90D5-62BF9E235C9B}" Directory_="APPDIR" Attributes="256" KeyPath="cairogobject.dll"/>
-    <ROW Component="cairoscriptinterpreter.dll" ComponentId="{FDEB7CFA-86EF-46B5-A3F6-DEAD8EFECE2D}" Directory_="APPDIR" Attributes="256" KeyPath="cairoscriptinterpreter.dll"/>
-    <ROW Component="camd.dll" ComponentId="{9D2D5C1F-716A-41C5-B7F2-FC280D0250CA}" Directory_="APPDIR" Attributes="256" KeyPath="camd.dll"/>
-    <ROW Component="cares.dll" ComponentId="{1591AC46-2FB1-46CD-AAC3-3CBAF67B996C}" Directory_="APPDIR" Attributes="256" KeyPath="cares.dll"/>
-    <ROW Component="ccolamd.dll" ComponentId="{BE773C8A-35D2-4614-8F32-9F1D6A443F88}" Directory_="APPDIR" Attributes="256" KeyPath="ccolamd.dll"/>
-    <ROW Component="ceres.dll" ComponentId="{43E4F362-E063-4944-B7F6-3C11AAE035A2}" Directory_="APPDIR" Attributes="256" KeyPath="ceres.dll"/>
-    <ROW Component="cfitsio.dll" ComponentId="{467ED0FA-E1F6-4D0E-A47D-0A142D82A114}" Directory_="APPDIR" Attributes="256" KeyPath="cfitsio.dll"/>
-    <ROW Component="charset.dll" ComponentId="{2122B897-A648-4438-845F-18BE793ABC12}" Directory_="APPDIR" Attributes="256" KeyPath="charset.dll"/>
-    <ROW Component="cholmod.dll" ComponentId="{8C06C594-7AC8-461F-BCB6-871F6469EC2B}" Directory_="APPDIR" Attributes="256" KeyPath="cholmod.dll"/>
-    <ROW Component="colamd.dll" ComponentId="{904BA8DB-17C4-4B71-9F69-DBED480EB6CC}" Directory_="APPDIR" Attributes="256" KeyPath="colamd.dll"/>
-    <ROW Component="comerr64.dll" ComponentId="{AE3FC520-35BB-44AC-B828-42085DB965B9}" Directory_="APPDIR" Attributes="256" KeyPath="comerr64.dll"/>
-    <ROW Component="concrt140.dll" ComponentId="{7B15FCB0-681D-49D4-A344-006A16647B23}" Directory_="APPDIR" Attributes="256" KeyPath="concrt140.dll"/>
-    <ROW Component="crc32c.dll" ComponentId="{6AA34F31-F6D3-4398-B108-3BAA7BDBF818}" Directory_="APPDIR" Attributes="256" KeyPath="crc32c.dll"/>
-    <ROW Component="cxsparse.dll" ComponentId="{76348D52-E78E-466D-BAEB-DCD6630B196D}" Directory_="APPDIR" Attributes="256" KeyPath="cxsparse.dll"/>
     <ROW Component="dc.laz" ComponentId="{FD11A017-E7E7-4C37-83E0-3EEE3E6E6B00}" Directory_="PointcloudSampleFiles_Dir" Attributes="0" KeyPath="dc.laz" Type="0"/>
-    <ROW Component="deflate.dll" ComponentId="{29A0157A-C3D6-4368-9C19-C97DA405EB10}" Directory_="APPDIR" Attributes="256" KeyPath="deflate.dll"/>
-    <ROW Component="expat.dll" ComponentId="{DCEA9216-2AC4-4745-8A5B-77A96DC73601}" Directory_="APPDIR" Attributes="256" KeyPath="expat.dll"/>
-    <ROW Component="ffi8.dll" ComponentId="{2C7F3164-86D9-4879-AB52-E9C0784064FF}" Directory_="APPDIR" Attributes="256" KeyPath="ffi8.dll"/>
-    <ROW Component="flang.dll" ComponentId="{A6A83939-7B2E-4F80-911F-E62CCFC5397E}" Directory_="APPDIR" Attributes="256" KeyPath="flang.dll"/>
-    <ROW Component="flangrti.dll" ComponentId="{B0B15104-4E70-4FD1-B522-8CFE66431949}" Directory_="APPDIR" Attributes="256" KeyPath="flangrti.dll"/>
-    <ROW Component="fontconfig1.dll" ComponentId="{B6D80C16-0321-44AA-A884-FB95ABA24D9C}" Directory_="APPDIR" Attributes="256" KeyPath="fontconfig1.dll"/>
-    <ROW Component="freetype.dll" ComponentId="{EA305087-C4AB-4367-9D9A-C665C3CD811C}" Directory_="APPDIR" Attributes="256" KeyPath="freetype.dll"/>
-    <ROW Component="freexl.dll" ComponentId="{4117CE58-E828-4D2C-83C2-0DAE7D6FA6D3}" Directory_="APPDIR" Attributes="256" KeyPath="freexl.dll"/>
-    <ROW Component="gdal.dll" ComponentId="{3682A3B8-170E-4E02-B5ED-F29865004C88}" Directory_="APPDIR" Attributes="256" KeyPath="gdal.dll"/>
-    <ROW Component="geos.dll" ComponentId="{84E446E4-FBC4-45B1-9F47-28434C491391}" Directory_="APPDIR" Attributes="256" KeyPath="geos.dll"/>
-    <ROW Component="geos_c.dll" ComponentId="{EA6B081F-99E3-4C45-9F52-4ED33DA3E7C4}" Directory_="APPDIR" Attributes="256" KeyPath="geos_c.dll"/>
-    <ROW Component="geotiff.dll" ComponentId="{42D3EC74-1D8C-45F2-827A-8B146FF0A5D2}" Directory_="APPDIR" Attributes="256" KeyPath="geotiff.dll"/>
-    <ROW Component="gflags.dll" ComponentId="{D94441FC-41D2-4C00-9B1F-9036E57CCE65}" Directory_="APPDIR" Attributes="256" KeyPath="gflags.dll"/>
-    <ROW Component="glog.dll" ComponentId="{E5EF647B-EB1C-4E74-8290-8A042A9B753D}" Directory_="APPDIR" Attributes="256" KeyPath="glog.dll"/>
-    <ROW Component="gpr.dll" ComponentId="{C2B9585B-61B3-4FF2-839A-41323B807864}" Directory_="APPDIR" Attributes="256" KeyPath="gpr.dll"/>
-    <ROW Component="gssapi64.dll" ComponentId="{40D38928-2210-436D-8A99-93D073418401}" Directory_="APPDIR" Attributes="256" KeyPath="gssapi64.dll"/>
-    <ROW Component="hdf.dll" ComponentId="{63007889-22EE-46D9-810F-73D291FCCF43}" Directory_="APPDIR" Attributes="256" KeyPath="hdf.dll"/>
-    <ROW Component="hdf5.dll" ComponentId="{17B47F89-6E62-43C1-BFB8-016FD9635B2D}" Directory_="APPDIR" Attributes="256" KeyPath="hdf5.dll"/>
-    <ROW Component="hdf5_cpp.dll" ComponentId="{88F169C1-526D-4BA6-99FB-E5BD19399D5C}" Directory_="APPDIR" Attributes="256" KeyPath="hdf5_cpp.dll"/>
-    <ROW Component="hdf5_hl.dll" ComponentId="{A1E9B7CB-3736-4F5A-81BD-3BA041119C7D}" Directory_="APPDIR" Attributes="256" KeyPath="hdf5_hl.dll"/>
-    <ROW Component="hdf5_hl_cpp.dll" ComponentId="{73634314-65D1-4543-AD08-30B8F4C4F215}" Directory_="APPDIR" Attributes="256" KeyPath="hdf5_hl_cpp.dll"/>
-    <ROW Component="hdf5_tools.dll" ComponentId="{93DCA33D-F2BE-4951-B53E-8990A634CA4B}" Directory_="APPDIR" Attributes="256" KeyPath="hdf5_tools.dll"/>
-    <ROW Component="iconv.dll" ComponentId="{6675FD27-1A1E-46C7-AE40-3BBAF378B6E2}" Directory_="APPDIR" Attributes="256" KeyPath="iconv.dll"/>
-    <ROW Component="intl8.dll" ComponentId="{1DB2850E-A648-4AA0-BA30-34F167B90D70}" Directory_="APPDIR" Attributes="256" KeyPath="intl8.dll"/>
-    <ROW Component="jpeg8.dll" ComponentId="{932AD005-D18A-4F87-971E-4686B57DBA5F}" Directory_="APPDIR" Attributes="256" KeyPath="jpeg8.dll"/>
-    <ROW Component="k5sprt64.dll" ComponentId="{5B297275-3447-482B-BA81-7C920451BF53}" Directory_="APPDIR" Attributes="256" KeyPath="k5sprt64.dll"/>
-    <ROW Component="kfwlogon.dll" ComponentId="{F9A0D176-6078-4E37-A5BA-37E99EB9DA1D}" Directory_="APPDIR" Attributes="256" KeyPath="kfwlogon.dll"/>
-    <ROW Component="klu.dll" ComponentId="{3C00D62F-89AD-4F30-95D8-F4179740D405}" Directory_="APPDIR" Attributes="256" KeyPath="klu.dll"/>
-    <ROW Component="krb5_64.dll" ComponentId="{0F8B3632-5C8A-4596-BFF3-9985B9775EAE}" Directory_="APPDIR" Attributes="256" KeyPath="krb5_64.dll"/>
-    <ROW Component="krbcc64.dll" ComponentId="{B8DD6071-5D33-45F1-992F-1589EF143119}" Directory_="APPDIR" Attributes="256" KeyPath="krbcc64.dll"/>
     <ROW Component="las" ComponentId="{C0BCF152-95C3-4486-A213-BB5071DCEB23}" Directory_="APPDIR" Attributes="260" KeyPath="las"/>
     <ROW Component="las_1" ComponentId="{A3498909-7A55-4AFF-955B-FD4EC7ECA82F}" Directory_="APPDIR" Attributes="260" KeyPath="las_1"/>
     <ROW Component="laz" ComponentId="{3E3E4A74-6269-4CFE-9A1C-8B359CF4023B}" Directory_="APPDIR" Attributes="260" KeyPath="laz"/>
     <ROW Component="laz_1" ComponentId="{F998CED3-0195-4CB2-8ADA-9A48A9492763}" Directory_="APPDIR" Attributes="260" KeyPath="laz_1"/>
-    <ROW Component="lcms2.dll" ComponentId="{F85B2CE5-4EA5-485F-BDA0-EE547AE4E742}" Directory_="APPDIR" Attributes="256" KeyPath="lcms2.dll"/>
-    <ROW Component="ldl.dll" ComponentId="{49A67AE3-7CB9-43A7-BE37-AADA57DF5BE3}" Directory_="APPDIR" Attributes="256" KeyPath="ldl.dll"/>
-    <ROW Component="leashw64.dll" ComponentId="{C5914C23-2C26-4AB5-AE5F-89B1435DC1A3}" Directory_="APPDIR" Attributes="256" KeyPath="leashw64.dll"/>
-    <ROW Component="libblas.dll" ComponentId="{4CBAA4F3-6135-4DF0-8155-065AE3FF295F}" Directory_="APPDIR" Attributes="256" KeyPath="libblas.dll"/>
-    <ROW Component="libbz2.dll" ComponentId="{7BA8B55F-8725-4232-A5C3-50425104316D}" Directory_="APPDIR" Attributes="256" KeyPath="libbz2.dll"/>
-    <ROW Component="libcblas.dll" ComponentId="{DF5E5E3B-3F5B-4F01-B5CE-19C1B31988EE}" Directory_="APPDIR" Attributes="256" KeyPath="libcblas.dll"/>
-    <ROW Component="libcrypto3x64.dll" ComponentId="{DF008DEF-CDF2-4DD1-B139-82E7560CD000}" Directory_="APPDIR" Attributes="256" KeyPath="libcrypto3x64.dll"/>
-    <ROW Component="libcurl.dll" ComponentId="{067AA622-A170-469B-A90F-4C75FEE3CAF4}" Directory_="APPDIR" Attributes="256" KeyPath="libcurl.dll"/>
-    <ROW Component="libecpg.dll" ComponentId="{3AE50B18-1898-42FC-92DF-69539C6A4D19}" Directory_="APPDIR" Attributes="256" KeyPath="libecpg.dll"/>
-    <ROW Component="libecpg_compat.dll" ComponentId="{CFF74DEA-2F02-4A95-9DCB-2B8FCEC2DA8F}" Directory_="APPDIR" Attributes="256" KeyPath="libecpg_compat.dll"/>
-    <ROW Component="libexpat.dll" ComponentId="{B8CDFC78-6BA0-463A-B3EB-586565F9EB2E}" Directory_="APPDIR" Attributes="256" KeyPath="libexpat.dll"/>
-    <ROW Component="libimalloc.dll" ComponentId="{0C2D9EF1-E620-4B1C-AF16-FE0F8113DEA6}" Directory_="APPDIR" Attributes="256" KeyPath="libimalloc.dll"/>
-    <ROW Component="libiomp5md.dll" ComponentId="{2319E676-D978-4AE2-9B86-578E953AE43F}" Directory_="APPDIR" Attributes="256" KeyPath="libiomp5md.dll"/>
-    <ROW Component="libkea.dll" ComponentId="{008636C7-0FFE-4BA4-AA5B-DDCFEFE42A28}" Directory_="APPDIR" Attributes="256" KeyPath="libkea.dll"/>
-    <ROW Component="liblapack.dll" ComponentId="{5F2E39E7-7AE0-42A8-8888-88E186949BB3}" Directory_="APPDIR" Attributes="256" KeyPath="liblapack.dll"/>
-    <ROW Component="liblapacke.dll" ComponentId="{78B71DBF-5006-48FA-8A4E-43C7616D57B3}" Directory_="APPDIR" Attributes="256" KeyPath="liblapacke.dll"/>
-    <ROW Component="liblz4.dll" ComponentId="{B6096CFF-ADEA-4A13-8069-B9904EA543C1}" Directory_="APPDIR" Attributes="256" KeyPath="liblz4.dll"/>
-    <ROW Component="liblzma.dll" ComponentId="{360ED027-5103-4012-B87F-1BD247ECF1E5}" Directory_="APPDIR" Attributes="256" KeyPath="liblzma.dll"/>
-    <ROW Component="libminizip.dll" ComponentId="{8DAD350F-90B3-43EE-A06A-0CF75C9EF573}" Directory_="APPDIR" Attributes="256" KeyPath="libminizip.dll"/>
-    <ROW Component="libomp.dll" ComponentId="{CE6C2EBC-35AD-4A38-8BE3-20913DF4EC70}" Directory_="APPDIR" Attributes="256" KeyPath="libomp.dll"/>
     <ROW Component="libopenblas.dll" ComponentId="{A5125084-5D48-43F3-99C2-1D0EEAA849DE}" Directory_="APPDIR" Attributes="256" KeyPath="libopenblas.dll"/>
-    <ROW Component="libpdal_plugin_filter_trajectory.dll" ComponentId="{DECE45CA-72DB-435B-8A9F-A9F7905B45C5}" Directory_="APPDIR" Attributes="256" KeyPath="libpdal_plugin_filter_trajectory.dll"/>
-    <ROW Component="libpdal_plugin_kernel_fauxplugin.dll" ComponentId="{525B9489-5CCC-4E57-AE14-DB499EB02F03}" Directory_="APPDIR" Attributes="256" KeyPath="libpdal_plugin_kernel_fauxplugin.dll"/>
-    <ROW Component="libpdal_plugin_reader_draco.dll" ComponentId="{91E289A5-0044-42E0-9596-A765EFDC918D}" Directory_="APPDIR" Attributes="256" KeyPath="libpdal_plugin_reader_draco.dll"/>
-    <ROW Component="libpdal_plugin_reader_e57.dll" ComponentId="{65D96958-61B2-42EC-9079-7743D17150BE}" Directory_="APPDIR" Attributes="256" KeyPath="libpdal_plugin_reader_e57.dll"/>
-    <ROW Component="libpdal_plugin_reader_hdf.dll" ComponentId="{206642CE-09C0-4177-AA3C-DC50C687F838}" Directory_="APPDIR" Attributes="256" KeyPath="libpdal_plugin_reader_hdf.dll"/>
-    <ROW Component="libpdal_plugin_reader_icebridge.dll" ComponentId="{6088565F-E4D5-4A2F-92D5-B5A75064B6C1}" Directory_="APPDIR" Attributes="256" KeyPath="libpdal_plugin_reader_icebridge.dll"/>
-    <ROW Component="libpdal_plugin_reader_pgpointcloud.dll" ComponentId="{2E277432-82CD-482C-803B-4ADB921E87A3}" Directory_="APPDIR" Attributes="256" KeyPath="libpdal_plugin_reader_pgpointcloud.dll"/>
-    <ROW Component="libpdal_plugin_writer_draco.dll" ComponentId="{5D3AE4B7-BC17-461F-8503-A5C6F23A720A}" Directory_="APPDIR" Attributes="256" KeyPath="libpdal_plugin_writer_draco.dll"/>
-    <ROW Component="libpdal_plugin_writer_e57.dll" ComponentId="{03351D31-A4A0-48EA-A529-8BAF86E2FD14}" Directory_="APPDIR" Attributes="256" KeyPath="libpdal_plugin_writer_e57.dll"/>
-    <ROW Component="libpdal_plugin_writer_pgpointcloud.dll" ComponentId="{7992FA31-21F8-4786-9836-A50DD6DC2470}" Directory_="APPDIR" Attributes="256" KeyPath="libpdal_plugin_writer_pgpointcloud.dll"/>
-    <ROW Component="libpgtypes.dll" ComponentId="{BBDCDE8C-F0D5-4D20-B947-9BEC8982F0E5}" Directory_="APPDIR" Attributes="256" KeyPath="libpgtypes.dll"/>
-    <ROW Component="libpng16.dll" ComponentId="{5C2D6212-F5B5-4B2D-9EA7-95734C5644A9}" Directory_="APPDIR" Attributes="256" KeyPath="libpng16.dll"/>
-    <ROW Component="libpq.dll" ComponentId="{7A277B1A-6F8E-4E8F-8B11-1A43A4E941F4}" Directory_="APPDIR" Attributes="256" KeyPath="libpq.dll"/>
-    <ROW Component="libprotobuf.dll" ComponentId="{BE0E6B72-A041-4863-9872-25E3A4183E36}" Directory_="APPDIR" Attributes="256" KeyPath="libprotobuf.dll"/>
-    <ROW Component="libprotobuflite.dll" ComponentId="{D41134EB-49F2-4D5E-A1AA-0BAEEAE23079}" Directory_="APPDIR" Attributes="256" KeyPath="libprotobuflite.dll"/>
-    <ROW Component="libprotoc.dll" ComponentId="{1270DBA0-E397-47FB-83A5-8B5692C50FE0}" Directory_="APPDIR" Attributes="256" KeyPath="libprotoc.dll"/>
-    <ROW Component="librttopo.dll" ComponentId="{B94E2EA1-3063-4D6E-B571-EE2AB66FBBA0}" Directory_="APPDIR" Attributes="256" KeyPath="librttopo.dll"/>
-    <ROW Component="libsharpyuv.dll" ComponentId="{CA865E9B-44A8-42C6-B70A-529071936D86}" Directory_="APPDIR" Attributes="256" KeyPath="libsharpyuv.dll"/>
-    <ROW Component="libssh2.dll" ComponentId="{BA6DEACF-DED8-4459-87F5-F4D1D516784A}" Directory_="APPDIR" Attributes="256" KeyPath="libssh2.dll"/>
-    <ROW Component="libssl3x64.dll" ComponentId="{ED537AD6-54D2-455A-9147-E00472D55EF8}" Directory_="APPDIR" Attributes="256" KeyPath="libssl3x64.dll"/>
-    <ROW Component="libtiff.dll" ComponentId="{4F9045DD-BD95-4F73-9683-1B7F3C6EC6BA}" Directory_="APPDIR" Attributes="256" KeyPath="libtiff.dll"/>
-    <ROW Component="libwebp.dll" ComponentId="{A017DD68-A4F6-4B4C-89DB-7EA6F25B7C4A}" Directory_="APPDIR" Attributes="256" KeyPath="libwebp.dll"/>
-    <ROW Component="libwebpdecoder.dll" ComponentId="{2A87C3D8-4502-4DCD-A490-51B2C74C8BD1}" Directory_="APPDIR" Attributes="256" KeyPath="libwebpdecoder.dll"/>
-    <ROW Component="libwebpdemux.dll" ComponentId="{03EEC92B-B94F-440C-940F-44C5369EAAD4}" Directory_="APPDIR" Attributes="256" KeyPath="libwebpdemux.dll"/>
-    <ROW Component="libwebpmux.dll" ComponentId="{A22ACC37-64BA-451F-B5D5-8C698ACA43B3}" Directory_="APPDIR" Attributes="256" KeyPath="libwebpmux.dll"/>
-    <ROW Component="libxml2.dll" ComponentId="{9D1B7AB4-83F7-48B4-878B-600A3A18839E}" Directory_="APPDIR" Attributes="256" KeyPath="libxml2.dll"/>
-    <ROW Component="libzstd.dll" ComponentId="{FDAB7C07-CABD-4BAC-BFF3-60CEF842BE2A}" Directory_="APPDIR" Attributes="256" KeyPath="libzstd.dll"/>
-    <ROW Component="lzo2.dll" ComponentId="{3E536E55-DCD1-46DD-8076-37F7A798ACD2}" Directory_="APPDIR" Attributes="256" KeyPath="lzo2.dll"/>
-    <ROW Component="mfhdf.dll" ComponentId="{2C5C0733-D8E9-409E-82D4-E76C06C0B810}" Directory_="APPDIR" Attributes="256" KeyPath="mfhdf.dll"/>
-    <ROW Component="mod_spatialite.dll" ComponentId="{4860FDAE-0D67-4276-8EE0-FCA09DFE5094}" Directory_="APPDIR" Attributes="256" KeyPath="mod_spatialite.dll"/>
-    <ROW Component="msvcp140.dll" ComponentId="{C36FD8F5-3221-446A-9E4F-85B1CDAB3F69}" Directory_="APPDIR" Attributes="256" KeyPath="msvcp140.dll"/>
-    <ROW Component="msvcp140_1.dll" ComponentId="{6BDEB3B3-ACD5-4C23-BC7A-69AD9DBB21E8}" Directory_="APPDIR" Attributes="256" KeyPath="msvcp140_1.dll"/>
-    <ROW Component="msvcp140_2.dll" ComponentId="{BEB246DB-573A-461F-9793-ACAD37E8EAFD}" Directory_="APPDIR" Attributes="256" KeyPath="msvcp140_2.dll"/>
-    <ROW Component="msvcp140_atomic_wait.dll" ComponentId="{7CA754FA-4A90-40C5-A4C0-6E1438D5B571}" Directory_="APPDIR" Attributes="256" KeyPath="msvcp140_atomic_wait.dll"/>
-    <ROW Component="msvcp140_codecvt_ids.dll" ComponentId="{89EC8303-1870-4FDC-9E1B-F914C57567C5}" Directory_="APPDIR" Attributes="256" KeyPath="msvcp140_codecvt_ids.dll"/>
-    <ROW Component="netcdf.dll" ComponentId="{2B98E73E-7D45-484A-8BBC-8EEF9EF78383}" Directory_="APPDIR" Attributes="256" KeyPath="netcdf.dll"/>
-    <ROW Component="nitfc.dll" ComponentId="{2192C463-0F67-4386-99C3-3D08BFEFAFA8}" Directory_="APPDIR" Attributes="256" KeyPath="nitfc.dll"/>
-    <ROW Component="nitfcpp.dll" ComponentId="{F3C221DA-D7C2-4E40-B24B-277F568E9939}" Directory_="APPDIR" Attributes="256" KeyPath="nitfcpp.dll"/>
-    <ROW Component="ompstub.dll" ComponentId="{4B346682-2D05-427D-9AA9-83BEF4219E21}" Directory_="APPDIR" Attributes="256" KeyPath="ompstub.dll"/>
-    <ROW Component="omptarget.dll" ComponentId="{39DD29D6-77BC-4950-A546-C39E00F74700}" Directory_="APPDIR" Attributes="256" KeyPath="omptarget.dll"/>
-    <ROW Component="omptarget.rtl.level0.dll" ComponentId="{BFD00EE9-04AD-408C-A53E-D4E549CA1287}" Directory_="APPDIR" Attributes="256" KeyPath="omptarget.rtl.level0.dll"/>
-    <ROW Component="omptarget.rtl.opencl.dll" ComponentId="{9613D0EE-0419-4311-A671-51E2BCC130F8}" Directory_="APPDIR" Attributes="256" KeyPath="omptarget.rtl.opencl.dll"/>
-    <ROW Component="omptarget.sycl.wrap.dll" ComponentId="{02B3780F-CB08-47CA-B145-438F844196E9}" Directory_="APPDIR" Attributes="256" KeyPath="omptarget.sycl.wrap.dll"/>
-    <ROW Component="openblas.dll" ComponentId="{D6F8B102-8A49-4AD3-9692-F246315267E2}" Directory_="APPDIR" Attributes="256" KeyPath="openblas.dll"/>
-    <ROW Component="opencv_videoio_ffmpeg490_64.dll" ComponentId="{810C3013-A1AB-4531-A79D-3494360B0630}" Directory_="APPDIR" Attributes="256" KeyPath="opencv_videoio_ffmpeg490_64.dll"/>
     <ROW Component="opencv_world490.dll" ComponentId="{256E5B4C-5B1B-4546-9F12-89CE5CEC10FA}" Directory_="APPDIR" Attributes="256" KeyPath="opencv_world490.dll"/>
-    <ROW Component="opencv_world490d.dll" ComponentId="{09550551-3263-4D79-8F20-0B69191EF01F}" Directory_="APPDIR" Attributes="256" KeyPath="opencv_world490d.dll"/>
-    <ROW Component="openjp2.dll" ComponentId="{FCEBA98B-48EB-47AE-AEE8-9BAF66B38CF6}" Directory_="APPDIR" Attributes="256" KeyPath="openjp2.dll"/>
     <ROW Component="pcd" ComponentId="{DD906875-3276-411C-AB2A-32E344EFA3F6}" Directory_="APPDIR" Attributes="260" KeyPath="pcd"/>
     <ROW Component="pcd_1" ComponentId="{526BD0F4-2764-4546-A620-389325B68B05}" Directory_="APPDIR" Attributes="260" KeyPath="pcd_1"/>
-    <ROW Component="pcl_common.dll" ComponentId="{E0454368-28F4-4A7D-B095-A026342ADA70}" Directory_="APPDIR" Attributes="256" KeyPath="pcl_common.dll"/>
-    <ROW Component="pcl_features.dll" ComponentId="{B01B8DB1-8083-4C6D-9C7B-5EF60EA3C8CB}" Directory_="APPDIR" Attributes="256" KeyPath="pcl_features.dll"/>
-    <ROW Component="pcl_filters.dll" ComponentId="{834977D7-2338-47EB-8204-AECB81F0DE7F}" Directory_="APPDIR" Attributes="256" KeyPath="pcl_filters.dll"/>
-    <ROW Component="pcl_io.dll" ComponentId="{30076DEF-64E6-4D7F-BF58-815D18E34A9B}" Directory_="APPDIR" Attributes="256" KeyPath="pcl_io.dll"/>
-    <ROW Component="pcl_io_ply.dll" ComponentId="{36279D99-0F0D-412D-9D7D-AF2BD3CC849D}" Directory_="APPDIR" Attributes="256" KeyPath="pcl_io_ply.dll"/>
-    <ROW Component="pcre216.dll" ComponentId="{87258BF0-A56B-4F47-8E52-D8CD4DE089FF}" Directory_="APPDIR" Attributes="256" KeyPath="pcre216.dll"/>
-    <ROW Component="pcre232.dll" ComponentId="{F4CF655C-4503-43CC-AD2B-3DE37052B363}" Directory_="APPDIR" Attributes="256" KeyPath="pcre232.dll"/>
-    <ROW Component="pcre28.dll" ComponentId="{ED48294D-B45B-4D06-A97E-385E3FB871B7}" Directory_="APPDIR" Attributes="256" KeyPath="pcre28.dll"/>
-    <ROW Component="pcre2posix.dll" ComponentId="{5A610539-031A-43DD-AA82-4CEE1EB19967}" Directory_="APPDIR" Attributes="256" KeyPath="pcre2posix.dll"/>
-    <ROW Component="pdalcpp.dll" ComponentId="{CDDD3F57-20ED-4E49-9CDD-E4BB6F9754D1}" Directory_="APPDIR" Attributes="256" KeyPath="pdalcpp.dll"/>
     <ROW Component="ply" ComponentId="{515A419D-5282-4539-8DC8-22110001F38B}" Directory_="APPDIR" Attributes="260" KeyPath="ply"/>
     <ROW Component="ply_1" ComponentId="{B0A86507-0A5B-41BE-8D24-1A1B250EE66D}" Directory_="APPDIR" Attributes="260" KeyPath="ply_1"/>
-    <ROW Component="poppler.dll" ComponentId="{25480818-77CD-42E9-A0C1-0C604C0F9780}" Directory_="APPDIR" Attributes="256" KeyPath="poppler.dll"/>
-    <ROW Component="popplercpp.dll" ComponentId="{AF57E07D-8722-408D-AA88-162D0ADDC546}" Directory_="APPDIR" Attributes="256" KeyPath="popplercpp.dll"/>
-    <ROW Component="popplerglib.dll" ComponentId="{B54F7220-0A65-4F39-B17E-4A315A1B0445}" Directory_="APPDIR" Attributes="256" KeyPath="popplerglib.dll"/>
-    <ROW Component="proj_9_3.dll" ComponentId="{936AD407-DC33-4F3D-8311-C9E90A12424D}" Directory_="APPDIR" Attributes="256" KeyPath="proj_9_3.dll"/>
-    <ROW Component="re2.dll" ComponentId="{625C1070-4E04-4EFA-82D8-EC97C1882D7D}" Directory_="APPDIR" Attributes="256" KeyPath="re2.dll"/>
     <ROW Component="settings.xml" ComponentId="{E110DD1C-67F4-44C3-B7FC-4A19281117FA}" Directory_="ProductName_Dir" Attributes="0" KeyPath="settings.xml" Type="0"/>
-    <ROW Component="snappy.dll" ComponentId="{C78FCB89-FA45-4177-979C-6240831C898D}" Directory_="APPDIR" Attributes="256" KeyPath="snappy.dll"/>
-    <ROW Component="spatialite.dll" ComponentId="{2A920338-B749-460F-9030-48307ED497B2}" Directory_="APPDIR" Attributes="256" KeyPath="spatialite.dll"/>
-    <ROW Component="spqr.dll" ComponentId="{2419F654-3D20-46AF-ACFF-EB35831E2E2D}" Directory_="APPDIR" Attributes="256" KeyPath="spqr.dll"/>
-    <ROW Component="sqlite3.dll" ComponentId="{96DF0693-4B1C-4EAB-B496-FB36DAC310FE}" Directory_="APPDIR" Attributes="256" KeyPath="sqlite3.dll"/>
-    <ROW Component="szip.dll" ComponentId="{7C2CADD6-2049-419E-91DA-1E302423C2B9}" Directory_="APPDIR" Attributes="256" KeyPath="szip.dll"/>
-    <ROW Component="tbb.dll_1" ComponentId="{43728E22-3746-442C-863F-8D978A155873}" Directory_="APPDIR" Attributes="256" KeyPath="tbb.dll_1"/>
-    <ROW Component="tbb12.dll" ComponentId="{1D9CF93E-9F2A-4589-A260-B57D9693424D}" Directory_="APPDIR" Attributes="256" KeyPath="tbb12.dll"/>
-    <ROW Component="tbbbind_2_5.dll" ComponentId="{EA075330-77C4-4F5A-8531-01404A268119}" Directory_="APPDIR" Attributes="256" KeyPath="tbbbind_2_5.dll"/>
-    <ROW Component="tbbmalloc.dll" ComponentId="{7B586160-B72C-4081-BB6D-76FF0D57DB74}" Directory_="APPDIR" Attributes="256" KeyPath="tbbmalloc.dll"/>
-    <ROW Component="tbbmalloc_proxy.dll" ComponentId="{47784859-F912-4670-800A-1744E3B86E83}" Directory_="APPDIR" Attributes="256" KeyPath="tbbmalloc_proxy.dll"/>
-    <ROW Component="textstyle0.dll" ComponentId="{134FBA88-2975-45C5-BFB2-BAB9FECCA853}" Directory_="APPDIR" Attributes="256" KeyPath="textstyle0.dll"/>
-    <ROW Component="tiff.dll" ComponentId="{40D68274-AEBE-4FE5-A81D-B8FA7CB92867}" Directory_="APPDIR" Attributes="256" KeyPath="tiff.dll"/>
-    <ROW Component="tiledb.dll" ComponentId="{608EC311-432C-4A30-99F9-3D7FF1DFD7F3}" Directory_="APPDIR" Attributes="256" KeyPath="tiledb.dll"/>
-    <ROW Component="turbojpeg.dll" ComponentId="{E0AD93FE-55CC-48E0-83E4-3CB078B5C322}" Directory_="APPDIR" Attributes="256" KeyPath="turbojpeg.dll"/>
-    <ROW Component="ucrtbase.dll" ComponentId="{A7373CED-3122-4D5E-B48A-43E872DB7DFD}" Directory_="APPDIR" Attributes="256" KeyPath="ucrtbase.dll"/>
-    <ROW Component="umfpack.dll" ComponentId="{4A8FF339-CE0C-40AD-A103-290E3A98A390}" Directory_="APPDIR" Attributes="256" KeyPath="umfpack.dll"/>
-    <ROW Component="uriparser.dll" ComponentId="{8E2642DD-621F-4C0E-A84A-86D9474B65D4}" Directory_="APPDIR" Attributes="256" KeyPath="uriparser.dll"/>
-    <ROW Component="utf8_range_lib.dll" ComponentId="{7BBC9D1C-BF71-4CA7-A897-AE662CDD7098}" Directory_="APPDIR" Attributes="256" KeyPath="utf8_range_lib.dll"/>
-    <ROW Component="vcamp140.dll" ComponentId="{6144DC79-B9E0-47C9-917E-9B1CD57153E3}" Directory_="APPDIR" Attributes="256" KeyPath="vcamp140.dll"/>
-    <ROW Component="vccorlib140.dll" ComponentId="{BC906109-D874-4FE2-87C6-375AC1B75618}" Directory_="APPDIR" Attributes="256" KeyPath="vccorlib140.dll"/>
-    <ROW Component="vcomp140.dll" ComponentId="{2B97CD7D-CCD2-4C87-8798-E206619D812D}" Directory_="APPDIR" Attributes="256" KeyPath="vcomp140.dll"/>
-    <ROW Component="vcruntime140.dll" ComponentId="{4C76260F-42D1-4A5A-A172-05E7D7D2CF39}" Directory_="APPDIR" Attributes="256" KeyPath="vcruntime140.dll"/>
-    <ROW Component="vcruntime140_1.dll" ComponentId="{F3E3DD30-BB5B-48E3-87FF-DBB738F4683F}" Directory_="APPDIR" Attributes="256" KeyPath="vcruntime140_1.dll"/>
-    <ROW Component="vcruntime140_threads.dll" ComponentId="{68CB9599-CF68-4DF1-B922-3B1456372173}" Directory_="APPDIR" Attributes="256" KeyPath="vcruntime140_threads.dll"/>
-    <ROW Component="xdr.dll" ComponentId="{89B635A0-D91D-4AA0-814A-63DF197B0CF1}" Directory_="APPDIR" Attributes="256" KeyPath="xdr.dll"/>
-    <ROW Component="xercesc_3_2.dll" ComponentId="{1D49BD94-630E-4F40-BEB8-00EBE914EEF7}" Directory_="APPDIR" Attributes="256" KeyPath="xercesc_3_2.dll"/>
-    <ROW Component="xpprof64.dll" ComponentId="{27B9114C-EB64-4D94-8D3B-001BFAC60955}" Directory_="APPDIR" Attributes="256" KeyPath="xpprof64.dll"/>
-    <ROW Component="zip.dll" ComponentId="{AD01F6E5-204A-4376-A4F3-9AB57DD255BD}" Directory_="APPDIR" Attributes="256" KeyPath="zip.dll"/>
-    <ROW Component="zlib.dll" ComponentId="{106DD3A9-4ED3-4929-81D6-A5FED4BAD952}" Directory_="APPDIR" Attributes="256" KeyPath="zlib.dll"/>
-    <ROW Component="zstd.dll" ComponentId="{FF006C6D-6296-45E9-9D87-7DE353F877B7}" Directory_="APPDIR" Attributes="256" KeyPath="zstd.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
     <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0"/>
     <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
-    <ROW File="abseil_dll.dll" Component_="abseil_dll.dll" FileName="ABSEIL~1.DLL|abseil_dll.dll" Attributes="0" SourcePath="Release\abseil_dll.dll" SelfReg="false"/>
-    <ROW File="aec.dll" Component_="aec.dll" FileName="aec.dll" Attributes="0" SourcePath="Release\aec.dll" SelfReg="false"/>
-    <ROW File="archive.dll" Component_="archive.dll" FileName="archive.dll" Attributes="0" SourcePath="Release\archive.dll" SelfReg="false"/>
-    <ROW File="asprintf0.dll" Component_="asprintf0.dll" FileName="ASPRIN~1.DLL|asprintf-0.dll" Attributes="0" SourcePath="Release\asprintf-0.dll" SelfReg="false"/>
-    <ROW File="blosc.dll" Component_="blosc.dll" FileName="blosc.dll" Attributes="0" SourcePath="Release\blosc.dll" SelfReg="false"/>
-    <ROW File="btf.dll" Component_="btf.dll" FileName="btf.dll" Attributes="0" SourcePath="Release\btf.dll" SelfReg="false"/>
-    <ROW File="bzip2.dll" Component_="bzip2.dll" FileName="bzip2.dll" Attributes="0" SourcePath="Release\bzip2.dll" SelfReg="false"/>
-    <ROW File="cairogobject.dll" Component_="cairogobject.dll" FileName="CAIRO-~1.DLL|cairo-gobject.dll" Attributes="0" SourcePath="Release\cairo-gobject.dll" SelfReg="false"/>
-    <ROW File="cairoscriptinterpreter.dll" Component_="cairoscriptinterpreter.dll" FileName="CAIRO-~2.DLL|cairo-script-interpreter.dll" Attributes="0" SourcePath="Release\cairo-script-interpreter.dll" SelfReg="false"/>
-    <ROW File="cairo.dll" Component_="cairo.dll" FileName="cairo.dll" Attributes="0" SourcePath="Release\cairo.dll" SelfReg="false"/>
-    <ROW File="camd.dll" Component_="camd.dll" FileName="camd.dll" Attributes="0" SourcePath="Release\camd.dll" SelfReg="false"/>
-    <ROW File="cares.dll" Component_="cares.dll" FileName="cares.dll" Attributes="0" SourcePath="Release\cares.dll" SelfReg="false"/>
-    <ROW File="ccolamd.dll" Component_="ccolamd.dll" FileName="ccolamd.dll" Attributes="0" SourcePath="Release\ccolamd.dll" SelfReg="false"/>
-    <ROW File="ceres.dll" Component_="ceres.dll" FileName="ceres.dll" Attributes="0" SourcePath="Release\ceres.dll" SelfReg="false"/>
-    <ROW File="cfitsio.dll" Component_="cfitsio.dll" FileName="cfitsio.dll" Attributes="0" SourcePath="Release\cfitsio.dll" SelfReg="false"/>
-    <ROW File="charset.dll" Component_="charset.dll" FileName="charset.dll" Attributes="0" SourcePath="Release\charset.dll" SelfReg="false"/>
-    <ROW File="cholmod.dll" Component_="cholmod.dll" FileName="cholmod.dll" Attributes="0" SourcePath="Release\cholmod.dll" SelfReg="false"/>
     <ROW File="CloudShellExtension.dll" Component_="CloudShellExtension.dll_1" FileName="CLOUDS~1.DLL|CloudShellExtension.dll" Attributes="512" SourcePath="Release\CloudShellExtension.dll" SelfReg="false"/>
-    <ROW File="colamd.dll" Component_="colamd.dll" FileName="colamd.dll" Attributes="0" SourcePath="Release\colamd.dll" SelfReg="false"/>
-    <ROW File="comerr64.dll" Component_="comerr64.dll" FileName="comerr64.dll" Attributes="0" SourcePath="Release\comerr64.dll" SelfReg="false"/>
-    <ROW File="concrt140.dll" Component_="concrt140.dll" FileName="CONCRT~1.DLL|concrt140.dll" Attributes="0" SourcePath="Release\concrt140.dll" SelfReg="false"/>
-    <ROW File="crc32c.dll" Component_="crc32c.dll" FileName="crc32c.dll" Attributes="0" SourcePath="Release\crc32c.dll" SelfReg="false"/>
-    <ROW File="cxsparse.dll" Component_="cxsparse.dll" FileName="cxsparse.dll" Attributes="0" SourcePath="Release\cxsparse.dll" SelfReg="false"/>
-    <ROW File="deflate.dll" Component_="deflate.dll" FileName="deflate.dll" Attributes="0" SourcePath="Release\deflate.dll" SelfReg="false"/>
-    <ROW File="expat.dll" Component_="expat.dll" FileName="expat.dll" Attributes="0" SourcePath="Release\expat.dll" SelfReg="false"/>
-    <ROW File="ffi8.dll" Component_="ffi8.dll" FileName="ffi-8.dll" Attributes="0" SourcePath="Release\ffi-8.dll" SelfReg="false"/>
-    <ROW File="flang.dll" Component_="flang.dll" FileName="flang.dll" Attributes="0" SourcePath="Release\flang.dll" SelfReg="false"/>
-    <ROW File="flangrti.dll" Component_="flangrti.dll" FileName="flangrti.dll" Attributes="0" SourcePath="Release\flangrti.dll" SelfReg="false"/>
-    <ROW File="fontconfig1.dll" Component_="fontconfig1.dll" FileName="FONTCO~1.DLL|fontconfig-1.dll" Attributes="0" SourcePath="Release\fontconfig-1.dll" SelfReg="false"/>
-    <ROW File="freetype.dll" Component_="freetype.dll" FileName="freetype.dll" Attributes="0" SourcePath="Release\freetype.dll" SelfReg="false"/>
-    <ROW File="freexl.dll" Component_="freexl.dll" FileName="freexl.dll" Attributes="0" SourcePath="Release\freexl.dll" SelfReg="false"/>
-    <ROW File="gdal.dll" Component_="gdal.dll" FileName="gdal.dll" Attributes="0" SourcePath="Release\gdal.dll" SelfReg="false"/>
-    <ROW File="geos.dll" Component_="geos.dll" FileName="geos.dll" Attributes="0" SourcePath="Release\geos.dll" SelfReg="false"/>
-    <ROW File="geos_c.dll" Component_="geos_c.dll" FileName="geos_c.dll" Attributes="0" SourcePath="Release\geos_c.dll" SelfReg="false"/>
-    <ROW File="geotiff.dll" Component_="geotiff.dll" FileName="geotiff.dll" Attributes="0" SourcePath="Release\geotiff.dll" SelfReg="false"/>
-    <ROW File="gflags.dll" Component_="gflags.dll" FileName="gflags.dll" Attributes="0" SourcePath="Release\gflags.dll" SelfReg="false"/>
-    <ROW File="glog.dll" Component_="glog.dll" FileName="glog.dll" Attributes="0" SourcePath="Release\glog.dll" SelfReg="false"/>
-    <ROW File="gpr.dll" Component_="gpr.dll" FileName="gpr.dll" Attributes="0" SourcePath="Release\gpr.dll" SelfReg="false"/>
-    <ROW File="gssapi64.dll" Component_="gssapi64.dll" FileName="gssapi64.dll" Attributes="0" SourcePath="Release\gssapi64.dll" SelfReg="false"/>
-    <ROW File="hdf.dll" Component_="hdf.dll" FileName="hdf.dll" Attributes="0" SourcePath="Release\hdf.dll" SelfReg="false"/>
-    <ROW File="hdf5.dll" Component_="hdf5.dll" FileName="hdf5.dll" Attributes="0" SourcePath="Release\hdf5.dll" SelfReg="false"/>
-    <ROW File="hdf5_cpp.dll" Component_="hdf5_cpp.dll" FileName="hdf5_cpp.dll" Attributes="0" SourcePath="Release\hdf5_cpp.dll" SelfReg="false"/>
-    <ROW File="hdf5_hl.dll" Component_="hdf5_hl.dll" FileName="hdf5_hl.dll" Attributes="0" SourcePath="Release\hdf5_hl.dll" SelfReg="false"/>
-    <ROW File="hdf5_hl_cpp.dll" Component_="hdf5_hl_cpp.dll" FileName="HDF5_H~1.DLL|hdf5_hl_cpp.dll" Attributes="0" SourcePath="Release\hdf5_hl_cpp.dll" SelfReg="false"/>
-    <ROW File="hdf5_tools.dll" Component_="hdf5_tools.dll" FileName="HDF5_T~1.DLL|hdf5_tools.dll" Attributes="0" SourcePath="Release\hdf5_tools.dll" SelfReg="false"/>
-    <ROW File="iconv.dll" Component_="iconv.dll" FileName="iconv.dll" Attributes="0" SourcePath="Release\iconv.dll" SelfReg="false"/>
-    <ROW File="intl8.dll" Component_="intl8.dll" FileName="intl-8.dll" Attributes="0" SourcePath="Release\intl-8.dll" SelfReg="false"/>
-    <ROW File="jpeg8.dll" Component_="jpeg8.dll" FileName="jpeg8.dll" Attributes="0" SourcePath="Release\jpeg8.dll" SelfReg="false"/>
-    <ROW File="k5sprt64.dll" Component_="k5sprt64.dll" FileName="k5sprt64.dll" Attributes="0" SourcePath="Release\k5sprt64.dll" SelfReg="false"/>
-    <ROW File="kfwlogon.dll" Component_="kfwlogon.dll" FileName="kfwlogon.dll" Attributes="0" SourcePath="Release\kfwlogon.dll" SelfReg="false"/>
-    <ROW File="klu.dll" Component_="klu.dll" FileName="klu.dll" Attributes="0" SourcePath="Release\klu.dll" SelfReg="false"/>
-    <ROW File="krb5_64.dll" Component_="krb5_64.dll" FileName="krb5_64.dll" Attributes="0" SourcePath="Release\krb5_64.dll" SelfReg="false"/>
-    <ROW File="krbcc64.dll" Component_="krbcc64.dll" FileName="krbcc64.dll" Attributes="0" SourcePath="Release\krbcc64.dll" SelfReg="false"/>
-    <ROW File="lcms2.dll" Component_="lcms2.dll" FileName="lcms2.dll" Attributes="0" SourcePath="Release\lcms2.dll" SelfReg="false"/>
-    <ROW File="ldl.dll" Component_="ldl.dll" FileName="ldl.dll" Attributes="0" SourcePath="Release\ldl.dll" SelfReg="false"/>
-    <ROW File="leashw64.dll" Component_="leashw64.dll" FileName="leashw64.dll" Attributes="0" SourcePath="Release\leashw64.dll" SelfReg="false"/>
-    <ROW File="Lerc.dll" Component_="Lerc.dll" FileName="Lerc.dll" Attributes="0" SourcePath="Release\Lerc.dll" SelfReg="false"/>
-    <ROW File="libblas.dll" Component_="libblas.dll" FileName="libblas.dll" Attributes="0" SourcePath="Release\libblas.dll" SelfReg="false"/>
-    <ROW File="libbz2.dll" Component_="libbz2.dll" FileName="libbz2.dll" Attributes="0" SourcePath="Release\libbz2.dll" SelfReg="false"/>
-    <ROW File="libcblas.dll" Component_="libcblas.dll" FileName="libcblas.dll" Attributes="0" SourcePath="Release\libcblas.dll" SelfReg="false"/>
-    <ROW File="libcrypto3x64.dll" Component_="libcrypto3x64.dll" FileName="LIBCRY~1.DLL|libcrypto-3-x64.dll" Attributes="0" SourcePath="Release\libcrypto-3-x64.dll" SelfReg="false"/>
-    <ROW File="libcurl.dll" Component_="libcurl.dll" FileName="libcurl.dll" Attributes="0" SourcePath="Release\libcurl.dll" SelfReg="false"/>
-    <ROW File="libecpg.dll" Component_="libecpg.dll" FileName="libecpg.dll" Attributes="0" SourcePath="Release\libecpg.dll" SelfReg="false"/>
-    <ROW File="libecpg_compat.dll" Component_="libecpg_compat.dll" FileName="LIBECP~1.DLL|libecpg_compat.dll" Attributes="0" SourcePath="Release\libecpg_compat.dll" SelfReg="false"/>
-    <ROW File="libexpat.dll" Component_="libexpat.dll" FileName="libexpat.dll" Attributes="0" SourcePath="Release\libexpat.dll" SelfReg="false"/>
-    <ROW File="libimalloc.dll" Component_="libimalloc.dll" FileName="LIBIMA~1.DLL|libimalloc.dll" Attributes="0" SourcePath="Release\libimalloc.dll" SelfReg="false"/>
-    <ROW File="libiomp5md.dll" Component_="libiomp5md.dll" FileName="LIBIOM~1.DLL|libiomp5md.dll" Attributes="0" SourcePath="Release\libiomp5md.dll" SelfReg="false"/>
-    <ROW File="libkea.dll" Component_="libkea.dll" FileName="libkea.dll" Attributes="0" SourcePath="Release\libkea.dll" SelfReg="false"/>
-    <ROW File="liblapack.dll" Component_="liblapack.dll" FileName="LIBLAP~1.DLL|liblapack.dll" Attributes="0" SourcePath="Release\liblapack.dll" SelfReg="false"/>
-    <ROW File="liblapacke.dll" Component_="liblapacke.dll" FileName="LIBLAP~2.DLL|liblapacke.dll" Attributes="0" SourcePath="Release\liblapacke.dll" SelfReg="false"/>
-    <ROW File="liblz4.dll" Component_="liblz4.dll" FileName="liblz4.dll" Attributes="0" SourcePath="Release\liblz4.dll" SelfReg="false"/>
-    <ROW File="liblzma.dll" Component_="liblzma.dll" FileName="liblzma.dll" Attributes="0" SourcePath="Release\liblzma.dll" SelfReg="false"/>
-    <ROW File="libminizip.dll" Component_="libminizip.dll" FileName="LIBMIN~1.DLL|libminizip.dll" Attributes="0" SourcePath="Release\libminizip.dll" SelfReg="false"/>
-    <ROW File="libomp.dll" Component_="libomp.dll" FileName="libomp.dll" Attributes="0" SourcePath="Release\libomp.dll" SelfReg="false"/>
     <ROW File="libopenblas.dll" Component_="libopenblas.dll" FileName="LIBOPE~1.DLL|libopenblas.dll" Attributes="0" SourcePath="Release\libopenblas.dll" SelfReg="false"/>
-    <ROW File="libpdal_plugin_filter_trajectory.dll" Component_="libpdal_plugin_filter_trajectory.dll" FileName="LIBPDA~1.DLL|libpdal_plugin_filter_trajectory.dll" Attributes="0" SourcePath="Release\libpdal_plugin_filter_trajectory.dll" SelfReg="false"/>
-    <ROW File="libpdal_plugin_kernel_fauxplugin.dll" Component_="libpdal_plugin_kernel_fauxplugin.dll" FileName="LIBPDA~2.DLL|libpdal_plugin_kernel_fauxplugin.dll" Attributes="0" SourcePath="Release\libpdal_plugin_kernel_fauxplugin.dll" SelfReg="false"/>
-    <ROW File="libpdal_plugin_reader_draco.dll" Component_="libpdal_plugin_reader_draco.dll" FileName="LIBPDA~3.DLL|libpdal_plugin_reader_draco.dll" Attributes="0" SourcePath="Release\libpdal_plugin_reader_draco.dll" SelfReg="false"/>
-    <ROW File="libpdal_plugin_reader_e57.dll" Component_="libpdal_plugin_reader_e57.dll" FileName="LIBPDA~4.DLL|libpdal_plugin_reader_e57.dll" Attributes="0" SourcePath="Release\libpdal_plugin_reader_e57.dll" SelfReg="false"/>
-    <ROW File="libpdal_plugin_reader_hdf.dll" Component_="libpdal_plugin_reader_hdf.dll" FileName="LIBPDA~5.DLL|libpdal_plugin_reader_hdf.dll" Attributes="0" SourcePath="Release\libpdal_plugin_reader_hdf.dll" SelfReg="false"/>
-    <ROW File="libpdal_plugin_reader_icebridge.dll" Component_="libpdal_plugin_reader_icebridge.dll" FileName="LIBPDA~6.DLL|libpdal_plugin_reader_icebridge.dll" Attributes="0" SourcePath="Release\libpdal_plugin_reader_icebridge.dll" SelfReg="false"/>
-    <ROW File="libpdal_plugin_reader_pgpointcloud.dll" Component_="libpdal_plugin_reader_pgpointcloud.dll" FileName="LIBPDA~7.DLL|libpdal_plugin_reader_pgpointcloud.dll" Attributes="0" SourcePath="Release\libpdal_plugin_reader_pgpointcloud.dll" SelfReg="false"/>
-    <ROW File="libpdal_plugin_writer_draco.dll" Component_="libpdal_plugin_writer_draco.dll" FileName="LIBPDA~8.DLL|libpdal_plugin_writer_draco.dll" Attributes="0" SourcePath="Release\libpdal_plugin_writer_draco.dll" SelfReg="false"/>
-    <ROW File="libpdal_plugin_writer_e57.dll" Component_="libpdal_plugin_writer_e57.dll" FileName="LIBPDA~9.DLL|libpdal_plugin_writer_e57.dll" Attributes="0" SourcePath="Release\libpdal_plugin_writer_e57.dll" SelfReg="false"/>
-    <ROW File="libpdal_plugin_writer_pgpointcloud.dll" Component_="libpdal_plugin_writer_pgpointcloud.dll" FileName="LIBPD~10.DLL|libpdal_plugin_writer_pgpointcloud.dll" Attributes="0" SourcePath="Release\libpdal_plugin_writer_pgpointcloud.dll" SelfReg="false"/>
-    <ROW File="libpgtypes.dll" Component_="libpgtypes.dll" FileName="LIBPGT~1.DLL|libpgtypes.dll" Attributes="0" SourcePath="Release\libpgtypes.dll" SelfReg="false"/>
-    <ROW File="libpng16.dll" Component_="libpng16.dll" FileName="libpng16.dll" Attributes="0" SourcePath="Release\libpng16.dll" SelfReg="false"/>
-    <ROW File="libpq.dll" Component_="libpq.dll" FileName="libpq.dll" Attributes="0" SourcePath="Release\libpq.dll" SelfReg="false"/>
-    <ROW File="libprotobuflite.dll" Component_="libprotobuflite.dll" FileName="LIBPRO~2.DLL|libprotobuf-lite.dll" Attributes="0" SourcePath="Release\libprotobuf-lite.dll" SelfReg="false"/>
-    <ROW File="libprotobuf.dll" Component_="libprotobuf.dll" FileName="LIBPRO~1.DLL|libprotobuf.dll" Attributes="0" SourcePath="Release\libprotobuf.dll" SelfReg="false"/>
-    <ROW File="libprotoc.dll" Component_="libprotoc.dll" FileName="LIBPRO~3.DLL|libprotoc.dll" Attributes="0" SourcePath="Release\libprotoc.dll" SelfReg="false"/>
-    <ROW File="librttopo.dll" Component_="librttopo.dll" FileName="LIBRTT~1.DLL|librttopo.dll" Attributes="0" SourcePath="Release\librttopo.dll" SelfReg="false"/>
-    <ROW File="libsharpyuv.dll" Component_="libsharpyuv.dll" FileName="LIBSHA~1.DLL|libsharpyuv.dll" Attributes="0" SourcePath="Release\libsharpyuv.dll" SelfReg="false"/>
-    <ROW File="libssh2.dll" Component_="libssh2.dll" FileName="libssh2.dll" Attributes="0" SourcePath="Release\libssh2.dll" SelfReg="false"/>
-    <ROW File="libssl3x64.dll" Component_="libssl3x64.dll" FileName="LIBSSL~1.DLL|libssl-3-x64.dll" Attributes="0" SourcePath="Release\libssl-3-x64.dll" SelfReg="false"/>
-    <ROW File="libtiff.dll" Component_="libtiff.dll" FileName="libtiff.dll" Attributes="0" SourcePath="Release\libtiff.dll" SelfReg="false"/>
-    <ROW File="libwebp.dll" Component_="libwebp.dll" FileName="libwebp.dll" Attributes="0" SourcePath="Release\libwebp.dll" SelfReg="false"/>
-    <ROW File="libwebpdecoder.dll" Component_="libwebpdecoder.dll" FileName="LIBWEB~1.DLL|libwebpdecoder.dll" Attributes="0" SourcePath="Release\libwebpdecoder.dll" SelfReg="false"/>
-    <ROW File="libwebpdemux.dll" Component_="libwebpdemux.dll" FileName="LIBWEB~2.DLL|libwebpdemux.dll" Attributes="0" SourcePath="Release\libwebpdemux.dll" SelfReg="false"/>
-    <ROW File="libwebpmux.dll" Component_="libwebpmux.dll" FileName="LIBWEB~3.DLL|libwebpmux.dll" Attributes="0" SourcePath="Release\libwebpmux.dll" SelfReg="false"/>
-    <ROW File="libxml2.dll" Component_="libxml2.dll" FileName="libxml2.dll" Attributes="0" SourcePath="Release\libxml2.dll" SelfReg="false"/>
-    <ROW File="libzstd.dll" Component_="libzstd.dll" FileName="libzstd.dll" Attributes="0" SourcePath="Release\libzstd.dll" SelfReg="false"/>
-    <ROW File="lzo2.dll" Component_="lzo2.dll" FileName="lzo2.dll" Attributes="0" SourcePath="Release\lzo2.dll" SelfReg="false"/>
-    <ROW File="mfhdf.dll" Component_="mfhdf.dll" FileName="mfhdf.dll" Attributes="0" SourcePath="Release\mfhdf.dll" SelfReg="false"/>
-    <ROW File="mod_spatialite.dll" Component_="mod_spatialite.dll" FileName="MOD_SP~1.DLL|mod_spatialite.dll" Attributes="0" SourcePath="Release\mod_spatialite.dll" SelfReg="false"/>
-    <ROW File="msvcp140.dll" Component_="msvcp140.dll" FileName="msvcp140.dll" Attributes="0" SourcePath="Release\msvcp140.dll" SelfReg="false"/>
-    <ROW File="msvcp140_1.dll" Component_="msvcp140_1.dll" FileName="MSVCP1~1.DLL|msvcp140_1.dll" Attributes="0" SourcePath="Release\msvcp140_1.dll" SelfReg="false"/>
-    <ROW File="msvcp140_2.dll" Component_="msvcp140_2.dll" FileName="MSVCP1~2.DLL|msvcp140_2.dll" Attributes="0" SourcePath="Release\msvcp140_2.dll" SelfReg="false"/>
-    <ROW File="msvcp140_atomic_wait.dll" Component_="msvcp140_atomic_wait.dll" FileName="MSVCP1~3.DLL|msvcp140_atomic_wait.dll" Attributes="0" SourcePath="Release\msvcp140_atomic_wait.dll" SelfReg="false"/>
-    <ROW File="msvcp140_codecvt_ids.dll" Component_="msvcp140_codecvt_ids.dll" FileName="MSVCP1~4.DLL|msvcp140_codecvt_ids.dll" Attributes="0" SourcePath="Release\msvcp140_codecvt_ids.dll" SelfReg="false"/>
-    <ROW File="netcdf.dll" Component_="netcdf.dll" FileName="netcdf.dll" Attributes="0" SourcePath="Release\netcdf.dll" SelfReg="false"/>
-    <ROW File="nitfc.dll" Component_="nitfc.dll" FileName="nitf-c.dll" Attributes="0" SourcePath="Release\nitf-c.dll" SelfReg="false"/>
-    <ROW File="nitfcpp.dll" Component_="nitfcpp.dll" FileName="nitf-cpp.dll" Attributes="0" SourcePath="Release\nitf-cpp.dll" SelfReg="false"/>
-    <ROW File="ompstub.dll" Component_="ompstub.dll" FileName="ompstub.dll" Attributes="0" SourcePath="Release\ompstub.dll" SelfReg="false"/>
-    <ROW File="omptarget.dll" Component_="omptarget.dll" FileName="OMPTAR~1.DLL|omptarget.dll" Attributes="0" SourcePath="Release\omptarget.dll" SelfReg="false"/>
-    <ROW File="omptarget.rtl.level0.dll" Component_="omptarget.rtl.level0.dll" FileName="OMPTAR~2.DLL|omptarget.rtl.level0.dll" Attributes="0" SourcePath="Release\omptarget.rtl.level0.dll" SelfReg="false"/>
-    <ROW File="omptarget.rtl.opencl.dll" Component_="omptarget.rtl.opencl.dll" FileName="OMPTAR~3.DLL|omptarget.rtl.opencl.dll" Attributes="0" SourcePath="Release\omptarget.rtl.opencl.dll" SelfReg="false"/>
-    <ROW File="omptarget.sycl.wrap.dll" Component_="omptarget.sycl.wrap.dll" FileName="OMPTAR~4.DLL|omptarget.sycl.wrap.dll" Attributes="0" SourcePath="Release\omptarget.sycl.wrap.dll" SelfReg="false"/>
     <ROW File="Open3D.dll_1" Component_="Open3D.dll_1" FileName="Open3D.dll" Attributes="0" SourcePath="Release\Open3D.dll" SelfReg="false"/>
-    <ROW File="openblas.dll" Component_="openblas.dll" FileName="openblas.dll" Attributes="0" SourcePath="Release\openblas.dll" SelfReg="false"/>
-    <ROW File="opencv_videoio_ffmpeg490_64.dll" Component_="opencv_videoio_ffmpeg490_64.dll" FileName="OPENCV~1.DLL|opencv_videoio_ffmpeg490_64.dll" Attributes="0" SourcePath="Release\opencv_videoio_ffmpeg490_64.dll" SelfReg="false"/>
     <ROW File="opencv_world490.dll" Component_="opencv_world490.dll" FileName="OPENCV~2.DLL|opencv_world490.dll" Attributes="0" SourcePath="Release\opencv_world490.dll" SelfReg="false"/>
-    <ROW File="opencv_world490d.dll" Component_="opencv_world490d.dll" FileName="OPENCV~3.DLL|opencv_world490d.dll" Attributes="0" SourcePath="Release\opencv_world490d.dll" SelfReg="false"/>
-    <ROW File="openjp2.dll" Component_="openjp2.dll" FileName="openjp2.dll" Attributes="0" SourcePath="Release\openjp2.dll" SelfReg="false"/>
-    <ROW File="OpenNI2.dll" Component_="OpenNI2.dll" FileName="OpenNI2.dll" Attributes="0" SourcePath="Release\OpenNI2.dll" SelfReg="false"/>
-    <ROW File="OpenNI2.jni.dll" Component_="OpenNI2.jni.dll" FileName="OPENNI~1.DLL|OpenNI2.jni.dll" Attributes="0" SourcePath="Release\OpenNI2.jni.dll" SelfReg="false"/>
-    <ROW File="pcl_common.dll" Component_="pcl_common.dll" FileName="PCL_CO~1.DLL|pcl_common.dll" Attributes="0" SourcePath="Release\pcl_common.dll" SelfReg="false"/>
-    <ROW File="pcl_features.dll" Component_="pcl_features.dll" FileName="PCL_FE~1.DLL|pcl_features.dll" Attributes="0" SourcePath="Release\pcl_features.dll" SelfReg="false"/>
-    <ROW File="pcl_filters.dll" Component_="pcl_filters.dll" FileName="PCL_FI~1.DLL|pcl_filters.dll" Attributes="0" SourcePath="Release\pcl_filters.dll" SelfReg="false"/>
-    <ROW File="pcl_io.dll" Component_="pcl_io.dll" FileName="pcl_io.dll" Attributes="0" SourcePath="Release\pcl_io.dll" SelfReg="false"/>
-    <ROW File="pcl_io_ply.dll" Component_="pcl_io_ply.dll" FileName="PCL_IO~1.DLL|pcl_io_ply.dll" Attributes="0" SourcePath="Release\pcl_io_ply.dll" SelfReg="false"/>
-    <ROW File="pcre216.dll" Component_="pcre216.dll" FileName="pcre2-16.dll" Attributes="0" SourcePath="Release\pcre2-16.dll" SelfReg="false"/>
-    <ROW File="pcre232.dll" Component_="pcre232.dll" FileName="pcre2-32.dll" Attributes="0" SourcePath="Release\pcre2-32.dll" SelfReg="false"/>
-    <ROW File="pcre28.dll" Component_="pcre28.dll" FileName="pcre2-8.dll" Attributes="0" SourcePath="Release\pcre2-8.dll" SelfReg="false"/>
-    <ROW File="pcre2posix.dll" Component_="pcre2posix.dll" FileName="PCRE2-~1.DLL|pcre2-posix.dll" Attributes="0" SourcePath="Release\pcre2-posix.dll" SelfReg="false"/>
-    <ROW File="pdalcpp.dll" Component_="pdalcpp.dll" FileName="pdalcpp.dll" Attributes="0" SourcePath="Release\pdalcpp.dll" SelfReg="false"/>
-    <ROW File="popplercpp.dll" Component_="popplercpp.dll" FileName="POPPLE~1.DLL|poppler-cpp.dll" Attributes="0" SourcePath="Release\poppler-cpp.dll" SelfReg="false"/>
-    <ROW File="popplerglib.dll" Component_="popplerglib.dll" FileName="POPPLE~2.DLL|poppler-glib.dll" Attributes="0" SourcePath="Release\poppler-glib.dll" SelfReg="false"/>
-    <ROW File="poppler.dll" Component_="poppler.dll" FileName="poppler.dll" Attributes="0" SourcePath="Release\poppler.dll" SelfReg="false"/>
-    <ROW File="proj.db" Component_="CloudShellExtension.exp_1" FileName="proj.db" Attributes="0" SourcePath="Release\proj.db" SelfReg="false"/>
-    <ROW File="proj.ini" Component_="CloudShellExtension.exp_1" FileName="proj.ini" Attributes="0" SourcePath="Release\proj.ini" SelfReg="false"/>
-    <ROW File="proj_9_3.dll" Component_="proj_9_3.dll" FileName="proj_9_3.dll" Attributes="0" SourcePath="Release\proj_9_3.dll" SelfReg="false"/>
-    <ROW File="re2.dll" Component_="re2.dll" FileName="re2.dll" Attributes="0" SourcePath="Release\re2.dll" SelfReg="false"/>
     <ROW File="brightday_ibl.ktx_1" Component_="brightday_ibl.ktx_1" FileName="BRIGHT~1.KTX|brightday_ibl.ktx" Attributes="0" SourcePath="Release\resources\brightday_ibl.ktx" SelfReg="false"/>
     <ROW File="brightday_skybox.ktx_1" Component_="brightday_ibl.ktx_1" FileName="BRIGHT~2.KTX|brightday_skybox.ktx" Attributes="0" SourcePath="Release\resources\brightday_skybox.ktx" SelfReg="false"/>
     <ROW File="colorMap.filamat_1" Component_="brightday_ibl.ktx_1" FileName="COLORM~1.FIL|colorMap.filamat" Attributes="0" SourcePath="Release\resources\colorMap.filamat" SelfReg="false"/>
@@ -464,36 +157,6 @@
     <ROW File="unlitLine.filamat_1" Component_="brightday_ibl.ktx_1" FileName="UNLITL~1.FIL|unlitLine.filamat" Attributes="0" SourcePath="Release\resources\unlitLine.filamat" SelfReg="false"/>
     <ROW File="unlitPolygonOffset.filamat_1" Component_="brightday_ibl.ktx_1" FileName="UNLITP~1.FIL|unlitPolygonOffset.filamat" Attributes="0" SourcePath="Release\resources\unlitPolygonOffset.filamat" SelfReg="false"/>
     <ROW File="unlitSolidColor.filamat_1" Component_="brightday_ibl.ktx_1" FileName="UNLITS~1.FIL|unlitSolidColor.filamat" Attributes="0" SourcePath="Release\resources\unlitSolidColor.filamat" SelfReg="false"/>
-    <ROW File="snappy.dll" Component_="snappy.dll" FileName="snappy.dll" Attributes="0" SourcePath="Release\snappy.dll" SelfReg="false"/>
-    <ROW File="spatialite.dll" Component_="spatialite.dll" FileName="SPATIA~1.DLL|spatialite.dll" Attributes="0" SourcePath="Release\spatialite.dll" SelfReg="false"/>
-    <ROW File="spqr.dll" Component_="spqr.dll" FileName="spqr.dll" Attributes="0" SourcePath="Release\spqr.dll" SelfReg="false"/>
-    <ROW File="sqlite3.dll" Component_="sqlite3.dll" FileName="sqlite3.dll" Attributes="0" SourcePath="Release\sqlite3.dll" SelfReg="false"/>
-    <ROW File="szip.dll" Component_="szip.dll" FileName="szip.dll" Attributes="0" SourcePath="Release\szip.dll" SelfReg="false"/>
-    <ROW File="tbb.dll_1" Component_="tbb.dll_1" FileName="tbb.dll" Attributes="1" SourcePath="Release\tbb.dll" SelfReg="false"/>
-    <ROW File="tbb12.dll" Component_="tbb12.dll" FileName="tbb12.dll" Attributes="0" SourcePath="Release\tbb12.dll" SelfReg="false"/>
-    <ROW File="tbbbind_2_5.dll" Component_="tbbbind_2_5.dll" FileName="TBBBIN~1.DLL|tbbbind_2_5.dll" Attributes="0" SourcePath="Release\tbbbind_2_5.dll" SelfReg="false"/>
-    <ROW File="tbbmalloc.dll" Component_="tbbmalloc.dll" FileName="TBBMAL~1.DLL|tbbmalloc.dll" Attributes="1" SourcePath="Release\tbbmalloc.dll" SelfReg="false"/>
-    <ROW File="tbbmalloc_proxy.dll" Component_="tbbmalloc_proxy.dll" FileName="TBBMAL~2.DLL|tbbmalloc_proxy.dll" Attributes="0" SourcePath="Release\tbbmalloc_proxy.dll" SelfReg="false"/>
-    <ROW File="textstyle0.dll" Component_="textstyle0.dll" FileName="TEXTST~1.DLL|textstyle-0.dll" Attributes="0" SourcePath="Release\textstyle-0.dll" SelfReg="false"/>
-    <ROW File="tiff.dll" Component_="tiff.dll" FileName="tiff.dll" Attributes="0" SourcePath="Release\tiff.dll" SelfReg="false"/>
-    <ROW File="tiledb.dll" Component_="tiledb.dll" FileName="tiledb.dll" Attributes="0" SourcePath="Release\tiledb.dll" SelfReg="false"/>
-    <ROW File="turbojpeg.dll" Component_="turbojpeg.dll" FileName="TURBOJ~1.DLL|turbojpeg.dll" Attributes="0" SourcePath="Release\turbojpeg.dll" SelfReg="false"/>
-    <ROW File="ucrtbase.dll" Component_="ucrtbase.dll" FileName="ucrtbase.dll" Attributes="0" SourcePath="Release\ucrtbase.dll" SelfReg="false"/>
-    <ROW File="umfpack.dll" Component_="umfpack.dll" FileName="umfpack.dll" Attributes="0" SourcePath="Release\umfpack.dll" SelfReg="false"/>
-    <ROW File="uriparser.dll" Component_="uriparser.dll" FileName="URIPAR~1.DLL|uriparser.dll" Attributes="0" SourcePath="Release\uriparser.dll" SelfReg="false"/>
-    <ROW File="utf8_range_lib.dll" Component_="utf8_range_lib.dll" FileName="UTF8_R~1.DLL|utf8_range_lib.dll" Attributes="0" SourcePath="Release\utf8_range_lib.dll" SelfReg="false"/>
-    <ROW File="vcamp140.dll" Component_="vcamp140.dll" FileName="vcamp140.dll" Attributes="0" SourcePath="Release\vcamp140.dll" SelfReg="false"/>
-    <ROW File="vccorlib140.dll" Component_="vccorlib140.dll" FileName="VCCORL~1.DLL|vccorlib140.dll" Attributes="0" SourcePath="Release\vccorlib140.dll" SelfReg="false"/>
-    <ROW File="vcomp140.dll" Component_="vcomp140.dll" FileName="vcomp140.dll" Attributes="0" SourcePath="Release\vcomp140.dll" SelfReg="false"/>
-    <ROW File="vcruntime140.dll" Component_="vcruntime140.dll" FileName="VCRUNT~1.DLL|vcruntime140.dll" Attributes="0" SourcePath="Release\vcruntime140.dll" SelfReg="false"/>
-    <ROW File="vcruntime140_1.dll" Component_="vcruntime140_1.dll" FileName="VCRUNT~2.DLL|vcruntime140_1.dll" Attributes="0" SourcePath="Release\vcruntime140_1.dll" SelfReg="false"/>
-    <ROW File="vcruntime140_threads.dll" Component_="vcruntime140_threads.dll" FileName="VCRUNT~3.DLL|vcruntime140_threads.dll" Attributes="0" SourcePath="Release\vcruntime140_threads.dll" SelfReg="false"/>
-    <ROW File="xdr.dll" Component_="xdr.dll" FileName="xdr.dll" Attributes="0" SourcePath="Release\xdr.dll" SelfReg="false"/>
-    <ROW File="xercesc_3_2.dll" Component_="xercesc_3_2.dll" FileName="XERCES~1.DLL|xerces-c_3_2.dll" Attributes="0" SourcePath="Release\xerces-c_3_2.dll" SelfReg="false"/>
-    <ROW File="xpprof64.dll" Component_="xpprof64.dll" FileName="xpprof64.dll" Attributes="0" SourcePath="Release\xpprof64.dll" SelfReg="false"/>
-    <ROW File="zip.dll" Component_="zip.dll" FileName="zip.dll" Attributes="0" SourcePath="Release\zip.dll" SelfReg="false"/>
-    <ROW File="zlib.dll" Component_="zlib.dll" FileName="zlib.dll" Attributes="0" SourcePath="Release\zlib.dll" SelfReg="false"/>
-    <ROW File="zstd.dll" Component_="zstd.dll" FileName="zstd.dll" Attributes="0" SourcePath="Release\zstd.dll" SelfReg="false"/>
     <ROW File="settings.xml" Component_="settings.xml" FileName="settings.xml" Attributes="0" SourcePath="..\CloudExtensionOptions\Settings\settings.xml" SelfReg="false"/>
     <ROW File="dc.laz" Component_="dc.laz" FileName="dc.laz" Attributes="0" SourcePath="..\sample\dc.laz" SelfReg="false"/>
     <ROW File="sample.laz" Component_="dc.laz" FileName="sample.laz" Attributes="0" SourcePath="..\sample\sample.laz" SelfReg="false"/>
@@ -501,7 +164,6 @@
     <ROW File="CloudExtensionOptions.exe.config" Component_="CloudShellExtension.exp_1" FileName="CLOUDE~1.CON|CloudExtensionOptions.exe.config" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\CloudExtensionOptions.exe.config" SelfReg="false"/>
     <ROW File="Microsoft.Win32.Registry.dll" Component_="Microsoft.Win32.Registry.dll" FileName="MICROS~1.DLL|Microsoft.Win32.Registry.dll" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\Microsoft.Win32.Registry.dll" SelfReg="false"/>
     <ROW File="Cryptolens.Licensing.dll" Component_="Cryptolens.Licensing.dll" FileName="CRYPTO~1.DLL|Cryptolens.Licensing.dll" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\Cryptolens.Licensing.dll" SelfReg="false"/>
-    <ROW File="Microsoft.Bcl.AsyncInterfaces.dll" Component_="Microsoft.Bcl.AsyncInterfaces.dll" FileName="MICROS~2.DLL|Microsoft.Bcl.AsyncInterfaces.dll" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\Microsoft.Bcl.AsyncInterfaces.dll" SelfReg="false"/>
     <ROW File="Newtonsoft.Json.dll" Component_="Newtonsoft.Json.dll" FileName="NEWTON~1.DLL|Newtonsoft.Json.dll" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\Newtonsoft.Json.dll" SelfReg="false"/>
     <ROW File="Newtonsoft.Json.xml" Component_="CloudShellExtension.exp_1" FileName="NEWTON~1.XML|Newtonsoft.Json.xml" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\Newtonsoft.Json.xml" SelfReg="false"/>
     <ROW File="System.Buffers.dll" Component_="System.Buffers.dll" FileName="SYSTEM~1.DLL|System.Buffers.dll" Attributes="0" SourcePath="..\CloudExtensionOptions\bin\Release\System.Buffers.dll" SelfReg="false"/>
@@ -595,177 +257,10 @@
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatCompsComponent">
     <ROW Feature_="MainFeature" Component_="APPDIR"/>
     <ROW Feature_="MainFeature" Component_="ProductInformation"/>
-    <ROW Feature_="MainFeature" Component_="abseil_dll.dll"/>
-    <ROW Feature_="MainFeature" Component_="aec.dll"/>
-    <ROW Feature_="MainFeature" Component_="archive.dll"/>
-    <ROW Feature_="MainFeature" Component_="asprintf0.dll"/>
-    <ROW Feature_="MainFeature" Component_="blosc.dll"/>
-    <ROW Feature_="MainFeature" Component_="btf.dll"/>
-    <ROW Feature_="MainFeature" Component_="bzip2.dll"/>
-    <ROW Feature_="MainFeature" Component_="cairogobject.dll"/>
-    <ROW Feature_="MainFeature" Component_="cairoscriptinterpreter.dll"/>
-    <ROW Feature_="MainFeature" Component_="cairo.dll"/>
-    <ROW Feature_="MainFeature" Component_="camd.dll"/>
-    <ROW Feature_="MainFeature" Component_="cares.dll"/>
-    <ROW Feature_="MainFeature" Component_="ccolamd.dll"/>
-    <ROW Feature_="MainFeature" Component_="ceres.dll"/>
-    <ROW Feature_="MainFeature" Component_="cfitsio.dll"/>
-    <ROW Feature_="MainFeature" Component_="charset.dll"/>
-    <ROW Feature_="MainFeature" Component_="cholmod.dll"/>
-    <ROW Feature_="MainFeature" Component_="colamd.dll"/>
-    <ROW Feature_="MainFeature" Component_="comerr64.dll"/>
-    <ROW Feature_="MainFeature" Component_="concrt140.dll"/>
-    <ROW Feature_="MainFeature" Component_="crc32c.dll"/>
-    <ROW Feature_="MainFeature" Component_="cxsparse.dll"/>
-    <ROW Feature_="MainFeature" Component_="deflate.dll"/>
-    <ROW Feature_="MainFeature" Component_="expat.dll"/>
-    <ROW Feature_="MainFeature" Component_="ffi8.dll"/>
-    <ROW Feature_="MainFeature" Component_="flang.dll"/>
-    <ROW Feature_="MainFeature" Component_="flangrti.dll"/>
-    <ROW Feature_="MainFeature" Component_="fontconfig1.dll"/>
-    <ROW Feature_="MainFeature" Component_="freetype.dll"/>
-    <ROW Feature_="MainFeature" Component_="freexl.dll"/>
-    <ROW Feature_="MainFeature" Component_="gdal.dll"/>
-    <ROW Feature_="MainFeature" Component_="geos.dll"/>
-    <ROW Feature_="MainFeature" Component_="geos_c.dll"/>
-    <ROW Feature_="MainFeature" Component_="geotiff.dll"/>
-    <ROW Feature_="MainFeature" Component_="gflags.dll"/>
-    <ROW Feature_="MainFeature" Component_="glog.dll"/>
-    <ROW Feature_="MainFeature" Component_="gpr.dll"/>
-    <ROW Feature_="MainFeature" Component_="gssapi64.dll"/>
-    <ROW Feature_="MainFeature" Component_="hdf.dll"/>
-    <ROW Feature_="MainFeature" Component_="hdf5.dll"/>
-    <ROW Feature_="MainFeature" Component_="hdf5_cpp.dll"/>
-    <ROW Feature_="MainFeature" Component_="hdf5_hl.dll"/>
-    <ROW Feature_="MainFeature" Component_="hdf5_hl_cpp.dll"/>
-    <ROW Feature_="MainFeature" Component_="hdf5_tools.dll"/>
-    <ROW Feature_="MainFeature" Component_="iconv.dll"/>
-    <ROW Feature_="MainFeature" Component_="intl8.dll"/>
-    <ROW Feature_="MainFeature" Component_="jpeg8.dll"/>
-    <ROW Feature_="MainFeature" Component_="k5sprt64.dll"/>
-    <ROW Feature_="MainFeature" Component_="kfwlogon.dll"/>
-    <ROW Feature_="MainFeature" Component_="klu.dll"/>
-    <ROW Feature_="MainFeature" Component_="krb5_64.dll"/>
-    <ROW Feature_="MainFeature" Component_="krbcc64.dll"/>
-    <ROW Feature_="MainFeature" Component_="lcms2.dll"/>
-    <ROW Feature_="MainFeature" Component_="ldl.dll"/>
-    <ROW Feature_="MainFeature" Component_="leashw64.dll"/>
-    <ROW Feature_="MainFeature" Component_="Lerc.dll"/>
-    <ROW Feature_="MainFeature" Component_="libblas.dll"/>
-    <ROW Feature_="MainFeature" Component_="libbz2.dll"/>
-    <ROW Feature_="MainFeature" Component_="libcblas.dll"/>
-    <ROW Feature_="MainFeature" Component_="libcrypto3x64.dll"/>
-    <ROW Feature_="MainFeature" Component_="libcurl.dll"/>
-    <ROW Feature_="MainFeature" Component_="libecpg.dll"/>
-    <ROW Feature_="MainFeature" Component_="libecpg_compat.dll"/>
-    <ROW Feature_="MainFeature" Component_="libexpat.dll"/>
-    <ROW Feature_="MainFeature" Component_="libimalloc.dll"/>
-    <ROW Feature_="MainFeature" Component_="libiomp5md.dll"/>
-    <ROW Feature_="MainFeature" Component_="libkea.dll"/>
-    <ROW Feature_="MainFeature" Component_="liblapack.dll"/>
-    <ROW Feature_="MainFeature" Component_="liblapacke.dll"/>
-    <ROW Feature_="MainFeature" Component_="liblz4.dll"/>
-    <ROW Feature_="MainFeature" Component_="liblzma.dll"/>
-    <ROW Feature_="MainFeature" Component_="libminizip.dll"/>
-    <ROW Feature_="MainFeature" Component_="libomp.dll"/>
     <ROW Feature_="MainFeature" Component_="libopenblas.dll"/>
-    <ROW Feature_="MainFeature" Component_="libpdal_plugin_filter_trajectory.dll"/>
-    <ROW Feature_="MainFeature" Component_="libpdal_plugin_kernel_fauxplugin.dll"/>
-    <ROW Feature_="MainFeature" Component_="libpdal_plugin_reader_draco.dll"/>
-    <ROW Feature_="MainFeature" Component_="libpdal_plugin_reader_e57.dll"/>
-    <ROW Feature_="MainFeature" Component_="libpdal_plugin_reader_hdf.dll"/>
-    <ROW Feature_="MainFeature" Component_="libpdal_plugin_reader_icebridge.dll"/>
-    <ROW Feature_="MainFeature" Component_="libpdal_plugin_reader_pgpointcloud.dll"/>
-    <ROW Feature_="MainFeature" Component_="libpdal_plugin_writer_draco.dll"/>
-    <ROW Feature_="MainFeature" Component_="libpdal_plugin_writer_e57.dll"/>
-    <ROW Feature_="MainFeature" Component_="libpdal_plugin_writer_pgpointcloud.dll"/>
-    <ROW Feature_="MainFeature" Component_="libpgtypes.dll"/>
-    <ROW Feature_="MainFeature" Component_="libpng16.dll"/>
-    <ROW Feature_="MainFeature" Component_="libpq.dll"/>
-    <ROW Feature_="MainFeature" Component_="libprotobuflite.dll"/>
-    <ROW Feature_="MainFeature" Component_="libprotobuf.dll"/>
-    <ROW Feature_="MainFeature" Component_="libprotoc.dll"/>
-    <ROW Feature_="MainFeature" Component_="librttopo.dll"/>
-    <ROW Feature_="MainFeature" Component_="libsharpyuv.dll"/>
-    <ROW Feature_="MainFeature" Component_="libssh2.dll"/>
-    <ROW Feature_="MainFeature" Component_="libssl3x64.dll"/>
-    <ROW Feature_="MainFeature" Component_="libtiff.dll"/>
-    <ROW Feature_="MainFeature" Component_="libwebp.dll"/>
-    <ROW Feature_="MainFeature" Component_="libwebpdecoder.dll"/>
-    <ROW Feature_="MainFeature" Component_="libwebpdemux.dll"/>
-    <ROW Feature_="MainFeature" Component_="libwebpmux.dll"/>
-    <ROW Feature_="MainFeature" Component_="libxml2.dll"/>
-    <ROW Feature_="MainFeature" Component_="libzstd.dll"/>
-    <ROW Feature_="MainFeature" Component_="lzo2.dll"/>
-    <ROW Feature_="MainFeature" Component_="mfhdf.dll"/>
-    <ROW Feature_="MainFeature" Component_="mod_spatialite.dll"/>
-    <ROW Feature_="MainFeature" Component_="msvcp140.dll"/>
-    <ROW Feature_="MainFeature" Component_="msvcp140_1.dll"/>
-    <ROW Feature_="MainFeature" Component_="msvcp140_2.dll"/>
-    <ROW Feature_="MainFeature" Component_="msvcp140_atomic_wait.dll"/>
-    <ROW Feature_="MainFeature" Component_="msvcp140_codecvt_ids.dll"/>
-    <ROW Feature_="MainFeature" Component_="netcdf.dll"/>
-    <ROW Feature_="MainFeature" Component_="nitfc.dll"/>
-    <ROW Feature_="MainFeature" Component_="nitfcpp.dll"/>
-    <ROW Feature_="MainFeature" Component_="ompstub.dll"/>
-    <ROW Feature_="MainFeature" Component_="omptarget.dll"/>
-    <ROW Feature_="MainFeature" Component_="omptarget.rtl.level0.dll"/>
-    <ROW Feature_="MainFeature" Component_="omptarget.rtl.opencl.dll"/>
-    <ROW Feature_="MainFeature" Component_="omptarget.sycl.wrap.dll"/>
     <ROW Feature_="MainFeature" Component_="Open3D.dll_1"/>
-    <ROW Feature_="MainFeature" Component_="openblas.dll"/>
-    <ROW Feature_="MainFeature" Component_="opencv_videoio_ffmpeg490_64.dll"/>
     <ROW Feature_="MainFeature" Component_="opencv_world490.dll"/>
-    <ROW Feature_="MainFeature" Component_="opencv_world490d.dll"/>
-    <ROW Feature_="MainFeature" Component_="openjp2.dll"/>
-    <ROW Feature_="MainFeature" Component_="OpenNI2.dll"/>
-    <ROW Feature_="MainFeature" Component_="OpenNI2.jni.dll"/>
-    <ROW Feature_="MainFeature" Component_="pcl_common.dll"/>
-    <ROW Feature_="MainFeature" Component_="pcl_features.dll"/>
-    <ROW Feature_="MainFeature" Component_="pcl_filters.dll"/>
-    <ROW Feature_="MainFeature" Component_="pcl_io.dll"/>
-    <ROW Feature_="MainFeature" Component_="pcl_io_ply.dll"/>
-    <ROW Feature_="MainFeature" Component_="pcre216.dll"/>
-    <ROW Feature_="MainFeature" Component_="pcre232.dll"/>
-    <ROW Feature_="MainFeature" Component_="pcre28.dll"/>
-    <ROW Feature_="MainFeature" Component_="pcre2posix.dll"/>
-    <ROW Feature_="MainFeature" Component_="pdalcpp.dll"/>
-    <ROW Feature_="MainFeature" Component_="popplercpp.dll"/>
-    <ROW Feature_="MainFeature" Component_="popplerglib.dll"/>
-    <ROW Feature_="MainFeature" Component_="poppler.dll"/>
-    <ROW Feature_="MainFeature" Component_="proj_9_3.dll"/>
-    <ROW Feature_="MainFeature" Component_="re2.dll"/>
     <ROW Feature_="MainFeature" Component_="brightday_ibl.ktx_1"/>
-    <ROW Feature_="MainFeature" Component_="snappy.dll"/>
-    <ROW Feature_="MainFeature" Component_="spatialite.dll"/>
-    <ROW Feature_="MainFeature" Component_="spqr.dll"/>
-    <ROW Feature_="MainFeature" Component_="sqlite3.dll"/>
-    <ROW Feature_="MainFeature" Component_="szip.dll"/>
-    <ROW Feature_="MainFeature" Component_="tbb.dll_1"/>
-    <ROW Feature_="MainFeature" Component_="tbb12.dll"/>
-    <ROW Feature_="MainFeature" Component_="tbbbind_2_5.dll"/>
-    <ROW Feature_="MainFeature" Component_="tbbmalloc.dll"/>
-    <ROW Feature_="MainFeature" Component_="tbbmalloc_proxy.dll"/>
-    <ROW Feature_="MainFeature" Component_="textstyle0.dll"/>
-    <ROW Feature_="MainFeature" Component_="tiff.dll"/>
-    <ROW Feature_="MainFeature" Component_="tiledb.dll"/>
-    <ROW Feature_="MainFeature" Component_="turbojpeg.dll"/>
-    <ROW Feature_="MainFeature" Component_="ucrtbase.dll"/>
-    <ROW Feature_="MainFeature" Component_="umfpack.dll"/>
-    <ROW Feature_="MainFeature" Component_="uriparser.dll"/>
-    <ROW Feature_="MainFeature" Component_="utf8_range_lib.dll"/>
-    <ROW Feature_="MainFeature" Component_="vcamp140.dll"/>
-    <ROW Feature_="MainFeature" Component_="vccorlib140.dll"/>
-    <ROW Feature_="MainFeature" Component_="vcomp140.dll"/>
-    <ROW Feature_="MainFeature" Component_="vcruntime140.dll"/>
-    <ROW Feature_="MainFeature" Component_="vcruntime140_1.dll"/>
-    <ROW Feature_="MainFeature" Component_="vcruntime140_threads.dll"/>
-    <ROW Feature_="MainFeature" Component_="xdr.dll"/>
-    <ROW Feature_="MainFeature" Component_="xercesc_3_2.dll"/>
-    <ROW Feature_="MainFeature" Component_="xpprof64.dll"/>
-    <ROW Feature_="MainFeature" Component_="zip.dll"/>
-    <ROW Feature_="MainFeature" Component_="zlib.dll"/>
-    <ROW Feature_="MainFeature" Component_="zstd.dll"/>
     <ROW Feature_="MainFeature" Component_="CloudShellExtension.dll_1"/>
     <ROW Feature_="MainFeature" Component_="CloudShellExtension.exp_1"/>
     <ROW Feature_="MainFeature" Component_="CLSID"/>
@@ -811,7 +306,6 @@
     <ROW Feature_="MainFeature" Component_="Version"/>
     <ROW Feature_="MainFeature" Component_="__12"/>
     <ROW Feature_="MainFeature" Component_="Cryptolens.Licensing.dll"/>
-    <ROW Feature_="MainFeature" Component_="Microsoft.Bcl.AsyncInterfaces.dll"/>
     <ROW Feature_="MainFeature" Component_="Newtonsoft.Json.dll"/>
     <ROW Feature_="MainFeature" Component_="System.Buffers.dll"/>
     <ROW Feature_="MainFeature" Component_="System.Memory.dll"/>
@@ -848,8 +342,8 @@
     <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]." DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="DefaultBuild"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiMergeModsComponent">
-    <ROW Module="Microsoft_VC143_CRT_x64.msm" Path="C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.38.33130\MergeModules\Microsoft_VC143_CRT_x64.msm" Feature="MainFeature" Directory="APPDIR" Order="2"/>
-    <ROW Module="Microsoft_VC143_OpenMP_x64.msm" Path="C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.38.33130\MergeModules\Microsoft_VC143_OpenMP_x64.msm" Feature="MainFeature" Directory="APPDIR" Order="1"/>
+    <ROW Module="Microsoft_VC143_CRT_x64.msm_1" Path="C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.38.33135\MergeModules\Microsoft_VC143_CRT_x64.msm" Feature="MainFeature" Directory="APPDIR" Order="1"/>
+    <ROW Module="Microsoft_VC143_OpenMP_x64.msm_1" Path="C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.38.33135\MergeModules\Microsoft_VC143_OpenMP_x64.msm" Feature="MainFeature" Directory="APPDIR" Order="2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
     <ROW Registry="Approved" Root="2" Key="Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved" Name="\"/>

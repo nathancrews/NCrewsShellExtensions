@@ -89,5 +89,5 @@ private:
     std::filesystem::path  m_filePath;
     UINT m_idCmdFirst = 0;
     IUnknown* m_pSite = nullptr;
-    NCraftImageGen::ImageGenSettings m_imageGenSettings;
+    NCrewsImageGen::AppSettings m_imageGenSettings;
 };

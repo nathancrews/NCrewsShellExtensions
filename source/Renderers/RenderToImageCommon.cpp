@@ -1,10 +1,13 @@
 #include "Renderers/RenderToImageCommon.h"
 #include "tinyxml2.h"
 
-namespace NCraftImageGen
+namespace NCrewsImageGen
 {
 
 std::vector<std::string> ModelFileExtensions{ ".gltf", ".glb",".GLTF", ".GLB" };
+std::vector<std::string> PointcloudFileExtensions{ ".las", ".laz", ".LAS", ".LAZ" };
+
+/* OLD file support
 std::vector<std::string> PointcloudFileExtensions{ ".las",
 ".laz",
 ".pcd",
@@ -16,10 +19,10 @@ std::vector<std::string> PointcloudFileExtensions{ ".las",
 ".PCD",
 ".PLY",
 ".PTS",
-".XYZ" };
+".XYZ" };*/
 
 
-bool ReadImageGenSettings(std::filesystem::path& appDataPath, ImageGenSettings& outSettings)
+bool ReadImageGenSettings(std::filesystem::path& appDataPath, AppSettings& outSettings)
 {
     bool retval = false;
 
@@ -115,7 +118,7 @@ UINT GetFileNamesFromDirectory(std::filesystem::path& filePath, std::vector<std:
         }
     }
 
-    fileCount = outDirectoryFilenames.size();
+    fileCount = (UINT)outDirectoryFilenames.size();
 
     return fileCount;
 }
@@ -144,7 +147,7 @@ UINT GetCloudFileNamesFromDirectory(std::filesystem::path& filePath, std::vector
         }
     }
 
-    fileCount = outDirectoryFilenames.size();
+    fileCount = (UINT)outDirectoryFilenames.size();
 
     return fileCount;
 }

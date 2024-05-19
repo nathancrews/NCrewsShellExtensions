@@ -58,7 +58,7 @@ STDMETHODIMP ModelThumbnail::Initialize(IStream* pstream, DWORD grfMode)
 
                     if (myfile)
                     {
-                        int byteOut = fwrite(data, len, 1, myfile);
+                        size_t byteOut = fwrite(data, len, 1, myfile);
 
                         fclose(myfile);
                     }
@@ -75,7 +75,7 @@ STDMETHODIMP ModelThumbnail::Initialize(IStream* pstream, DWORD grfMode)
         std::filesystem::path settingsFilePath = g_AppDataPath;
         settingsFilePath = settingsFilePath.concat(g_SettingsFileName.c_str());
 
-        if (!NCraftImageGen::ReadImageGenSettings(settingsFilePath, m_imageGenSettings))
+        if (!NCrewsImageGen::ReadImageGenSettings(settingsFilePath, m_imageGenSettings))
         {
             utility::LogInfo("Error loading settings");
         }
@@ -97,7 +97,7 @@ STDMETHODIMP ModelThumbnail::GetThumbnail(UINT flag, HBITMAP* outHBITMAP, WTS_AL
     {
         HBITMAP localBMP = nullptr;
 
-        localBMP = NCraftImageGen::RenderModelToHBITMAP(g_AppPath, m_imageGenSettings, m_filePath);
+        localBMP = NCrewsImageGen::RenderModelToHBITMAP(g_AppPath, m_imageGenSettings, m_filePath);
 
         if (localBMP)
         {

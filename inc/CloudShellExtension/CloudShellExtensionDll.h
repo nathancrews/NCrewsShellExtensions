@@ -9,8 +9,8 @@ TCHAR g_DllModelName[MAX_PATH] = { 0 };
 std::filesystem::path g_AppPath;
 
 std::wstring g_AppName = L"Point Cloud Shell Extension";
-std::wstring g_appUserModelID = L"NCraft Image Generator";
-std::wstring g_ProducerName = L"NCraft Software";
+std::wstring g_appUserModelID = L"NCrews Image Generator";
+std::wstring g_ProducerName = L"NCrews Software";
 std::wstring g_AppDirectoryName = L"CloudShellExtension";
 std::wstring g_RegAppName = L"CloudShellExtension";
 

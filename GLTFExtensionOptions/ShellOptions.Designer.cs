@@ -36,6 +36,8 @@
             this.ImageSizeComboBox = new System.Windows.Forms.ComboBox();
             this.EnableButton = new System.Windows.Forms.Button();
             this.DisableButton = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.PurchaseButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // ImageFormatComboBox
@@ -45,7 +47,7 @@
             this.ImageFormatComboBox.Items.AddRange(new object[] {
             "jpg",
             "png"});
-            this.ImageFormatComboBox.Location = new System.Drawing.Point(103, 81);
+            this.ImageFormatComboBox.Location = new System.Drawing.Point(103, 72);
             this.ImageFormatComboBox.Name = "ImageFormatComboBox";
             this.ImageFormatComboBox.Size = new System.Drawing.Size(121, 21);
             this.ImageFormatComboBox.TabIndex = 0;
@@ -54,7 +56,7 @@
             // 
             // OkButton
             // 
-            this.OkButton.Location = new System.Drawing.Point(151, 146);
+            this.OkButton.Location = new System.Drawing.Point(151, 151);
             this.OkButton.Name = "OkButton";
             this.OkButton.Size = new System.Drawing.Size(75, 23);
             this.OkButton.TabIndex = 1;
@@ -64,7 +66,7 @@
             // 
             // CancelButton
             // 
-            this.CancelButton.Location = new System.Drawing.Point(264, 146);
+            this.CancelButton.Location = new System.Drawing.Point(264, 151);
             this.CancelButton.Name = "CancelButton";
             this.CancelButton.Size = new System.Drawing.Size(75, 23);
             this.CancelButton.TabIndex = 2;
@@ -75,7 +77,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 84);
+            this.label2.Location = new System.Drawing.Point(12, 75);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(71, 13);
             this.label2.TabIndex = 5;
@@ -84,7 +86,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(261, 89);
+            this.label4.Location = new System.Drawing.Point(264, 77);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(59, 13);
             this.label4.TabIndex = 9;
@@ -98,7 +100,7 @@
             "1024x768",
             "1440x1024",
             "2048x1440"});
-            this.ImageSizeComboBox.Location = new System.Drawing.Point(352, 86);
+            this.ImageSizeComboBox.Location = new System.Drawing.Point(355, 74);
             this.ImageSizeComboBox.Name = "ImageSizeComboBox";
             this.ImageSizeComboBox.Size = new System.Drawing.Size(121, 21);
             this.ImageSizeComboBox.TabIndex = 8;
@@ -107,7 +109,7 @@
             // 
             // EnableButton
             // 
-            this.EnableButton.Location = new System.Drawing.Point(12, 32);
+            this.EnableButton.Location = new System.Drawing.Point(12, 23);
             this.EnableButton.Name = "EnableButton";
             this.EnableButton.Size = new System.Drawing.Size(227, 23);
             this.EnableButton.TabIndex = 11;
@@ -117,7 +119,7 @@
             // 
             // DisableButton
             // 
-            this.DisableButton.Location = new System.Drawing.Point(264, 32);
+            this.DisableButton.Location = new System.Drawing.Point(264, 23);
             this.DisableButton.Name = "DisableButton";
             this.DisableButton.Size = new System.Drawing.Size(227, 23);
             this.DisableButton.TabIndex = 12;
@@ -125,11 +127,33 @@
             this.DisableButton.UseVisualStyleBackColor = true;
             this.DisableButton.Click += new System.EventHandler(this.DisableButton_Click);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(164, 119);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(226, 13);
+            this.label1.TabIndex = 15;
+            this.label1.Text = "https://www.buymeacoffee.com/nathancrews";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
+            // 
+            // PurchaseButton
+            // 
+            this.PurchaseButton.Location = new System.Drawing.Point(15, 114);
+            this.PurchaseButton.Name = "PurchaseButton";
+            this.PurchaseButton.Size = new System.Drawing.Size(120, 23);
+            this.PurchaseButton.TabIndex = 14;
+            this.PurchaseButton.Text = "Buy Me a Coffee?";
+            this.PurchaseButton.UseVisualStyleBackColor = true;
+            this.PurchaseButton.Click += new System.EventHandler(this.PurchaseButton_Click);
+            // 
             // ShellOptions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(506, 187);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.PurchaseButton);
             this.Controls.Add(this.DisableButton);
             this.Controls.Add(this.EnableButton);
             this.Controls.Add(this.label4);
@@ -139,7 +163,7 @@
             this.Controls.Add(this.OkButton);
             this.Controls.Add(this.ImageFormatComboBox);
             this.Name = "ShellOptions";
-            this.Text = "NCraft Shell Extension Options";
+            this.Text = "NCrews Shell Extension Options";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -156,6 +180,8 @@
         private System.Windows.Forms.ComboBox ImageSizeComboBox;
         private System.Windows.Forms.Button EnableButton;
         private System.Windows.Forms.Button DisableButton;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button PurchaseButton;
     }
 }
 

@@ -4,73 +4,9 @@
 #include <iostream>
 #include <fstream>
 #include <process.h>
-#include "wintoastlib.h"
 #include "Renderers/RenderGLTFToImage.h"
 #include "NCraftImageGen.h"
 #include "ModelMenu.h"
-
-void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& imageResults);
-
-class ModelCustomHandler : public WinToastLib::IWinToastHandler
-{
-public:
-
-    ModelCustomHandler()
-    {
-        DllAddRef();
-        utility::LogInfo("Model IWinToastHandler: CustomHandler() called");
-    }
-    ~ModelCustomHandler()
-    {
-        utility::LogInfo("Model IWinToastHandler: ~CustomHandler() called");
-        DllRelease();
-    }
-
-    void toastActivated() const
-    {
- //       utility::LogInfo("IWinToastHandler: Activated");
-       // exit(0);
-    }
-
-    void toastActivated(int actionIndex) const
-    {
-//        utility::LogInfo("IWinToastHandler: The user clicked on action");
-
-       // exit(16 + actionIndex);
-    }
-
-    void toastDismissed(WinToastDismissalReason state) const
-    {
-        switch (state)
-        {
-            case UserCanceled:
-  //              utility::LogInfo("IWinToastHandler: UserCanceled");
-
-              //  exit(1);
-                break;
-            case TimedOut:
-//                utility::LogInfo("IWinToastHandler: TimedOut");
-
-              //  exit(2);
-                break;
-            case ApplicationHidden:
-//                utility::LogInfo("IWinToastHandler: ApplicationHidden");
-
-               // exit(3);
-                break;
-            default:
-//                utility::LogInfo("IWinToastHandler: not activated");
-
-               // exit(4);
-                break;
-        }
-
-    }
-
-    void toastFailed() const
-    {
-    }
-};
 
 
 ModelMenu::ModelMenu() : m_ObjRefCount(1)
@@ -90,6 +26,8 @@ HRESULT ModelMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj,
 
     try
     {
+        open3d::utility::Logger::GetInstance().SetPrintFunction(model_print_fcn);
+
         if (!pdtobj)
         {
             return hr;
@@ -137,7 +75,7 @@ HRESULT ModelMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj,
                     }
                     else
                     {
-                        for (std::string pcext : NCraftImageGen::ModelFileExtensions)
+                        for (std::string pcext : NCrewsImageGen::ModelFileExtensions)
                         {
                             if (!testPath.extension().compare(pcext))
                             {
@@ -177,6 +115,8 @@ HRESULT ModelMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst
 {
     try
     {
+        open3d::utility::Logger::GetInstance().SetPrintFunction(model_print_fcn);
+
         if ((m_filePaths.size() == 0) || (uFlags & CMF_DEFAULTONLY))
         {
             utility::LogInfo("QueryContextMenu called....exiting no selected files or CMF_DEFAULTONLY");
@@ -245,6 +185,8 @@ HRESULT ModelMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 
     try
     {
+        open3d::utility::Logger::GetInstance().SetPrintFunction(model_print_fcn);
+
         if (!lpici)
         {
             hr = E_INVALIDARG;
@@ -277,19 +219,22 @@ HRESULT ModelMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
             filesToImage.push_back(cmdPath);
         }
 
-        tbb::concurrent_vector<NCraftImageGen::ImageGenResult> renderResults;
+        tbb::concurrent_vector<NCrewsImageGen::FileProcessPackage> renderResults;
 
         hr = S_OK;
         std::filesystem::path settingsFilePath = g_AppDataPath;
         settingsFilePath = settingsFilePath.concat(g_SettingsFileName.c_str());
 
-        if (!NCraftImageGen::ReadImageGenSettings(settingsFilePath, m_imageGenSettings))
+        if (!NCrewsImageGen::ReadImageGenSettings(settingsFilePath, m_imageGenSettings))
         {
             utility::LogInfo("Error loading settings");
         }
 
-        NCraftImageGen::RenderModelsToImages(g_AppPath, filesToImage, m_imageGenSettings, renderResults);
-        SendNotificationMessages(renderResults);
+        //std::string myCmd = "D:\\Projects\\LandXML2glTF\\LandXML2glTF\\build2\\bin\\Release\\LXML2GLTF.exe D:\\Projects\\LandXML2glTF\\LandXML2glTF\\LandXML\\subdivision-2.0\\subdivision-2.0.xml";
+        //std::system(myCmd.c_str());
+        //filesToImage.push_back(std::filesystem::path("D:\\Projects\\LandXML2glTF\\LandXML2glTF\\LandXML\\subdivision-2.0\\subdivision-2.0.gltf"));
+
+        NCrewsImageGen::RenderModelsToImages(g_AppPath, filesToImage, m_imageGenSettings, renderResults);
 
         m_filePaths.clear();
 
@@ -303,100 +248,3 @@ HRESULT ModelMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
     return hr;
 }
 
-void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& imageResults)
-{
-    try
-    {
-
-        if (!WinToastLib::WinToast::isCompatible())
-        {
-            utility::LogInfo("Model: WinToast Error, your system is not supported!");
-        }
-
-        std::wstring infoText;
-        WCHAR pointCountStr[MAX_PATH] = { 0 };
-        WCHAR timeStr[MAX_PATH] = { 0 };
-        WCHAR fileSizeStr[MAX_PATH] = { 0 };
-        UINT millionVal = 1000000;
-        UINT kVal = 1000;
-
-        WinToastLib::WinToast::instance()->setAppName(g_AppName);
-
-        if (imageResults.size() > 5)
-        {
-            WinToastLib::WinToastTemplate templ(WinToastLib::WinToastTemplate::ImageAndText02);
-
-            templ.setTextField(imageResults[0].m_ImageName.filename(), WinToastLib::WinToastTemplate::FirstLine);
-
-            if (std::filesystem::exists(imageResults[0].m_ImageName))
-            {
-                templ.setImagePath(imageResults[0].m_ImageName);
-            }
-
-            _swprintf(fileSizeStr, L"Generated: %d images", (int)imageResults.size());
-            templ.setTextField(fileSizeStr, WinToastLib::WinToastTemplate::SecondLine);
-
-            templ.setDuration(WinToastLib::WinToastTemplate::Short);
-
-            templ.setExpiration(50000);
-
-            if (WinToastLib::WinToast::instance()->showToast(templ, new ModelCustomHandler()) < 0)
-            {
-                utility::LogInfo("Model: WinToast Error, could not launch toast notification!");
-            }
-        }
-        else
-        {
-            for (NCraftImageGen::ImageGenResult& result : imageResults)
-            {
-                WinToastLib::WinToastTemplate templ(WinToastLib::WinToastTemplate::ImageAndText04);
-
-                templ.setDuration(WinToastLib::WinToastTemplate::Short);
-                templ.setExpiration(50000);
-                templ.setTextField(result.m_ImageName.filename(), WinToastLib::WinToastTemplate::FirstLine);
-                templ.setTextField(result.m_FileName.filename(), WinToastLib::WinToastTemplate::SecondLine);
-
-                if (std::filesystem::exists(result.m_ImageName))
-                {
-                    templ.setImagePath(result.m_ImageName);
-                }
-
-                if (result.m_fileSize > 1048576 * 1000)
-                {
-                    _swprintf(fileSizeStr, L"File size: %0.2f GB", (double)(result.m_fileSize) / (double)(1048576 * 1000));
-                }
-                else if (result.m_fileSize > 1048576)
-                {
-                    _swprintf(fileSizeStr, L"File size: %0.2f MB", (double)(result.m_fileSize) / (double)(1048576));
-                }
-                else
-                {
-                    _swprintf(fileSizeStr, L"File size: %0.2f KB", (double)result.m_fileSize / (double)1048);
-                }
-
-                if (result.m_processTimeSeconds > 1.0)
-                {
-                    _swprintf(timeStr, L"%0.2fs", result.m_processTimeSeconds);
-                }
-                else
-                {
-                    _swprintf(timeStr, L"%0.2fms", result.m_processTimeSeconds * 1000);
-                }
-
-                templ.setTextField(infoText, WinToastLib::WinToastTemplate::ThirdLine);
-
-                templ.setAttributionText(fileSizeStr);
-                templ.setExpiration(10000);
-
-                if (WinToastLib::WinToast::instance()->showToast(templ, new ModelCustomHandler()) < 0)
-                {
-                    utility::LogInfo("Model: WinToast Error, could not launch toast notification!");
-                }
-            }
-        }
-    }
-    catch (...)
-    {
-        utility::LogInfo("Model: Send Notification....catch!");
-    }
-}

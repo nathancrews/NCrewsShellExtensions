@@ -27,15 +27,25 @@ namespace GLTFExtensionOptions
 
             String dataPath = GetFolderPath(SpecialFolder.LocalApplicationData);
 
-            dataPath = Path.Combine(dataPath, "NCraft Software\\GLTFShellExtension");
+            dataPath = Path.Combine(dataPath, "NCrews Software\\GLTFShellExtension");
             m_settingsFilename = "settings.xml";
             m_settingsPathname = Path.Combine(dataPath, m_settingsFilename);
+
+            if (File.Exists(m_settingsPathname) == false)
+            {
+                return;
+            }
 
             this.ImageFormatComboBox.SelectedIndex = 0;
             this.ImageSizeComboBox.SelectedIndex = 0;
 
             m_xmlSettingsDoc = new XmlDocument();
             m_xmlSettingsDoc.Load(m_settingsPathname);
+
+            if (m_xmlSettingsDoc.DocumentElement == null)
+            {
+                return;
+            }
 
             XmlElement rootElem = m_xmlSettingsDoc.DocumentElement;
 
@@ -80,7 +90,7 @@ namespace GLTFExtensionOptions
 
         private void EnableButton_Click(object sender, EventArgs e)
         {
-            RegistryKey topCLSID = Registry.CurrentUser.OpenSubKey("SOFTWARE\\NCraft Software\\NCraft GLTF Shell Extension");
+            RegistryKey topCLSID = Registry.CurrentUser.OpenSubKey("SOFTWARE\\NCrews Software\\NCrews GLTF Shell Extension");
 
             if (topCLSID != null)
             {
@@ -101,7 +111,7 @@ namespace GLTFExtensionOptions
 
         private void DisableButton_Click(object sender, EventArgs e)
         {
-            RegistryKey topCLSID = Registry.CurrentUser.OpenSubKey("SOFTWARE\\NCraft Software\\NCraft GLTF Shell Extension");
+            RegistryKey topCLSID = Registry.CurrentUser.OpenSubKey("SOFTWARE\\NCrews Software\\NCrews GLTF Shell Extension");
 
             if (topCLSID != null)
             {
@@ -123,7 +133,7 @@ namespace GLTFExtensionOptions
 
         private void PurchaseButton_Click(object sender, EventArgs e)
         {
-            Process.Start("https://www.sourceforge.net");
+            Process.Start("https://www.buymeacoffee.com/nathancrews");
         }
 
         private void ImageFormatComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -136,39 +146,39 @@ namespace GLTFExtensionOptions
             m_imageSize = ImageSizeComboBox.Items[ImageSizeComboBox.SelectedIndex].ToString();
         }
 
-        private void LicenseKeyTextBox_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void OkButton_Click(object sender, EventArgs e)
         {
-            XmlElement rootElem = m_xmlSettingsDoc.DocumentElement;
-
-            XmlNode imageFormatElem = rootElem.SelectSingleNode("descendant::ImageFormat");
-            if (imageFormatElem != null && imageFormatElem.FirstChild != null)
+            if (m_xmlSettingsDoc != null && m_xmlSettingsDoc.DocumentElement != null)
             {
-                m_imageFormat = ImageFormatComboBox.Text;
 
-                if (m_imageFormat.Length > 0)
+                XmlElement rootElem = m_xmlSettingsDoc.DocumentElement;
+
+                XmlNode imageFormatElem = rootElem.SelectSingleNode("descendant::ImageFormat");
+                if (imageFormatElem != null && imageFormatElem.FirstChild != null)
                 {
-                    imageFormatElem.FirstChild.Value = m_imageFormat;
+                    m_imageFormat = ImageFormatComboBox.Text;
+
+                    if (m_imageFormat.Length > 0)
+                    {
+                        imageFormatElem.FirstChild.Value = m_imageFormat;
+                    }
                 }
+
+                XmlNode imageSizeElem = rootElem.SelectSingleNode("descendant::ImageSize");
+                if (imageSizeElem != null && imageSizeElem.FirstChild != null)
+                {
+                    m_imageFormat = ImageSizeComboBox.Text;
+
+                    if (m_imageSize.Length > 0)
+                    {
+                        imageSizeElem.FirstChild.Value = m_imageSize;
+                    }
+                }
+
+
+                m_xmlSettingsDoc.Save(m_settingsPathname);
             }
 
-            XmlNode imageSizeElem = rootElem.SelectSingleNode("descendant::ImageSize");
-            if (imageSizeElem != null && imageSizeElem.FirstChild != null)
-            {
-                m_imageFormat = ImageSizeComboBox.Text;
-
-                if (m_imageSize.Length > 0)
-                {
-                    imageSizeElem.FirstChild.Value = m_imageSize;
-                }
-            }
-
-
-            m_xmlSettingsDoc.Save(m_settingsPathname);
             this.Close();
         }
 
@@ -180,9 +190,13 @@ namespace GLTFExtensionOptions
         XmlDocument m_xmlSettingsDoc;
         String m_settingsFilename;
         String m_settingsPathname;
-        String m_keyValue;
         String m_imageFormat = "png";
         String m_imageSize = "1440x1024";
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+            Process.Start("https://www.buymeacoffee.com/nathancrews");
+        }
     }
 
 

@@ -7,17 +7,17 @@ using namespace Gdiplus;
 #pragma comment (lib,"Gdiplus.lib")
 
 
-namespace NCraftImageGen
+namespace NCrewsImageGen
 {
 
 NCRAFTIMAGEGENAPI UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::filesystem::path>& filePaths,
-                                            NCraftImageGen::ImageGenSettings& imageSettings,
-                                            tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& outRenderResults);
+                                            NCrewsImageGen::AppSettings& imageSettings,
+                                            tbb::concurrent_vector<NCrewsImageGen::FileProcessPackage>& outRenderResults);
 NCRAFTIMAGEGENAPI HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath,
-                                               NCraftImageGen::ImageGenSettings& imageSettings, std::filesystem::path& filePath);
+                                               NCrewsImageGen::AppSettings& imageSettings, std::filesystem::path& filePath);
 
 NCRAFTIMAGEGENAPI UINT RenderModelToImage(FilamentRenderer* modelRenderer,
-                                          NCraftImageGen::ImageGenSettings& imageSettings, NCraftImageGen::ImageGenResult& fileInfo);
+                                          NCrewsImageGen::AppSettings& imageSettings, NCrewsImageGen::FileProcessPackage& fileInfo);
 
 NCRAFTIMAGEGENAPI int GetEncoderClsid(const WCHAR* format, CLSID* pClsid);
 }

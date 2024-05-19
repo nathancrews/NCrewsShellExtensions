@@ -31,15 +31,13 @@
             this.ImageFormatComboBox = new System.Windows.Forms.ComboBox();
             this.OkButton = new System.Windows.Forms.Button();
             this.CancelButton = new System.Windows.Forms.Button();
-            this.LicenseKeyTextBox = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.ImageSizeComboBox = new System.Windows.Forms.ComboBox();
             this.PurchaseButton = new System.Windows.Forms.Button();
             this.EnableButton = new System.Windows.Forms.Button();
             this.DisableButton = new System.Windows.Forms.Button();
-            this.ValidateButton = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // ImageFormatComboBox
@@ -58,7 +56,7 @@
             // 
             // OkButton
             // 
-            this.OkButton.Location = new System.Drawing.Point(164, 203);
+            this.OkButton.Location = new System.Drawing.Point(164, 183);
             this.OkButton.Name = "OkButton";
             this.OkButton.Size = new System.Drawing.Size(75, 23);
             this.OkButton.TabIndex = 1;
@@ -68,30 +66,13 @@
             // 
             // CancelButton
             // 
-            this.CancelButton.Location = new System.Drawing.Point(277, 203);
+            this.CancelButton.Location = new System.Drawing.Point(277, 183);
             this.CancelButton.Name = "CancelButton";
             this.CancelButton.Size = new System.Drawing.Size(75, 23);
             this.CancelButton.TabIndex = 2;
             this.CancelButton.Text = "Cancel";
             this.CancelButton.UseVisualStyleBackColor = true;
             this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
-            // 
-            // LicenseKeyTextBox
-            // 
-            this.LicenseKeyTextBox.Location = new System.Drawing.Point(103, 135);
-            this.LicenseKeyTextBox.Name = "LicenseKeyTextBox";
-            this.LicenseKeyTextBox.Size = new System.Drawing.Size(222, 20);
-            this.LicenseKeyTextBox.TabIndex = 3;
-            this.LicenseKeyTextBox.TextChanged += new System.EventHandler(this.LicenseKeyTextBox_TextChanged);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(9, 138);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(65, 13);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "License Key";
             // 
             // label2
             // 
@@ -128,11 +109,11 @@
             // 
             // PurchaseButton
             // 
-            this.PurchaseButton.Location = new System.Drawing.Point(12, 175);
+            this.PurchaseButton.Location = new System.Drawing.Point(12, 130);
             this.PurchaseButton.Name = "PurchaseButton";
             this.PurchaseButton.Size = new System.Drawing.Size(120, 23);
             this.PurchaseButton.TabIndex = 10;
-            this.PurchaseButton.Text = "Purchase License";
+            this.PurchaseButton.Text = "Buy Me a Coffee?";
             this.PurchaseButton.UseVisualStyleBackColor = true;
             this.PurchaseButton.Click += new System.EventHandler(this.PurchaseButton_Click);
             // 
@@ -156,35 +137,33 @@
             this.DisableButton.UseVisualStyleBackColor = true;
             this.DisableButton.Click += new System.EventHandler(this.DisableButton_Click);
             // 
-            // ValidateButton
+            // label1
             // 
-            this.ValidateButton.Location = new System.Drawing.Point(341, 133);
-            this.ValidateButton.Name = "ValidateButton";
-            this.ValidateButton.Size = new System.Drawing.Size(119, 23);
-            this.ValidateButton.TabIndex = 13;
-            this.ValidateButton.Text = "Validate License";
-            this.ValidateButton.UseVisualStyleBackColor = true;
-            this.ValidateButton.Click += new System.EventHandler(this.ValidateButton_Click);
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(161, 135);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(226, 13);
+            this.label1.TabIndex = 13;
+            this.label1.Text = "https://www.buymeacoffee.com/nathancrews";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // ShellOptions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(506, 239);
-            this.Controls.Add(this.ValidateButton);
+            this.ClientSize = new System.Drawing.Size(506, 215);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.DisableButton);
             this.Controls.Add(this.EnableButton);
             this.Controls.Add(this.PurchaseButton);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.ImageSizeComboBox);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.LicenseKeyTextBox);
             this.Controls.Add(this.CancelButton);
             this.Controls.Add(this.OkButton);
             this.Controls.Add(this.ImageFormatComboBox);
             this.Name = "ShellOptions";
-            this.Text = "NCraft Shell Extension Options";
+            this.Text = "NCrews Shell Extension Options";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -196,15 +175,13 @@
         private System.Windows.Forms.ComboBox ImageFormatComboBox;
         private System.Windows.Forms.Button OkButton;
         private System.Windows.Forms.Button CancelButton;
-        private System.Windows.Forms.TextBox LicenseKeyTextBox;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ComboBox ImageSizeComboBox;
         private System.Windows.Forms.Button PurchaseButton;
         private System.Windows.Forms.Button EnableButton;
         private System.Windows.Forms.Button DisableButton;
-        private System.Windows.Forms.Button ValidateButton;
+        private System.Windows.Forms.Label label1;
     }
 }
 

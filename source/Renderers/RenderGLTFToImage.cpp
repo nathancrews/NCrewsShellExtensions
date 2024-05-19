@@ -1,11 +1,11 @@
 #include "Renderers/RenderGLTFToImage.h"
 
-namespace NCraftImageGen
+namespace NCrewsImageGen
 {
 
 UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::filesystem::path>& filePaths,
-                          NCraftImageGen::ImageGenSettings& imageSettings,
-                          tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& outRenderResults)
+                          NCrewsImageGen::AppSettings& imageSettings,
+                          tbb::concurrent_vector<NCrewsImageGen::FileProcessPackage>& outRenderResults)
 {
     const int width = imageSettings.imageWidth;
     const int height = imageSettings.imageHeight;
@@ -56,7 +56,7 @@ UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::files
     {
         utility::LogInfo("Checking image cache for {}", reqPath.string().c_str());
 
-        NCraftImageGen::ImageGenResult toAddResult(reqPath);
+        NCrewsImageGen::FileProcessPackage toAddResult(reqPath);
 
         uintmax_t fsize = 0;
         __std_win_error wep = std::filesystem::_File_size(reqPath, fsize);
@@ -129,7 +129,7 @@ UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::files
 
 
 UINT RenderModelToImage(FilamentRenderer* modelRenderer,
-                        NCraftImageGen::ImageGenSettings& imageSettings, NCraftImageGen::ImageGenResult& fileInfo)
+                        NCrewsImageGen::AppSettings& imageSettings, NCrewsImageGen::FileProcessPackage& fileInfo)
 {
     const int width = imageSettings.imageWidth;
     const int height = imageSettings.imageHeight;
@@ -198,7 +198,7 @@ UINT RenderModelToImage(FilamentRenderer* modelRenderer,
 }
 
 HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath,
-                             NCraftImageGen::ImageGenSettings& imageSettings, std::filesystem::path& filePath)
+                             NCrewsImageGen::AppSettings& imageSettings, std::filesystem::path& filePath)
 {
     HBITMAP result = NULL;
     const int width = 1024;

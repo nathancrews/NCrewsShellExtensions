@@ -36,7 +36,7 @@ namespace CloudExtensionOptions
 
             String dataPath = GetFolderPath(SpecialFolder.LocalApplicationData);
 
-            dataPath = Path.Combine(dataPath, "NCraft Software\\CloudShellExtension");
+            dataPath = Path.Combine(dataPath, "NCrews Software\\CloudShellExtension");
             m_settingsFilename = "settings.xml";
             m_settingsPathname = Path.Combine(dataPath, m_settingsFilename);
 
@@ -83,15 +83,15 @@ namespace CloudExtensionOptions
                             }
                         }
 
-                        XmlNode keyElem = rootElem.SelectSingleNode("descendant::LicenseKey");
-                        if (keyElem != null && keyElem.FirstChild != null)
-                        {
-                            m_keyValue = keyElem.FirstChild.Value;
-                            if (m_imageSize.Length > 0)
-                            {
-                                LicenseKeyTextBox.Text = m_keyValue;
-                            }
-                        }
+                        //XmlNode keyElem = rootElem.SelectSingleNode("descendant::LicenseKey");
+                        //if (keyElem != null && keyElem.FirstChild != null)
+                        //{
+                        //    m_keyValue = keyElem.FirstChild.Value;
+                        //    if (m_imageSize.Length > 0)
+                        //    {
+                        //        LicenseKeyTextBox.Text = m_keyValue;
+                        //    }
+                        //}
                     }
                 }
             }
@@ -105,7 +105,7 @@ namespace CloudExtensionOptions
 
         private void EnableButton_Click(object sender, EventArgs e)
         {
-            RegistryKey topCLSID = Registry.CurrentUser.OpenSubKey("SOFTWARE\\NCraft Software\\NCraft Point Cloud Shell Extension");
+            RegistryKey topCLSID = Registry.CurrentUser.OpenSubKey("SOFTWARE\\NCrews Software\\NCrews Point Cloud Shell Extension");
 
             if (topCLSID != null)
             {
@@ -126,7 +126,7 @@ namespace CloudExtensionOptions
 
         private void DisableButton_Click(object sender, EventArgs e)
         {
-            RegistryKey topCLSID = Registry.CurrentUser.OpenSubKey("SOFTWARE\\NCraft Software\\NCraft Point Cloud Shell Extension");
+            RegistryKey topCLSID = Registry.CurrentUser.OpenSubKey("SOFTWARE\\NCrews Software\\NCrews Point Cloud Shell Extension");
 
             if (topCLSID != null)
             {
@@ -149,7 +149,7 @@ namespace CloudExtensionOptions
         private void PurchaseButton_Click(object sender, EventArgs e)
         {
 
-            //   Process.Start("https://www.sourceforge.net");
+            Process.Start("https://www.buymeacoffee.com/nathancrews");
 
         }
 
@@ -163,10 +163,10 @@ namespace CloudExtensionOptions
             m_imageSize = ImageSizeComboBox.Items[ImageSizeComboBox.SelectedIndex].ToString();
         }
 
-        private void LicenseKeyTextBox_TextChanged(object sender, EventArgs e)
-        {
-            m_keyValue = LicenseKeyTextBox.Text;
-        }
+        //private void LicenseKeyTextBox_TextChanged(object sender, EventArgs e)
+        //{
+        //    m_keyValue = LicenseKeyTextBox.Text;
+        //}
 
         private void OkButton_Click(object sender, EventArgs e)
         {
@@ -233,36 +233,41 @@ namespace CloudExtensionOptions
         String m_imageSize = "1440x1024";
         bool m_isLicensed = false;
 
-        private void ValidateButton_Click(object sender, EventArgs e)
+        //private void ValidateButton_Click(object sender, EventArgs e)
+        //{
+        //    // var licenseKey = "JJVRT-LBIZO-ZFNJN-LMYLV"; // <--  remember to change this to your license key
+        //    var RSAPubKey = "<RSAKeyValue><Modulus>k8EvVN6X4dfoNdSXJNvwPYOM3qsldRYXBDRnWJH4ptmVgFX3unlQ53EdYu2cDxbSR9MMonpvmq2Dgs7WOM0Q4U8WVMNcexzxyTIoeImULzerPGQPN6UIZaGulUiPkFSSVXqD/cgYdlkzqro+x2hMExNMJB97ISsBy3aqYGdCtoUP8i0yjdbFcZKOns7ZaPYJE24MiYaIKp4dXNceWZ8w8SXWlxtvnqPe8KeXHRpf+/SrdoBd1IU6TXknLpL5gYpywfsQb8tk9rLtWFJLQEhkzID1KYwfSnBVXVn95u+OZI7h8CyQVl9sAmxAk0ETCQHE1hgesHwreSYA0X4KYBs0gw==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
+
+        //    var auth = "WyI3MTg2OTc5OSIsInR4UkVKd2RhU2dUcG9vU091cHljNUZDWHY0TWltVmpDaFBERVFjdEwiXQ==";
+        //    var result = Key.Activate(token: auth, parameters: new ActivateModel()
+        //    {
+        //        Key = m_keyValue,
+        //        ProductId = 23571,  // <--  remember to change this to your Product Id
+        //        Sign = true,
+        //        MachineCode = Helpers.GetMachineCodePI(v: 2)
+        //    });
+
+        //    if (result == null || result.Result == ResultType.Error ||
+        //        !result.LicenseKey.HasValidSignature(RSAPubKey).IsValid())
+        //    {
+        //        const string message = "Invalid License";
+        //        const string caption = "Point Cloud Shell Extension";
+        //        MessageBox.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //    }
+        //    else
+        //    {
+        //        // everything went fine if we are here!
+        //        this.m_isLicensed = true;
+
+        //        const string message = "License Validation Successful";
+        //        const string caption = "Point Cloud Shell Extension";
+        //        MessageBox.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //    }
+        //}
+
+        private void label1_Click(object sender, EventArgs e)
         {
-            // var licenseKey = "JJVRT-LBIZO-ZFNJN-LMYLV"; // <--  remember to change this to your license key
-            var RSAPubKey = "<RSAKeyValue><Modulus>k8EvVN6X4dfoNdSXJNvwPYOM3qsldRYXBDRnWJH4ptmVgFX3unlQ53EdYu2cDxbSR9MMonpvmq2Dgs7WOM0Q4U8WVMNcexzxyTIoeImULzerPGQPN6UIZaGulUiPkFSSVXqD/cgYdlkzqro+x2hMExNMJB97ISsBy3aqYGdCtoUP8i0yjdbFcZKOns7ZaPYJE24MiYaIKp4dXNceWZ8w8SXWlxtvnqPe8KeXHRpf+/SrdoBd1IU6TXknLpL5gYpywfsQb8tk9rLtWFJLQEhkzID1KYwfSnBVXVn95u+OZI7h8CyQVl9sAmxAk0ETCQHE1hgesHwreSYA0X4KYBs0gw==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
-
-            var auth = "WyI3MTg2OTc5OSIsInR4UkVKd2RhU2dUcG9vU091cHljNUZDWHY0TWltVmpDaFBERVFjdEwiXQ==";
-            var result = Key.Activate(token: auth, parameters: new ActivateModel()
-            {
-                Key = m_keyValue,
-                ProductId = 23571,  // <--  remember to change this to your Product Id
-                Sign = true,
-                MachineCode = Helpers.GetMachineCodePI(v: 2)
-            });
-
-            if (result == null || result.Result == ResultType.Error ||
-                !result.LicenseKey.HasValidSignature(RSAPubKey).IsValid())
-            {
-                const string message = "Invalid License";
-                const string caption = "Point Cloud Shell Extension";
-                MessageBox.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            else
-            {
-                // everything went fine if we are here!
-                this.m_isLicensed = true;
-
-                const string message = "License Validation Successful";
-                const string caption = "Point Cloud Shell Extension";
-                MessageBox.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
+            Process.Start("https://www.buymeacoffee.com/nathancrews");
         }
     }
 

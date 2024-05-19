@@ -74,7 +74,7 @@ private:
     long        m_ObjRefCount = 0;
     std::vector<std::filesystem::path>  m_filePaths;
     UINT m_idCmdFirst = 0;
-    NCraftImageGen::ImageGenSettings m_imageGenSettings;
+    NCrewsImageGen::AppSettings m_imageGenSettings;
 
 
 };

@@ -2,11 +2,14 @@
 #include "CloudShellExtensionDll.h"
 #include "CloudMenuGUID.h"
 #include "CloudClassFactory.h"
-#include "wintoastlib.h"
 #include "Renderers/RenderToImageCommon.h"
 
 void cloud_print_fcn(const std::string& logString)
 {
+#ifdef NO_LOGGING
+    return;
+#endif // NO_LOGGING
+
     std::filesystem::path logFilePath = std::filesystem::temp_directory_path();
 
     logFilePath.replace_filename("CloudShellExtension");
@@ -21,6 +24,8 @@ void cloud_print_fcn(const std::string& logString)
     fs.flush();
     fs.close();
 }
+
+#define CHECK_HRESULT(res) (if (res != ERROR_SUCCESS) return E_UNEXPECTED;)
 
 
 // Standard DLL functions
@@ -53,16 +58,6 @@ BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
 
         utility::LogInfo("appdata = {}", g_AppDataPath.string());
 
-        
- 
-        WinToastLib::WinToast::instance()->setAppName(g_AppName);
-        WinToastLib::WinToast::instance()->setAppUserModelId(g_appUserModelID);
-
-        if (!WinToastLib::WinToast::instance()->initialize())
-        {
-            utility::LogInfo("WinToast Error, your system in not compatible!");
-        }
-
     }
     return TRUE;
 }
@@ -79,9 +74,9 @@ HRESULT DllCanUnloadNow(void)
 
     if (g_DllModuleRefCount <= 0)
     {
-        WinToastLib::WinToast::instance()->clear();
-
         utility::LogInfo("DllCanUnloadNow calling GdiplusShutdown and unloading.");
+
+        utility::Logger::GetInstance().ResetPrintFunction();
 
         return S_OK;
     }
@@ -125,40 +120,25 @@ HRESULT DllRegisterServer()
 {
     HKEY hkey;
     DWORD lpDisp;
+    HRESULT retStatus = E_UNEXPECTED;
 
     wchar_t* menuExtGUID = nullptr;
     DWORD res = StringFromCLSID(CloudMenuGUID, &menuExtGUID);
     std::wstring lpSubKey = L"Software\\Classes\\CLSID\\" + std::wstring(menuExtGUID);
 
-    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_CREATE_SUB_KEY, NULL, &hkey, &lpDisp);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
+    retStatus = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_CREATE_SUB_KEY, NULL, &hkey, &lpDisp);
 
     wchar_t dllName[MAX_PATH] = { 0 };
     GetModuleFileName(g_hinst, dllName, MAX_PATH);
 
     lpSubKey = L"InProcServer32";
-    res = RegCreateKeyEx(hkey, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
+    retStatus = RegCreateKeyEx(hkey, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
 
-    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)dllName, (DWORD)(std::wstring(dllName).size() + 1U) * 2U);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
+    retStatus = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)dllName, (DWORD)(std::wstring(dllName).size() + 1U) * 2U);
 
     std::wstring lpKeyValue = L"Apartment";
 
-    res = RegSetValueEx(hkey, L"ThreadingModel", 0, REG_SZ, (BYTE*)lpKeyValue.c_str(), (DWORD)((lpKeyValue.size() + 1U) * 2U));
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
+    retStatus = RegSetValueEx(hkey, L"ThreadingModel", 0, REG_SZ, (BYTE*)lpKeyValue.c_str(), (DWORD)((lpKeyValue.size() + 1U) * 2U));
 
     RegCloseKey(hkey);
 
@@ -166,45 +146,49 @@ HRESULT DllRegisterServer()
     //**************************************************************************************************************
     // Register for file types
 
+    lpSubKey = L".las\\ShellEx\\ContextMenuHandlers\\CloudShellExtension";
+
+    retStatus = RegCreateKeyEx(HKEY_CLASSES_ROOT, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+
+    retStatus = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+
+    RegCloseKey(hkey);
+
     lpSubKey = L"Software\\Classes\\.las\\ShellEx\\ContextMenuHandlers\\CloudShellExtension";
 
-    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
-    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
+    retStatus = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+
+    retStatus = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+
+    RegCloseKey(hkey);
+
+
+    lpSubKey = L".laz\\ShellEx\\ContextMenuHandlers\\CloudShellExtension";
+
+    retStatus = RegCreateKeyEx(HKEY_CLASSES_ROOT, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+
+    retStatus = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
 
     RegCloseKey(hkey);
 
     lpSubKey = L"Software\\Classes\\.laz\\ShellEx\\ContextMenuHandlers\\CloudShellExtension";
 
-    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
-    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
+    retStatus = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+
+    retStatus = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
 
     RegCloseKey(hkey);
 
+    /*
     lpSubKey = L"Software\\Classes\\.pcd\\ShellEx\\ContextMenuHandlers\\CloudShellExtension";
 
-    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
-    if (res != ERROR_SUCCESS)
+    retStatus = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (retStatus != ERROR_SUCCESS)
     {
         return E_UNEXPECTED;
     }
-    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
-    if (res != ERROR_SUCCESS)
+    retStatus = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+    if (retStatus != ERROR_SUCCESS)
     {
         return E_UNEXPECTED;
     }
@@ -213,13 +197,13 @@ HRESULT DllRegisterServer()
 
     lpSubKey = L"Software\\Classes\\.ply\\ShellEx\\ContextMenuHandlers\\CloudShellExtension";
 
-    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
-    if (res != ERROR_SUCCESS)
+    retStatus = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (retStatus != ERROR_SUCCESS)
     {
         return E_UNEXPECTED;
     }
-    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
-    if (res != ERROR_SUCCESS)
+    retStatus = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+    if (retStatus != ERROR_SUCCESS)
     {
         return E_UNEXPECTED;
     }
@@ -229,13 +213,13 @@ HRESULT DllRegisterServer()
 
     lpSubKey = L"Software\\Classes\\.pts\\ShellEx\\ContextMenuHandlers\\CloudShellExtension";
 
-    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
-    if (res != ERROR_SUCCESS)
+    retStatus = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (retStatus != ERROR_SUCCESS)
     {
         return E_UNEXPECTED;
     }
-    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
-    if (res != ERROR_SUCCESS)
+    retStatus = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+    if (retStatus != ERROR_SUCCESS)
     {
         return E_UNEXPECTED;
     }
@@ -244,63 +228,110 @@ HRESULT DllRegisterServer()
 
     lpSubKey = L"Software\\Classes\\.xyz\\ShellEx\\ContextMenuHandlers\\CloudShellExtension";
 
-    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
-    if (res != ERROR_SUCCESS)
+    retStatus = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (retStatus != ERROR_SUCCESS)
     {
         return E_UNEXPECTED;
     }
-    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
-    if (res != ERROR_SUCCESS)
+    retStatus = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+    if (retStatus != ERROR_SUCCESS)
     {
         return E_UNEXPECTED;
     }
 
-    RegCloseKey(hkey);
+    RegCloseKey(hkey);*/
 
     //**************************************************************************************************************
     // For Directories
     lpSubKey = L"Software\\Classes\\Directory\\ShellEx\\ContextMenuHandlers\\CloudShellExtension";
 
-    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
-    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
+    retStatus = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+
+    retStatus = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
 
     RegCloseKey(hkey);
 
     //
     //**************************************************************************************************************
-
-
     // Put extension on the approved list
     lpSubKey = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved";
 
     if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
     {
-        res = RegSetValueEx(hkey, std::wstring(menuExtGUID).c_str(), 0, REG_SZ, (BYTE*)dllName, (DWORD)(std::wstring(dllName).size() + 1U) * 2U);
-        if (res != ERROR_SUCCESS)
-        {
-            return E_UNEXPECTED;
-        }
+        retStatus = RegSetValueEx(hkey, std::wstring(menuExtGUID).c_str(), 0, REG_SZ, (BYTE*)dllName, (DWORD)(std::wstring(dllName).size() + 1U) * 2U);
     }
 
-    lpSubKey = L"SOFTWARE\\Classes\\SystemFileAssociations\\.ply\\ShellEx\\ContextMenuHandlers\\CloudShellExtension";
-
-    res = RegCreateKeyEx(HKEY_LOCAL_MACHINE, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hkey, &lpDisp);
-    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
-
     RegCloseKey(hkey);
+    //**************************************************************************************************************
 
+
+    // Delete laz_auto_file entries, they mess up the menu commands displaying properly
+    lpSubKey = L"laz_auto_file";
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CLASSES_ROOT, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        retStatus = RegDeleteKey(HKEY_CLASSES_ROOT, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    lpSubKey = L"Software\\Classes\\laz_auto_file";
+
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        retStatus = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_LOCAL_MACHINE, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        retStatus = RegDeleteKey(HKEY_LOCAL_MACHINE, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_CONFIG, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        retStatus = RegDeleteKey(HKEY_CURRENT_CONFIG, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+// Delete las_auto_file entries, they mess up the menu commands displaying properly
+    lpSubKey = L"las_auto_file";
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CLASSES_ROOT, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        retStatus = RegDeleteKey(HKEY_CLASSES_ROOT, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    lpSubKey = L"Software\\Classes\\las_auto_file";
+
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_LOCAL_MACHINE, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        retStatus = RegDeleteKey(HKEY_LOCAL_MACHINE, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        retStatus = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_CONFIG, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        retStatus = RegDeleteKey(HKEY_CURRENT_CONFIG, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
 
     SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
 
-    return S_OK;
+    return retStatus;
 }
 
 HRESULT DllUnregisterServer()
@@ -360,6 +391,7 @@ HRESULT DllUnregisterServer()
         RegCloseKey(hkey);
     }
 
+    /*
     lpSubKey = L"Software\\Classes\\.pcd\\ShellEx\\ContextMenuHandlers\\CloudShellExtension";
     if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
     {
@@ -391,7 +423,7 @@ HRESULT DllUnregisterServer()
 
         RegCloseKey(hkey);
     }
-
+*/
 
     SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
 

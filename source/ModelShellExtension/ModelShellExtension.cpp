@@ -3,11 +3,14 @@
 #include "ModelMenuGUID.h"
 #include "ModelThumbnailGUID.h"
 #include "ModelClassFactory.h"
-#include "wintoastlib.h"
 #include "Renderers/RenderGLTFToImage.h"
 
 void model_print_fcn(const std::string& logString)
 {
+#ifdef NO_LOGGING
+    return;
+#endif // NO_LOGGING
+
     std::filesystem::path logFilePath = std::filesystem::temp_directory_path();
 
     logFilePath.replace_filename("ModelShellExtension");
@@ -51,17 +54,6 @@ BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
 
         utility::LogInfo("appdata = {}", g_AppDataPath.string());
 
-
-        utility::LogInfo("appdata = {}", g_AppDataPath.string());
-
-         WinToastLib::WinToast::instance()->setAppName(g_AppName);
-        WinToastLib::WinToast::instance()->setAppUserModelId(g_appUserModelID);
-
-        if (!WinToastLib::WinToast::instance()->initialize())
-        {
-            utility::LogInfo("WinToast Error, system is not compatible!");
-        }
-
         GdiplusStartupInput gpStartupInput;
         Gdiplus::Status mstat = GdiplusStartup(&g_gpToken, &gpStartupInput, NULL);
         if (mstat != Gdiplus::Status::Ok)
@@ -70,6 +62,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
         }
 
     }
+
     return TRUE;
 }
 
@@ -85,10 +78,10 @@ HRESULT DllCanUnloadNow(void)
 
     if (g_DllModuleRefCount <= 0)
     {
-        WinToastLib::WinToast::instance()->clear();
-
         utility::LogInfo("DllCanUnloadNow calling GdiplusShutdown and unloading.");
         GdiplusShutdown(g_gpToken);
+
+        utility::Logger::GetInstance().ResetPrintFunction();
 
         return S_OK;
     }
@@ -219,6 +212,85 @@ HRESULT DllRegisterServer()
 
     RegCloseKey(hkey);
 
+    //**************************************************************************************************************
+    // Register context menu for file types
+
+    lpSubKey = L"Software\\Classes\\.gltf\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
+
+    lpSubKey = L"Software\\Classes\\gltf_auto_file\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
+
+    lpSubKey = L"Software\\Classes\\.glb\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
+
+    lpSubKey = L"Software\\Classes\\glb_auto_file\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    //RegCloseKey(hkey);
+
+    lpSubKey = L"Software\\Classes\\Directory\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
+
+    //*****************************************************************************************
 
     //*****************************************************************************************
     // Register Thumbnail generator file types
@@ -256,86 +328,8 @@ HRESULT DllRegisterServer()
     }
 
     RegCloseKey(hkey);
+    //*****************************************************************************************
 
-
-    //**************************************************************************************************************
-    // Register context menu for file types
-
-    lpSubKey = L"Software\\Classes\\.gltf\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
-
-    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
-    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
-
-    RegCloseKey(hkey);
-
-    lpSubKey = L"Software\\Classes\\.glb\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
-
-    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
-    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
-
-    RegCloseKey(hkey);
-
-    lpSubKey = L"Software\\Classes\\gltf_auto_file\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
-
-    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
-    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
-
-    RegCloseKey(hkey);
-
-   
-    lpSubKey = L"Software\\Classes\\glb_auto_file\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
-
-    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
-    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
-
-    RegCloseKey(hkey);
-
-    lpSubKey = L"Software\\Classes\\Directory\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
-
-    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
-    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
-    if (res != ERROR_SUCCESS)
-    {
-        return E_UNEXPECTED;
-    }
-
-    RegCloseKey(hkey);
 
     //**************************************************************************************************************
     // Put extensions on the approved list

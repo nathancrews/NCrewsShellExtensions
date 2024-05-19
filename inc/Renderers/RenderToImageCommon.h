@@ -28,11 +28,42 @@ using namespace open3d;
 using namespace open3d::visualization::gui;
 using namespace open3d::visualization::rendering;
 
-namespace NCraftImageGen
+namespace pcl
+{
+struct PointXYZRGB
+{
+    float x = 0.0f, y = 0.0f, z = 0.0f;
+    std::uint8_t r = 0, g = 0, b = 0;
+};
+
+}
+
+namespace NCrewsImageGen
 {
 
-struct ImageGenSettings
+const struct PCColor
 {
+    static inline Eigen::Vector3d Black = { 0.0f, 0.0f, 0.0f };
+    static inline Eigen::Vector3d GrayLight = { 0.25f, 0.25f, 0.25f };
+    static inline Eigen::Vector3d Gray = { 0.50f, 0.50f, 0.50f };
+    static inline Eigen::Vector3d GrayDark = { 0.750f, 0.750f, 0.750f };
+    static inline Eigen::Vector3d White = { 1.0f, 1.0f, 1.0f };
+    static inline Eigen::Vector3d Red = { 1.0f, 0.0f, 0.0f };
+    static inline Eigen::Vector3d GreenLight = { 0.0f, 0.5f, 0.0f };
+    static inline Eigen::Vector3d GreenMedium = { 0.0f, 0.5f, 0.0f };
+    static inline Eigen::Vector3d Green = { 0.0f, 1.0f, 0.0f };
+    static inline Eigen::Vector3d Brown = { 0.58f, 0.3f, 0.0f };
+    static inline Eigen::Vector3d BrownDark = { 0.58f, 0.3f, 0.0f };
+    static inline Eigen::Vector3d Blue = { 0.0f, 0.0f, 1.0f };
+    static inline Eigen::Vector3d Yellow = { 1.0f, 1.0f, 0.0f };
+    static inline Eigen::Vector3d Magenta = { 1.0f, 0.0f, 1.0f };
+    static inline Eigen::Vector3d Cyan = { 0.0f, 0.5f, 0.5f };
+};
+
+
+struct AppSettings
+{
+    pcl::PointXYZRGB mergedBasePoint = { 0.0f,0.0f,0.0f };
     UINT imageWidth = 1440;
     UINT imageHeight = 1024;
     std::string imageFormat = "png";
@@ -40,10 +71,10 @@ struct ImageGenSettings
     UINT is_Licensed = false;
 };
 
-struct ImageGenResult
+struct FileProcessPackage
 {
-    ImageGenResult() {};
-    ImageGenResult(std::filesystem::path& filePath) { m_FileName = filePath; };
+    FileProcessPackage() {};
+    FileProcessPackage(std::filesystem::path& filePath) { m_FileName = filePath; };
 
     bool m_imageFileCacheOk = false;
     UINT m_modelType = 0; // 0 = point cloud, 1 = gltf
@@ -56,7 +87,7 @@ struct ImageGenResult
     std::shared_ptr<geometry::PointCloud> m_cloudPtr;
 };
 
-NCRAFTIMAGEGENAPI bool ReadImageGenSettings(std::filesystem::path& appDataPath, ImageGenSettings& outSettings);
+NCRAFTIMAGEGENAPI bool ReadImageGenSettings(std::filesystem::path& appDataPath, AppSettings& outSettings);
 
 NCRAFTIMAGEGENAPI UINT GetFileNamesFromDirectory(std::filesystem::path& filePath, std::vector<std::string>& allowedFileExtensions, 
                                                  std::vector<std::filesystem::path>& outDirectoryFilenames);

@@ -4,74 +4,9 @@
 #include <iostream>
 #include <fstream>
 #include <process.h>
-#include "wintoastlib.h"
 #include "Renderers/RenderPointCloudToImage.h"
 #include "NCraftImageGen.h"
 #include "CloudMenu.h"
-
-void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& imageResults);
-
-class CloudCustomHandler : public WinToastLib::IWinToastHandler
-{
-public:
-
-    CloudCustomHandler()
-    {
-        DllAddRef();
-        utility::LogInfo("Cloud IWinToastHandler: CustomHandler() called");
-    }
-    ~CloudCustomHandler()
-    {
-        utility::LogInfo("Cloud IWinToastHandler: ~CustomHandler() called");
-        DllRelease();
-    }
-
-    void toastActivated() const
-    {
-//        utility::LogInfo("IWinToastHandler: Activated");
-        //std::wcout << L"The user clicked in this toast" << std::endl;
-       // exit(0);
-    }
-
-    void toastActivated(int actionIndex) const
-    {
-//        utility::LogInfo("IWinToastHandler: The user clicked on action");
-        //std::wcout << L"The user clicked on action #" << actionIndex << std::endl;
-       // exit(16 + actionIndex);
-    }
-
-    void toastDismissed(WinToastDismissalReason state) const
-    {
-        switch (state)
-        {
-            case UserCanceled:
-//                utility::LogInfo("IWinToastHandler: UserCanceled");
-
-              //  exit(1);
-                break;
-            case TimedOut:
-//                utility::LogInfo("IWinToastHandler: TimedOut");
-
-              //  exit(2);
-                break;
-            case ApplicationHidden:
-//                utility::LogInfo("IWinToastHandler: ApplicationHidden");
-
-               // exit(3);
-                break;
-            default:
-//                utility::LogInfo("IWinToastHandler: not activated");
-
-               // exit(4);
-                break;
-        }
-    }
-
-    void toastFailed() const
-    {
-    //    exit(5);
-    }
-};
 
 
 CloudMenu::CloudMenu() : m_ObjRefCount(1)
@@ -91,6 +26,7 @@ HRESULT CloudMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj,
 
     try
     {
+        open3d::utility::Logger::GetInstance().SetPrintFunction(cloud_print_fcn);
 
         if (!pdtobj)
         {
@@ -112,7 +48,7 @@ HRESULT CloudMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj,
         std::filesystem::path settingsFilePath = g_AppDataPath;
         settingsFilePath = settingsFilePath.concat(g_SettingsFileName.c_str());
 
-        if (!NCraftImageGen::ReadImageGenSettings(settingsFilePath, m_imageGenSettings))
+        if (!NCrewsImageGen::ReadImageGenSettings(settingsFilePath, m_imageGenSettings))
         {
             utility::LogInfo("Error loading settings");
         }
@@ -147,7 +83,7 @@ HRESULT CloudMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj,
                     }
                     else
                     {
-                        for (std::string pcext : NCraftImageGen::PointcloudFileExtensions)
+                        for (std::string pcext : NCrewsImageGen::PointcloudFileExtensions)
                         {
                             if (!testPath.extension().compare(pcext))
                             {
@@ -188,6 +124,8 @@ HRESULT CloudMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst
 
     try
     {
+        open3d::utility::Logger::GetInstance().SetPrintFunction(cloud_print_fcn);
+
         if ((m_filePaths.size() == 0) || (uFlags & CMF_DEFAULTONLY))
         {
             utility::LogInfo("Cloud: QueryContextMenu called....exiting no selected files or CMF_DEFAULTONLY");
@@ -284,6 +222,8 @@ HRESULT CloudMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 
     try
     {
+        open3d::utility::Logger::GetInstance().SetPrintFunction(cloud_print_fcn);
+
         if (!lpici)
         {
             hr = E_INVALIDARG;
@@ -316,7 +256,7 @@ HRESULT CloudMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
             filesToImage.push_back(cmdPath);
         }
 
-        tbb::concurrent_vector<NCraftImageGen::ImageGenResult> renderResults;
+        tbb::concurrent_vector<NCrewsImageGen::FileProcessPackage> renderResults;
 
         hr = S_OK;
         try
@@ -325,16 +265,13 @@ HRESULT CloudMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
             if (idCmd == 0)
             {
                 utility::LogInfo("Cloud: Menu command 0 called...");
-                NCraftImageGen::RenderPointcloudFiles(g_AppPath, filesToImage, m_imageGenSettings, renderResults);
+                NCrewsImageGen::RenderPointcloudFiles(g_AppPath, filesToImage, m_imageGenSettings, renderResults);
             }
             else if (idCmd == 1)
             {
                 utility::LogInfo("Cloud: Menu command 1 called...");
-
-                NCraftImageGen::RenderPointcloudFilesToSingleImage(g_AppPath, filesToImage, m_imageGenSettings, renderResults);
+                NCrewsImageGen::RenderPointcloudFilesToSingleImage(g_AppPath, filesToImage, m_imageGenSettings, renderResults);
             }
-
-            SendNotificationMessages(renderResults);
 
             m_filePaths.clear();
         }
@@ -354,114 +291,3 @@ HRESULT CloudMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
     return hr;
 }
 
-void SendNotificationMessages(tbb::concurrent_vector<NCraftImageGen::ImageGenResult>& imageResults)
-{
-    try
-    {
-        if (!WinToastLib::WinToast::isCompatible())
-        {
-            utility::LogInfo("Cloud: WinToast Error, system is not supported!");
-        }
-
-        std::wstring infoText;
-        WCHAR pointCountStr[MAX_PATH] = { 0 };
-        WCHAR timeStr[MAX_PATH] = { 0 };
-        WCHAR fileSizeStr[MAX_PATH] = { 0 };
-        uintmax_t totalPointsProcessed = 0;
-        double totalProcessingTime = 0;
-        double totalFileSize = 0.0;
-        UINT millionVal = 1000000;
-        UINT kVal = 1000;
-
-        WinToastLib::WinToast::instance()->setAppName(g_AppName);
-        WinToastLib::WinToast::instance()->setAppUserModelId(g_AppName);
-
-
-        if (imageResults.size() > 4)
-        {
-            for (NCraftImageGen::ImageGenResult& result : imageResults)
-            {
-                totalPointsProcessed += result.m_pointCount;
-                totalProcessingTime += result.m_processTimeSeconds;
-                totalFileSize += result.m_fileSize;
-            }
-
-            WinToastLib::WinToastTemplate templ(WinToastLib::WinToastTemplate::ImageAndText04);
-
-            templ.setDuration(WinToastLib::WinToastTemplate::Short);
-            templ.setExpiration(50000);
-
-            if (std::filesystem::exists(imageResults[0].m_ImageName))
-            {
-                templ.setImagePath(imageResults[0].m_ImageName);
-            }
-
-            _swprintf(fileSizeStr, L"Generated: %d images", (int)imageResults.size());
-
-            templ.setTextField(fileSizeStr, WinToastLib::WinToastTemplate::FirstLine);
-
-            if (totalFileSize > 1048576 * 1000)
-            {
-                _swprintf(fileSizeStr, L"Total File size: %0.2f GB", (double)(totalFileSize) / (double)(1048576 * 1000));
-            }
-            else if (totalFileSize > 1048576)
-            {
-                _swprintf(fileSizeStr, L"Total File size: %0.2f MB", (double)(totalFileSize) / (double)(1048576));
-            }
-            else
-            {
-                _swprintf(fileSizeStr, L"Total File size: %0.2f KB", (double)(totalFileSize / (double)1048));
-            }
-
-            templ.setTextField(fileSizeStr, WinToastLib::WinToastTemplate::SecondLine);
-
-            if (WinToastLib::WinToast::instance()->showToast(templ, new CloudCustomHandler()) < 0)
-            {
-                utility::LogInfo("Cloud: WinToast Error, could not launch toast notification!");
-            }
-        }
-        else
-        {
-            for (NCraftImageGen::ImageGenResult& result : imageResults)
-            {
-                WinToastLib::WinToastTemplate templ(WinToastLib::WinToastTemplate::ImageAndText04);
-
-                templ.setDuration(WinToastLib::WinToastTemplate::Short);
-                templ.setExpiration(50000);
-
-                templ.setTextField(result.m_ImageName.filename(), WinToastLib::WinToastTemplate::FirstLine);
-                templ.setTextField(result.m_FileName.filename(), WinToastLib::WinToastTemplate::SecondLine);
-
-                if (std::filesystem::exists(result.m_ImageName))
-                {
-                    templ.setImagePath(result.m_ImageName);
-                }
-
-                if (result.m_fileSize > 1048576 * 1000)
-                {
-                    _swprintf(fileSizeStr, L"File size: %0.2f GB", (double)(result.m_fileSize) / (double)(1048576 * 1000));
-                }
-                else if (result.m_fileSize > 1048576)
-                {
-                    _swprintf(fileSizeStr, L"File size: %0.2f MB", (double)(result.m_fileSize) / (double)(1048576));
-                }
-                else
-                {
-                    _swprintf(fileSizeStr, L"File size: %0.2f KB", (double)result.m_fileSize / (double)1048);
-                }
-
-                templ.setTextField(fileSizeStr, WinToastLib::WinToastTemplate::ThirdLine);
-
-                if (WinToastLib::WinToast::instance()->showToast(templ, new CloudCustomHandler()) < 0)
-                {
-                    utility::LogInfo("Cloud: WinToast Error, could not launch toast notification!");
-                }
-
-            }
-        }
-    }
-    catch (...)
-    {
-        utility::LogInfo("Cloud: send notification....catch!");
-    }
-}
