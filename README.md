@@ -12,3 +12,11 @@ This "quick viewer" shell extension provides a Windows File Explorer right click
 multi-core. A second option is to create a merged 3D image for all selected .las/laz files. 
 Both menu options support multi-file select and directory processing.
 <b>Pre-built Windows x64 installer available at</b> https://buymeacoffee.com/nathancrews/e/255641
+
+
+NOTE:
+Projects use Open3D, OpenCV and LASLib C++ libraries to produce 3D images for the source content.
+The library files are not included in this project, but are required to build as Dynamic DLLs.
+Open3D: https://github.com/isl-org/Open3D
+OpenCV: https://github.com/opencv/opencv
+LASLib: https://github.com/LAStools/LAStools/tree/master/LASlib
