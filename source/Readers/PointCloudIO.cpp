@@ -1,3 +1,32 @@
+////////////////////////////////////////////////////////////////////////////////////
+// Copyright 2023-2024 Nathan Crews, NCrews Software
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright notice, this
+//    list of conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright notice,
+//    this list of conditions and the following disclaimer in the documentation
+//    and/or other materials provided with the distribution.
+//
+// 3. Neither the name of the copyright holder nor the names of its
+//    contributors may be used to endorse or promote products derived from
+//    this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+////////////////////////////////////////////////////////////////////////////////////
+
 #include "Renderers/RenderToImageCommon.h"
 #include "Readers/PointcloudIO.h"
 #include "Tools/MathHelper.h"
@@ -47,74 +76,12 @@ UINT LoadPointCloudFile(NCrewsImageGen::FileProcessPackage& outLoadResults, pcl:
         std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
         if (new_cloud_ptr)
         {
-            // TESTING new las/laz reader
             pointCount = LoadLASorLAZToO3D(outLoadResults.m_FileName, *new_cloud_ptr, mergedBasePoint);
             outLoadResults.m_pointCount = pointCount;
             new_cloud_ptr->SetName(outLoadResults.m_FileName.string());
             outLoadResults.m_cloudPtr = new_cloud_ptr;
         }
     }
-    //else if (!outLoadResults.m_FileName.extension().compare(".ply"))
-    //{
-    //    std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
-
-    //    pointCount = LoadPLYToO3DCloud(outLoadResults.m_FileName, *new_cloud_ptr);
-    //    outLoadResults.m_pointCount = pointCount;
-
-    //    if (pointCount > 0)
-    //    {
-    //        new_cloud_ptr->SetName(outLoadResults.m_FileName.string());
-    //        outLoadResults.m_cloudPtr = new_cloud_ptr;
-    //    }
-
-    //}
-    //else if (!outLoadResults.m_FileName.extension().compare(".pts"))
-    //{
-    //    std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
-
-    //    pointCount = LoadPTSToO3DCloud(outLoadResults.m_FileName, *new_cloud_ptr);
-    //    outLoadResults.m_pointCount = pointCount;
-
-    //    if (pointCount > 0)
-    //    {
-    //        new_cloud_ptr->SetName(outLoadResults.m_FileName.string());
-    //        outLoadResults.m_cloudPtr = new_cloud_ptr;
-    //    }
-
-    //}
-    //else if (!outLoadResults.m_FileName.extension().compare(".xyz"))
-    //{
-    //    std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
-
-    //    pointCount = LoadXYZToO3DCloud(outLoadResults.m_FileName, *new_cloud_ptr);
-    //    outLoadResults.m_pointCount = pointCount;
-
-    //    if (pointCount > 0)
-    //    {
-    //        new_cloud_ptr->SetName(outLoadResults.m_FileName.string());
-    //        outLoadResults.m_cloudPtr = new_cloud_ptr;
-    //    }
-
-    //}
-    //else if (!outLoadResults.m_FileName.extension().compare(".pcd"))
-    //{
-    //    std::shared_ptr<geometry::PointCloud> new_cloud_ptr = std::make_shared<geometry::PointCloud>();
-
-    //    if (new_cloud_ptr)
-    //    {
-    //        if (io::ReadPointCloud(outLoadResults.m_FileName.string(), *new_cloud_ptr))
-    //        {
-    //            pointCount = new_cloud_ptr->points_.size();
-    //            outLoadResults.m_pointCount = pointCount;
-
-    //            if (pointCount > 0)
-    //            {
-    //                new_cloud_ptr->SetName(outLoadResults.m_FileName.string());
-    //                outLoadResults.m_cloudPtr = new_cloud_ptr;
-    //            }
-    //        }
-    //    }
-    //}
 
     timer2.Stop();
     double exeTimeInner = timer2.GetDurationInSecond();
@@ -171,7 +138,7 @@ UINT LoadPointCloudFilesParallel(tbb::concurrent_vector<NCrewsImageGen::FileProc
 
     if (outLoadResults.size() > 0)
     {
-//        if (outLoadResults[0].m_imageFileCacheOk == false)
+        if (outLoadResults[0].m_imageFileCacheOk == false)
         {
             pointCountNP = LoadPointCloudFile(outLoadResults[0], mergedBasePoint);
 
@@ -183,7 +150,7 @@ UINT LoadPointCloudFilesParallel(tbb::concurrent_vector<NCrewsImageGen::FileProc
         {
             int pointCount = 0;
 
-//            if (outLoadResults[sz].m_imageFileCacheOk == false)
+            if (outLoadResults[sz].m_imageFileCacheOk == false)
             {
                 utility::Timer timer2;
                 timer2.Start();
@@ -211,7 +178,7 @@ UINT LoadPointCloudFilesParallel(tbb::concurrent_vector<NCrewsImageGen::FileProc
 }
 
 
-UINT LoadLASorLAZToO3D(std::filesystem::path& fileName, geometry::PointCloud& pointcloud, pcl::PointXYZRGB* pCommonBasePoint)
+UINT LoadLASorLAZToO3D(const std::filesystem::path& fileName, geometry::PointCloud& pointcloud, pcl::PointXYZRGB* pCommonBasePoint)
 {
     double px = 0.0, py = 0.0, pz = 0.0;
     double pBasex = 0.0, pBasey = 0.0, pBasez = 0.0;
@@ -221,7 +188,7 @@ UINT LoadLASorLAZToO3D(std::filesystem::path& fileName, geometry::PointCloud& po
     uint64_t pointsInFile = 0;
     pcl::PointXYZRGB pclPoint, point;
     uint64_t pointStep = 1;
-    uint64_t pointToPixel = 750000;
+    I64 pointToPixel = 750000;
     Eigen::Vector3d o3dPoint, o3dColor;
 
     LASreadOpener lasreadopener;
@@ -300,7 +267,7 @@ UINT LoadLASorLAZToO3D(std::filesystem::path& fileName, geometry::PointCloud& po
     return pointsInFile;
 }
 
-bool ComputeLASPointColor(LASheader* lHeader, LASpoint* lPnt, Eigen::Vector3d& outPntColor)
+bool ComputeLASPointColor(const LASheader* lHeader, const LASpoint* lPnt, Eigen::Vector3d& outPntColor)
 {
     if (!lPnt || !lHeader)
     {
@@ -311,7 +278,7 @@ bool ComputeLASPointColor(LASheader* lHeader, LASpoint* lPnt, Eigen::Vector3d& o
 
     if (lPnt->have_rgb)
     {
-    // 16bit RBG bit data
+        // 16bit RBG bit data
         outPntColor[0] = (double)((lPnt->get_R() >> 8) / 255.f);
         outPntColor[1] = (double)((lPnt->get_G() >> 8) / 255.f);
         outPntColor[2] = (double)((lPnt->get_B() >> 8) / 255.f);

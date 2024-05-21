@@ -1,3 +1,33 @@
+////////////////////////////////////////////////////////////////////////////////////
+// Copyright 2023-2024 Nathan Crews, NCrews Software
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright notice, this
+//    list of conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright notice,
+//    this list of conditions and the following disclaimer in the documentation
+//    and/or other materials provided with the distribution.
+//
+// 3. Neither the name of the copyright holder nor the names of its
+//    contributors may be used to endorse or promote products derived from
+//    this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+////////////////////////////////////////////////////////////////////////////////////
+
+
 #include "Readers/PointcloudIO.h"
 #include "open3d/visualization/utility/GLHelper.h"
 #include "Renderers/RenderPointcloudToImage.h"
@@ -104,14 +134,14 @@ UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::file
         sortedLoadResults.push_back(toAddResult);
     }
 
-    //std::function<bool(NCrewsImageGen::FileProcessPackage&, NCrewsImageGen::FileProcessPackage&)> sort
-    //    = [](NCrewsImageGen::FileProcessPackage& x, NCrewsImageGen::FileProcessPackage& y)
-    //    {
-    //        return (x.m_fileSize < y.m_fileSize);
-    //    };
+    std::function<bool(NCrewsImageGen::FileProcessPackage&, NCrewsImageGen::FileProcessPackage&)> sort
+        = [](NCrewsImageGen::FileProcessPackage& x, NCrewsImageGen::FileProcessPackage& y)
+        {
+            return (x.m_fileSize < y.m_fileSize);
+        };
 
-    //// sort files by file size
-    //sortedLoadResults.sort(sort);
+    // sort files by file size
+    sortedLoadResults.sort(sort);
 
     outRenderResults.clear();
 
@@ -152,7 +182,7 @@ UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::file
 
         pointCountTotal = NCrewsPointCloudTools::LoadPointCloudFilesParallel(innerRenderResults, &imageSettings.mergedBasePoint);
 
-        pointsTotal += pointCountTotal;
+        pointsTotal = pointCountTotal;
 
         timer2.Stop();
         execExecTotal = timer2.GetDurationInSecond();
@@ -171,7 +201,7 @@ UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::file
 
         for (int sz = 0; sz < innerRenderResults.size(); ++sz)
         {
-            if (/*(innerRenderResults[sz].m_imageFileCacheOk == false) &&*/
+            if ((innerRenderResults[sz].m_imageFileCacheOk == false) &&
                 innerRenderResults[sz].m_cloudPtr.get())
             {
                 RenderPointcloudToImage(renderer, imageSettings, innerRenderResults[sz]);
@@ -499,15 +529,20 @@ UINT RenderPointcloudFilesToSingleImage(std::filesystem::path& appPath, std::vec
 
     timer.Start();
 
+    double totalFileSize = 0.0;
+
     for (std::filesystem::path reqPath : batchModeFilenames)
     {
         NCrewsImageGen::FileProcessPackage toAddResult(reqPath);
+
+        toAddResult.m_modelType = 0;
 
         uintmax_t fsize = 0;
         __std_win_error wep = std::filesystem::_File_size(reqPath, fsize);
 
         toAddResult.m_fileSize = fsize;
-        toAddResult.m_modelType = 0;
+
+        totalFileSize += toAddResult.m_fileSize;
 
         std::filesystem::path imagePath = reqPath;
         toAddResult.m_ImageName = imagePath.replace_extension(imageSettings.imageFormat);
@@ -527,6 +562,12 @@ UINT RenderPointcloudFilesToSingleImage(std::filesystem::path& appPath, std::vec
 
     timer2.Stop();
     execExecTotal = timer2.GetDurationInSecond();
+
+    // set the merged file stats on the first file package for reporting
+    outRenderResults[0].m_fileSize = totalFileSize;
+    outRenderResults[0].m_pointCount = pointCountTotal;
+    //std::wstring mergedFilename = outRenderResults[0].m_FileName;
+    //outRenderResults[0].m_FileName = L"Merged_Files_" + mergedFilename;
 
     utility::LogInfo("[Single Image Files: {}] ==>Total points {}, Loading Process Duration: {} seconds", outRenderResults.size(), pointCountTotal, execExecTotal);
 

@@ -1,4 +1,4 @@
-﻿////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
 // Copyright 2023-2024 Nathan Crews, NCrews Software
 //
 // Redistribution and use in source and binary forms, with or without
@@ -27,26 +27,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////////
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
-namespace CloudExtensionOptions
-{
-    internal static class Program
-    {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        static void Main()
-        {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ShellOptions());
-        }
-    }
-}
+3rdparty:
+Open3D, https://github.com/isl-org/Open3D/main/LICENSE
+LASlib, https://github.com/LAStools/LAStools/tree/master/LASlib
+TinyXML2, Lee Thomason (www.grinninglizard.com)
