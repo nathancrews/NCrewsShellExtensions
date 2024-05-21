@@ -400,3 +400,6 @@ FodyWeavers.xsd
 /build/RelWithDebInfo
 /build/GLTF Windows Shell Extension-cache
 /build/NCraft Point Cloud Extension-cache
+/build/NCrews GLTF Shell Extension-cache
+/build/NCrews Point Cloud Shell Extension-cache
+/HelpImages
