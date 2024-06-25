@@ -403,3 +403,5 @@ FodyWeavers.xsd
 /build/NCrews GLTF Shell Extension-cache
 /build/NCrews Point Cloud Shell Extension-cache
 /HelpImages
+/NCImageGen_CGI/NCImageGen_CGI.vcxproj
+/NCImageGen_CGI/NCImageGen_CGI.vcxproj.filters
