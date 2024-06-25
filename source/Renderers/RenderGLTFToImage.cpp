@@ -37,6 +37,9 @@ UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::files
                           NCrewsImageGen::AppSettings& imageSettings,
                           tbb::concurrent_vector<NCrewsImageGen::FileProcessPackage>& outRenderResults)
 {
+    open3d::utility::Logger::GetInstance().SetVerbosityLevel(utility::VerbosityLevel::Error);
+    open3d::utility::Logger::GetInstance().SetPrintFunction(nullptr);
+
     const int width = imageSettings.imageWidth;
     const int height = imageSettings.imageHeight;
 

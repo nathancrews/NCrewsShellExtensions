@@ -11,8 +11,8 @@
 #include <windows.h>
 #include "targetver.h"
 
+#endif
+
 #include <cstdlib>
 #include <iostream>
 #include <numeric>
-
-#endif

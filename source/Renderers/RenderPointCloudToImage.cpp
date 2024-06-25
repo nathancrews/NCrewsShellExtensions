@@ -33,6 +33,10 @@
 #include "Renderers/RenderPointcloudToImage.h"
 #include "Tools/MathHelper.h"
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
 #pragma warning(push)
 #pragma warning(disable: 4201 4324 4263 4264 4265 4266 4267 4512 4996 4702 4244 4250 4068)
 
@@ -46,6 +50,36 @@
 #include <Eigen/Geometry>
 
 
+void Open3D_print_fcn(const std::string& logString)
+{
+//#ifdef NO_LOGGING
+//    return;
+//#endif // NO_LOGGING
+
+    std::filesystem::path logFilePath = std::filesystem::temp_directory_path();
+
+    logFilePath.replace_filename("ncImageGen");
+    logFilePath.replace_extension("log");
+
+    std::fstream fs;
+    fs.open(logFilePath, std::fstream::out | std::fstream::app);
+
+    if (fs.is_open())
+    {
+        fs << logString;
+        fs << "\n";
+
+        fs.flush();
+        fs.close();
+    }
+    else
+    {
+        std::cout << logString << std::endl;
+    }
+}
+
+
+
 namespace NCrewsImageGen
 {
 
@@ -53,6 +87,10 @@ UINT RenderPointcloudFiles(std::filesystem::path& appPath, std::vector<std::file
                            NCrewsImageGen::AppSettings& imageSettings,
                            tbb::concurrent_vector<NCrewsImageGen::FileProcessPackage>& outRenderResults)
 {
+
+    open3d::utility::Logger::GetInstance().SetVerbosityLevel(utility::VerbosityLevel::Error);
+    open3d::utility::Logger::GetInstance().SetPrintFunction(nullptr);
+
     UINT pointsTotal = 0;
     std::filesystem::path resourcePath = appPath;
     resourcePath += L"resources";
@@ -370,7 +408,7 @@ UINT RenderPointcloudToImage(FilamentRenderer* modelRenderer, NCrewsImageGen::Ap
 
                 int bl = 0;
 
-                infoText = "Produced by: NCrews Pointcloud Shell Extension 1.0";
+                infoText = "Produced by: NCrews Image Generator";
                 cv::Size ts = cv::getTextSize(infoText, cv::FONT_HERSHEY_SIMPLEX, textScale, lineWidth, &bl);
 
                 unsigned int nextTextRow = ts.height + rowSpacing;
