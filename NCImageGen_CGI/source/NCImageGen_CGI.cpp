@@ -1,13 +1,5 @@
-
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <vector>
-#include <iostream>
-#include <sstream>
-#include "inc/CGI_RenderWrapper.h"
 ////////////////////////////////////////////////////////////////////////////////////
-// Copyright 2023-2024 Nathan Crews, NCrews Software
+// Copyright 2023-2024 Nathan C. Crews IV
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -34,6 +26,13 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////////
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <vector>
+#include <iostream>
+#include <sstream>
+#include "inc/CGI_RenderWrapper.h"
 #include <filesystem>
 
 #pragma warning (push)
@@ -247,7 +246,14 @@ std::filesystem::path HandleLASFiles(std::filesystem::path& LASFilename, std::fi
 
     tbb::concurrent_vector<NCrewsImageGen::FileProcessPackage> renderResults;
 
-    NCrewsImageGen::RenderPointcloudFiles(exeDataPath, filesToImage, settings, renderResults);
+    try
+    {
+        NCrewsImageGen::RenderPointcloudFiles(exeDataPath, filesToImage, settings, renderResults);
+    }
+    catch (...)
+    {
+        renderResults.clear();
+    }
 
     if (renderResults.size() > 0)
     {
@@ -273,7 +279,7 @@ std::filesystem::path HandleGLTFFiles(std::filesystem::path& GLTFFilename, std::
     }
     catch (...)
     {
-    	
+        renderResults.clear();
     }
 
     if (renderResults.size() > 0)
