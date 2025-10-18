@@ -99,35 +99,64 @@ HRESULT CloudMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj,
 
             if (nameBuffer && wcslen(nameBuffer) > 0)
             {
-                LPWSTR nameBufferCopy = new WCHAR[wcslen(nameBuffer) + 2];
-                if (nameBufferCopy)
+                try 
                 {
-                    wcscpy(nameBufferCopy, nameBuffer);
-                    CoTaskMemFree(nameBuffer);
-
-                    std::filesystem::path testPath = nameBufferCopy;
-
-                    if (std::filesystem::is_directory(testPath))
+                    LPWSTR nameBufferCopy = new WCHAR[wcslen(nameBuffer) + 2];
+                    if (nameBufferCopy)
                     {
-                        m_filePaths.push_back(testPath);
-                    }
-                    else
-                    {
-                        for (std::string pcext : NCrewsImageGen::PointcloudFileExtensions)
+                        wcscpy(nameBufferCopy, nameBuffer);
+                        CoTaskMemFree(nameBuffer);
+                        nameBuffer = nullptr;  // Prevent double free
+
+                        std::filesystem::path testPath = nameBufferCopy;
+
+                        // Verify path exists before processing
+                        if (std::filesystem::exists(testPath))
                         {
-                            if (!testPath.extension().compare(pcext))
+                            if (std::filesystem::is_directory(testPath))
                             {
                                 m_filePaths.push_back(testPath);
-                                break;
+                            }
+                            else
+                            {
+                                for (const std::string& pcext : NCrewsImageGen::PointcloudFileExtensions)
+                                {
+                                    if (!testPath.extension().compare(pcext))
+                                    {
+                                        m_filePaths.push_back(testPath);
+                                        break;
+                                    }
+                                }
                             }
                         }
-                    }
 
-                    delete[]nameBufferCopy;
+                        delete[] nameBufferCopy;
+                        nameBufferCopy = nullptr;
+                    }
+                }
+                catch (const std::exception& e)
+                {
+                    std::string errorMsg = "Exception processing file path: " + std::string(e.what());
+                    utility::LogInfo(errorMsg.c_str());
+                }
+                catch (...)
+                {
+                    utility::LogInfo("Unknown exception processing file path");
                 }
             }
+            
+            // Clean up nameBuffer if not already freed
+            if (nameBuffer)
+            {
+                CoTaskMemFree(nameBuffer);
+                nameBuffer = nullptr;
+            }
 
-            pRet->Release();
+            if (pRet)
+            {
+                pRet->Release();
+                pRet = nullptr;
+            }
         }
 
         items->Release();

@@ -37,7 +37,7 @@
 #include "ocidl.h"
 #include "Renderers/RenderToImageCommon.h"
 
-class ModelThumbnail : public IThumbnailProvider, IInitializeWithStream
+class ModelThumbnail : public IThumbnailProvider, IInitializeWithStream, IInitializeWithFile, IInitializeWithItem
 {
 public:
 
@@ -69,31 +69,31 @@ public:
 
         if (IsEqualIID(riid, IID_IUnknown))
         {
-            *ppvObject = this;
+            *ppvObject = static_cast<IUnknown*>(static_cast<IThumbnailProvider*>(this));
             this->AddRef();
             return S_OK;
         }
         else if (IsEqualIID(riid, IID_IThumbnailProvider))
         {
-            *ppvObject = (IThumbnailProvider*)this;
+            *ppvObject = static_cast<IThumbnailProvider*>(this);
             this->AddRef();
             return S_OK;
         }
         else if (IsEqualIID(riid, IID_IInitializeWithFile))
         {
-            *ppvObject = (IInitializeWithFile*)this;
+            *ppvObject = static_cast<IInitializeWithFile*>(this);
             this->AddRef();
             return S_OK;
         }
         else if (IsEqualIID(riid, IID_IInitializeWithItem))
         {
-            *ppvObject = (IInitializeWithItem*)this;
+            *ppvObject = static_cast<IInitializeWithItem*>(this);
             this->AddRef();
             return S_OK;
         }
         else if (IsEqualIID(riid, IID_IInitializeWithStream))
         {
-            *ppvObject = (IInitializeWithStream*)this;
+            *ppvObject = static_cast<IInitializeWithStream*>(this);
             this->AddRef();
             return S_OK;
         }

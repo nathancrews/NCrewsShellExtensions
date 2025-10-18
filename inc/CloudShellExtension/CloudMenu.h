@@ -53,19 +53,19 @@ public:
 
         if (IsEqualIID(riid, IID_IUnknown))
         {
-            *ppvObject = this;
+            *ppvObject = static_cast<IUnknown*>(static_cast<IContextMenu*>(this));
             this->AddRef();
             return S_OK;
         }
         else if (IsEqualIID(riid, IID_IContextMenu))
         {
-            *ppvObject = (IContextMenu*)this;
+            *ppvObject = static_cast<IContextMenu*>(this);
             this->AddRef();
             return S_OK;
         }
         else if (IsEqualIID(riid, IID_IShellExtInit))
         {
-            *ppvObject = (IShellExtInit*)this;
+            *ppvObject = static_cast<IShellExtInit*>(this);
             this->AddRef();
             return S_OK;
         }

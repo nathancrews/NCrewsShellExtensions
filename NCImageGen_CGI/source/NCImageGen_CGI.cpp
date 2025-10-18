@@ -217,15 +217,44 @@ int main(int argc, char** argv, char** env)
 
         Debug_log("Results ImageFileURL: %s\n", LASImageFileURL.string().c_str());
 
+        std::string styleCSS = "<link rel=\"stylesheet\" href=\"styles/styles.css\"/>";
+        std::string bootStrapCSS = "<link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css\" rel=\"stylesheet\" integrity=\"sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH\" crossorigin=\"anonymous\">";
+
         if (isLASFileProcess)
         {
+#ifdef BUILD_HTMX
+            std::cout << "<html lang=\"en\"><head>" 
+                << styleCSS
+                << bootStrapCSS
+                << "</head>"
+                << "<body><img class=\"ImageResultPanel\" src=\""
+                << upPath 
+                << las_default_dir 
+                << pathSep 
+                << LASImageFileURL.string() << "\"/>"
+                << "</body></html>";
+#else
             std::cout << "<!DOCTYPE html><html lang = \"en\"><head><title>ImageGen Results</title></head>"
                 << "<body><img src=\"" << upPath << las_default_dir << pathSep << LASImageFileURL.string() << "\"/>" << "</body></html>" << "\n\n";
+#endif
         }
         else
         {
+#ifdef BUILD_HTMX
+            std::cout << "<html lang=\"en\"><head>"
+                << styleCSS
+                << bootStrapCSS
+                << "</head>"
+                << "<body><img class=\"ImageResultPanel\" src=\""
+                << upPath 
+                << gltf_default_dir 
+                << pathSep 
+                << LASImageFileURL.string() << "\"/>"
+                << "</body></html>";
+#else
             std::cout << "<!DOCTYPE html><html lang = \"en\"><head><title>ImageGen Results</title></head>"
                 << "<body><img src=\"" << upPath << gltf_default_dir << pathSep << LASImageFileURL.string() << "\"/>" << "</body></html>" << "\n\n";
+#endif
         }
     }
     else

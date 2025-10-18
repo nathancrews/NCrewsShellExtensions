@@ -362,18 +362,26 @@ HRESULT DllRegisterServer()
 
 
     //**************************************************************************************************************
-    // Put extensions on the approved list
+    // Put extensions on the approved list - try both HKLM and HKCU for Windows 11 compatibility
     lpSubKey = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved";
 
-    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    // Try HKEY_LOCAL_MACHINE first (preferred for Windows 11)
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_LOCAL_MACHINE, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
     {
-        res = RegSetValueEx(hkey, std::wstring(menuExtGUID).c_str(), 0, REG_SZ, (BYTE*)dllName, (DWORD)(std::wstring(dllName).size() + 1U) * 2U);
+        RegSetValueEx(hkey, std::wstring(menuExtGUID).c_str(), 0, REG_SZ, (BYTE*)L"Model Shell Extension Menu", (DWORD)(wcslen(L"Model Shell Extension Menu") + 1) * 2U);
+        RegSetValueEx(hkey, std::wstring(thumbExtGUID).c_str(), 0, REG_SZ, (BYTE*)L"Model Shell Extension Thumbnail", (DWORD)(wcslen(L"Model Shell Extension Thumbnail") + 1) * 2U);
+        RegCloseKey(hkey);
+    }
+    // Fallback to HKEY_CURRENT_USER
+    else if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegSetValueEx(hkey, std::wstring(menuExtGUID).c_str(), 0, REG_SZ, (BYTE*)L"Model Shell Extension Menu", (DWORD)(wcslen(L"Model Shell Extension Menu") + 1) * 2U);
         if (res != ERROR_SUCCESS)
         {
             return E_UNEXPECTED;
         }
 
-        res = RegSetValueEx(hkey, std::wstring(thumbExtGUID).c_str(), 0, REG_SZ, (BYTE*)dllName, (DWORD)(std::wstring(dllName).size() + 1U) * 2U);
+        res = RegSetValueEx(hkey, std::wstring(thumbExtGUID).c_str(), 0, REG_SZ, (BYTE*)L"Model Shell Extension Thumbnail", (DWORD)(wcslen(L"Model Shell Extension Thumbnail") + 1) * 2U);
         if (res != ERROR_SUCCESS)
         {
             return E_UNEXPECTED;
@@ -381,8 +389,27 @@ HRESULT DllRegisterServer()
         RegCloseKey(hkey);
     }
 
+    //*****************************************************************************************
+    // Windows 11 specific: Add additional thumbnail provider registration
+    lpSubKey = L"Software\\Classes\\.glb\\ShellEx\\{BB2E617C-0920-11D1-9A0B-00C04FC2D6C1}";
+    if (ERROR_SUCCESS == RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp))
+    {
+        RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)thumbExtGUIDStr.c_str(), (DWORD)(thumbExtGUIDStr.size() + 1U) * 2U);
+        RegCloseKey(hkey);
+    }
+    
+    // Windows 11: Force thumbnail cache refresh by setting DisableThumbnailCache temporarily
+    lpSubKey = L"Software\\Classes\\.glb";
+    if (ERROR_SUCCESS == RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp))
+    {
+        DWORD disableCache = 1;
+        RegSetValueEx(hkey, L"DisableThumbnailCache", 0, REG_DWORD, (BYTE*)&disableCache, sizeof(DWORD));
+        RegCloseKey(hkey);
+    }
 
     SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+    // Additional notification for thumbnail cache refresh on Windows 11
+    SHChangeNotify(SHCNE_UPDATEIMAGE, SHCNF_DWORD | SHCNF_FLUSH, NULL, NULL);
 
     return S_OK;
 }

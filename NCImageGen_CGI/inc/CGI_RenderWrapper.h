@@ -40,11 +40,9 @@
 
 using namespace cgicc;
 
-const std::string landxml_default_dir = "landxml";
-const std::string gltf_default_dir = "gltf";
-const std::string gltf_images_dir = "gltf_images";
-const std::string las_default_dir = "las";
-const std::string las_images_dir = "las_images";
+const std::string landxml_default_dir = "uploads/landxml";
+const std::string gltf_default_dir = "uploads/gltf";
+const std::string las_default_dir = "uploads/las";
 const std::string data_default_dir = "data";
 
 extern void Debug_log(const char* format, const char* value);

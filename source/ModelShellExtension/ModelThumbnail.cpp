@@ -123,23 +123,56 @@ STDMETHODIMP ModelThumbnail::GetThumbnail(UINT flag, HBITMAP* outHBITMAP, WTS_AL
     HRESULT res = E_FAIL;
 
     utility::LogInfo("GetThumbnail called...");
+    
+    if (!outHBITMAP)
+    {
+        return E_INVALIDARG;
+    }
+    
+    *outHBITMAP = nullptr;
+    if (alphaType)
+    {
+        *alphaType = WTSAT_RGB;  // No alpha channel in our thumbnails
+    }
+    
     try
     {
         HBITMAP localBMP = nullptr;
+        
+        // Check if we have a valid file path
+        if (m_filePath.empty() || !std::filesystem::exists(m_filePath))
+        {
+            utility::LogInfo("Invalid or missing file path");
+            return E_FAIL;
+        }
 
         localBMP = NCrewsImageGen::RenderModelToHBITMAP(g_AppPath, m_imageGenSettings, m_filePath);
 
         if (localBMP)
         {
             *outHBITMAP = localBMP;
-
             res = S_OK;
         }
+        else
+        {
+            utility::LogInfo("Failed to render model to bitmap");
+        }
 
-        std::filesystem::remove(m_filePath);
+        // Only remove temp files (those in temp directory)
+        if (m_filePath.string().find(std::filesystem::temp_directory_path().string()) != std::string::npos)
+        {
+            std::filesystem::remove(m_filePath);
+        }
+    }
+    catch (const std::exception& e)
+    {
+        std::string errorMsg = "Exception in GetThumbnail: " + std::string(e.what());
+        utility::LogInfo(errorMsg.c_str());
+        res = E_FAIL;
     }
     catch (...)
     {
+        utility::LogInfo("Unknown exception in GetThumbnail");
         res = E_FAIL;
     }
 
@@ -149,13 +182,70 @@ STDMETHODIMP ModelThumbnail::GetThumbnail(UINT flag, HBITMAP* outHBITMAP, WTS_AL
 STDMETHODIMP ModelThumbnail::Initialize(LPCWSTR pszFilePath, DWORD grfMode)
 {
     utility::LogInfo("Initialize With File called...");
-    return S_OK;
+    
+    try
+    {
+        if (!pszFilePath)
+        {
+            return E_INVALIDARG;
+        }
+        
+        m_filePath = pszFilePath;
+        
+        // Load settings
+        std::filesystem::path settingsFilePath = g_AppDataPath;
+        settingsFilePath = settingsFilePath.concat(g_SettingsFileName.c_str());
+        
+        if (!NCrewsImageGen::ReadImageGenSettings(settingsFilePath, m_imageGenSettings))
+        {
+            utility::LogInfo("Error loading settings");
+        }
+        
+        return S_OK;
+    }
+    catch (...)
+    {
+        return E_FAIL;
+    }
 }
 
 STDMETHODIMP ModelThumbnail::Initialize(IShellItem* psi, DWORD grfMode)
 {
     utility::LogInfo("Initialize With IShellItem called...");
-    return S_OK;
+    
+    try
+    {
+        if (!psi)
+        {
+            return E_INVALIDARG;
+        }
+        
+        LPWSTR pszFilePath = nullptr;
+        HRESULT hr = psi->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+        
+        if (SUCCEEDED(hr) && pszFilePath)
+        {
+            m_filePath = pszFilePath;
+            CoTaskMemFree(pszFilePath);
+            
+            // Load settings
+            std::filesystem::path settingsFilePath = g_AppDataPath;
+            settingsFilePath = settingsFilePath.concat(g_SettingsFileName.c_str());
+            
+            if (!NCrewsImageGen::ReadImageGenSettings(settingsFilePath, m_imageGenSettings))
+            {
+                utility::LogInfo("Error loading settings");
+            }
+            
+            return S_OK;
+        }
+        
+        return hr;
+    }
+    catch (...)
+    {
+        return E_FAIL;
+    }
 }
 
 

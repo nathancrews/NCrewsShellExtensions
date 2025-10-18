@@ -282,15 +282,21 @@ HRESULT DllRegisterServer()
 
     //
     //**************************************************************************************************************
-    // Put extension on the approved list
+    // Put extension on the approved list - try both HKLM and HKCU for Windows 11 compatibility
     lpSubKey = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved";
 
-    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    // Try HKEY_LOCAL_MACHINE first (preferred for Windows 11)
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_LOCAL_MACHINE, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
     {
-        retStatus = RegSetValueEx(hkey, std::wstring(menuExtGUID).c_str(), 0, REG_SZ, (BYTE*)dllName, (DWORD)(std::wstring(dllName).size() + 1U) * 2U);
+        RegSetValueEx(hkey, std::wstring(menuExtGUID).c_str(), 0, REG_SZ, (BYTE*)L"Point Cloud Shell Extension", (DWORD)(wcslen(L"Point Cloud Shell Extension") + 1) * 2U);
+        RegCloseKey(hkey);
     }
-
-    RegCloseKey(hkey);
+    // Fallback to HKEY_CURRENT_USER
+    else if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        retStatus = RegSetValueEx(hkey, std::wstring(menuExtGUID).c_str(), 0, REG_SZ, (BYTE*)L"Point Cloud Shell Extension", (DWORD)(wcslen(L"Point Cloud Shell Extension") + 1) * 2U);
+        RegCloseKey(hkey);
+    }
     //**************************************************************************************************************
 
 
@@ -358,9 +364,31 @@ HRESULT DllRegisterServer()
         RegCloseKey(hkey);
     }
 
-    SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+    //*****************************************************************************************
+    // Windows 11 specific: Enhanced shell notifications and cache management
+    
+    // Add enhanced file association entries for Windows 11
+    lpSubKey = L"Software\\Classes\\.las";
+    if (ERROR_SUCCESS == RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp))
+    {
+        DWORD disableCache = 1;
+        RegSetValueEx(hkey, L"DisableThumbnailCache", 0, REG_DWORD, (BYTE*)&disableCache, sizeof(DWORD));
+        RegCloseKey(hkey);
+    }
+    
+    lpSubKey = L"Software\\Classes\\.laz";
+    if (ERROR_SUCCESS == RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp))
+    {
+        DWORD disableCache = 1;
+        RegSetValueEx(hkey, L"DisableThumbnailCache", 0, REG_DWORD, (BYTE*)&disableCache, sizeof(DWORD));
+        RegCloseKey(hkey);
+    }
 
-    return retStatus;
+    SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+    // Additional notification for Windows 11 compatibility
+    SHChangeNotify(SHCNE_UPDATEIMAGE, SHCNF_DWORD | SHCNF_FLUSH, NULL, NULL);
+
+    return S_OK;
 }
 
 HRESULT DllUnregisterServer()
