@@ -4,7 +4,8 @@
 param(
     [switch]$Unregister,
     [switch]$Test,
-    [switch]$ClearCache
+    [switch]$ClearCache,
+    [switch]$ResetOpenWith
 )
 
 $ErrorActionPreference = "Continue"
@@ -42,11 +43,29 @@ function Clear-ThumbnailCache {
     Write-Host "Thumbnail cache cleared successfully." -ForegroundColor Green
 }
 
+function Add-HandlerToProgId {
+    param(
+        [Parameter(Mandatory)] [string]$Ext,
+        [Parameter(Mandatory)] [string]$HandlerName,
+        [Parameter(Mandatory)] [string]$Guid
+    )
+    $roots = @('HKCU:','HKLM:')
+    $hkcrDefault = (Get-ItemProperty -Path ("Registry::HKEY_CLASSES_ROOT\\$Ext") -ErrorAction SilentlyContinue)."(default)"
+    $userChoice = (Get-ItemProperty -Path ("HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\$Ext\\UserChoice") -ErrorAction SilentlyContinue).ProgId
+    $progId = if ($userChoice) { $userChoice } else { $hkcrDefault }
+    if (-not $progId) { return }
+    foreach ($root in $roots) {
+        $regPath = "$root\Software\Classes\$progId\ShellEx\ContextMenuHandlers\$HandlerName"
+        if (-not (Test-Path $regPath)) { New-Item -Path $regPath -Force | Out-Null }
+        Set-ItemProperty -Path $regPath -Name "(default)" -Value $Guid -ErrorAction SilentlyContinue
+    }
+}
+
 function Register-Extension {
     Write-Host "Registering Point Cloud Shell Extension..." -ForegroundColor Yellow
     
     # Register the DLL
-    $result = & "regsvr32.exe" "/s" $ActualDllPath
+$result = & "$env:WINDIR\System32\regsvr32.exe" "/s" $ActualDllPath
     if ($LASTEXITCODE -eq 0) {
         Write-Host "DLL registered successfully." -ForegroundColor Green
     } else {
@@ -62,31 +81,39 @@ function Register-Extension {
     
     try {
         # Add context menu handler for LAS files
-        $regPath = "HKCU:\Software\Classes\.las\ShellEx\ContextMenuHandlers\CloudShellExtension"
-        if (-not (Test-Path $regPath)) {
-            New-Item -Path $regPath -Force | Out-Null
+        foreach ($root in @('HKCU:','HKLM:')) {
+            # Register on the extension key
+            $regPath = "$root\Software\Classes\.las\ShellEx\ContextMenuHandlers\CloudShellExtension"
+            if (-not (Test-Path $regPath)) { New-Item -Path $regPath -Force | Out-Null }
+            Set-ItemProperty -Path $regPath -Name "(default)" -Value $MenuGUID
+            
+            $regPath = "$root\Software\Classes\.laz\ShellEx\ContextMenuHandlers\CloudShellExtension"
+            if (-not (Test-Path $regPath)) { New-Item -Path $regPath -Force | Out-Null }
+            Set-ItemProperty -Path $regPath -Name "(default)" -Value $MenuGUID
+
+            # Also register under SystemFileAssociations to ensure per-file menu on Win10/11
+            $regPath = "$root\Software\Classes\SystemFileAssociations\.las\ShellEx\ContextMenuHandlers\CloudShellExtension"
+            if (-not (Test-Path $regPath)) { New-Item -Path $regPath -Force | Out-Null }
+            Set-ItemProperty -Path $regPath -Name "(default)" -Value $MenuGUID
+
+            $regPath = "$root\Software\Classes\SystemFileAssociations\.laz\ShellEx\ContextMenuHandlers\CloudShellExtension"
+            if (-not (Test-Path $regPath)) { New-Item -Path $regPath -Force | Out-Null }
+            Set-ItemProperty -Path $regPath -Name "(default)" -Value $MenuGUID
+            
+            # Directory handler
+            $regPath = "$root\Software\Classes\Directory\ShellEx\ContextMenuHandlers\CloudShellExtension"
+            if (-not (Test-Path $regPath)) { New-Item -Path $regPath -Force | Out-Null }
+            Set-ItemProperty -Path $regPath -Name "(default)" -Value $MenuGUID
         }
-        Set-ItemProperty -Path $regPath -Name "(default)" -Value $MenuGUID
+
+        # Also bind to current ProgID (if any) so 3rd-party associations still get our menu
+        Add-HandlerToProgId -Ext '.las' -HandlerName 'CloudShellExtension' -Guid $MenuGUID
+        Add-HandlerToProgId -Ext '.laz' -HandlerName 'CloudShellExtension' -Guid $MenuGUID
         
-        # Add context menu handler for LAZ files
-        $regPath = "HKCU:\Software\Classes\.laz\ShellEx\ContextMenuHandlers\CloudShellExtension"
-        if (-not (Test-Path $regPath)) {
-            New-Item -Path $regPath -Force | Out-Null
-        }
-        Set-ItemProperty -Path $regPath -Name "(default)" -Value $MenuGUID
-        
-        # Add directory context menu handler
-        $regPath = "HKCU:\Software\Classes\Directory\ShellEx\ContextMenuHandlers\CloudShellExtension"
-        if (-not (Test-Path $regPath)) {
-            New-Item -Path $regPath -Force | Out-Null
-        }
-        Set-ItemProperty -Path $regPath -Name "(default)" -Value $MenuGUID
-        
-        # Add to approved shell extensions
-        $regPath = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved"
-        if (Test-Path $regPath) {
-            Set-ItemProperty -Path $regPath -Name $MenuGUID -Value "Point Cloud Shell Extension"
-        }
+        # Add to approved shell extensions (system-wide)
+        $regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved"
+        if (-not (Test-Path $regPath)) { New-Item -Path $regPath -Force | Out-Null }
+        New-ItemProperty -Path $regPath -Name $MenuGUID -PropertyType String -Value "Point Cloud Shell Extension" -Force | Out-Null
         
         Write-Host "Registry entries added successfully." -ForegroundColor Green
         
@@ -97,14 +124,15 @@ function Register-Extension {
     # Notify shell of changes
     Write-Host "Notifying Windows Shell of changes..." -ForegroundColor Yellow
     
-    Add-Type -TypeDefinition @"
-        using System;
-        using System.Runtime.InteropServices;
-        public class Shell32 {
-            [DllImport("shell32.dll")]
-            public static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
-        }
-"@
+    $code = @'
+using System;
+using System.Runtime.InteropServices;
+public class Shell32 {
+    [DllImport("shell32.dll")]
+    public static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
+}
+'@
+    Add-Type -TypeDefinition $code
     
     [Shell32]::SHChangeNotify(0x08000000, 0x0000, [IntPtr]::Zero, [IntPtr]::Zero)  # SHCNE_ASSOCCHANGED
 }
@@ -113,7 +141,7 @@ function Unregister-Extension {
     Write-Host "Unregistering Point Cloud Shell Extension..." -ForegroundColor Yellow
     
     # Unregister the DLL
-    $result = & "regsvr32.exe" "/u" "/s" $ActualDllPath
+$result = & "$env:WINDIR\System32\regsvr32.exe" "/u" "/s" $ActualDllPath
     if ($LASTEXITCODE -eq 0) {
         Write-Host "DLL unregistered successfully." -ForegroundColor Green
     } else {
@@ -122,9 +150,22 @@ function Unregister-Extension {
     
     # Remove registry entries
     try {
-        Remove-Item -Path "HKCU:\Software\Classes\.las\ShellEx\ContextMenuHandlers\CloudShellExtension" -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item -Path "HKCU:\Software\Classes\.laz\ShellEx\ContextMenuHandlers\CloudShellExtension" -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item -Path "HKCU:\Software\Classes\Directory\ShellEx\ContextMenuHandlers\CloudShellExtension" -Recurse -Force -ErrorAction SilentlyContinue
+        foreach ($root in @('HKCU:','HKLM:')) {
+            Remove-Item -Path "$root\Software\Classes\.las\ShellEx\ContextMenuHandlers\CloudShellExtension" -Recurse -Force -ErrorAction SilentlyContinue
+            Remove-Item -Path "$root\Software\Classes\.laz\ShellEx\ContextMenuHandlers\CloudShellExtension" -Recurse -Force -ErrorAction SilentlyContinue
+            Remove-Item -Path "$root\Software\Classes\SystemFileAssociations\.las\ShellEx\ContextMenuHandlers\CloudShellExtension" -Recurse -Force -ErrorAction SilentlyContinue
+            Remove-Item -Path "$root\Software\Classes\SystemFileAssociations\.laz\ShellEx\ContextMenuHandlers\CloudShellExtension" -Recurse -Force -ErrorAction SilentlyContinue
+            Remove-Item -Path "$root\Software\Classes\Directory\ShellEx\ContextMenuHandlers\CloudShellExtension" -Recurse -Force -ErrorAction SilentlyContinue
+            # Remove from bound ProgIDs
+            foreach($ext in '.las','.laz'){
+                $hkcrDefault = (Get-ItemProperty -Path ("Registry::HKEY_CLASSES_ROOT\\$ext") -ErrorAction SilentlyContinue)."(default)"
+                $userChoice = (Get-ItemProperty -Path ("HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\$ext\\UserChoice") -ErrorAction SilentlyContinue).ProgId
+                $progId = if ($userChoice) { $userChoice } else { $hkcrDefault }
+                if ($progId) {
+                    Remove-Item -Path "$root\Software\Classes\$progId\ShellEx\ContextMenuHandlers\CloudShellExtension" -Recurse -Force -ErrorAction SilentlyContinue
+                }
+            }
+        }
         Write-Host "Registry entries removed." -ForegroundColor Green
     } catch {
         Write-Warning "Some registry entries could not be removed: $_"
@@ -146,15 +187,22 @@ function Test-Extension {
     $regPaths = @(
         "HKCU:\Software\Classes\.las\ShellEx\ContextMenuHandlers\CloudShellExtension",
         "HKCU:\Software\Classes\.laz\ShellEx\ContextMenuHandlers\CloudShellExtension",
-        "HKCU:\Software\Classes\Directory\ShellEx\ContextMenuHandlers\CloudShellExtension"
+        "HKCU:\Software\Classes\SystemFileAssociations\.las\ShellEx\ContextMenuHandlers\CloudShellExtension",
+        "HKCU:\Software\Classes\SystemFileAssociations\.laz\ShellEx\ContextMenuHandlers\CloudShellExtension",
+        "HKCU:\Software\Classes\Directory\ShellEx\ContextMenuHandlers\CloudShellExtension",
+        "HKLM:\Software\Classes\.las\ShellEx\ContextMenuHandlers\CloudShellExtension",
+        "HKLM:\Software\Classes\.laz\ShellEx\ContextMenuHandlers\CloudShellExtension",
+        "HKLM:\Software\Classes\SystemFileAssociations\.las\ShellEx\ContextMenuHandlers\CloudShellExtension",
+        "HKLM:\Software\Classes\SystemFileAssociations\.laz\ShellEx\ContextMenuHandlers\CloudShellExtension",
+        "HKLM:\Software\Classes\Directory\ShellEx\ContextMenuHandlers\CloudShellExtension"
     )
     
     foreach ($regPath in $regPaths) {
         if (Test-Path $regPath) {
             $value = (Get-ItemProperty -Path $regPath -Name "(default)" -ErrorAction SilentlyContinue)."(default)"
-            Write-Host "✓ Registry entry found: $regPath = $value" -ForegroundColor Green
+            Write-Host "Registry entry found: $regPath = $value" -ForegroundColor Green
         } else {
-            Write-Host "✗ Missing registry entry: $regPath" -ForegroundColor Red
+            Write-Host "Missing registry entry: $regPath" -ForegroundColor Red
         }
     }
     
@@ -166,6 +214,18 @@ function Test-Extension {
     Write-Host "5. Try batch processing options" -ForegroundColor Cyan
 }
 
+function Reset-OpenWithList {
+    param([string[]]$Extensions)
+    Write-Host "Resetting OpenWithList..." -ForegroundColor Yellow
+    foreach ($ext in $Extensions) {
+        $owl = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$ext\OpenWithList"
+        if (Test-Path $owl) {
+            Remove-Item -Path $owl -Recurse -Force -ErrorAction SilentlyContinue
+            Write-Host "Cleared OpenWithList for $ext" -ForegroundColor Green
+        }
+    }
+}
+
 function Test-SampleFiles {
     Write-Host "Looking for sample point cloud files..." -ForegroundColor Yellow
     
@@ -175,7 +235,7 @@ function Test-SampleFiles {
         if ($sampleFiles.Count -gt 0) {
             Write-Host "Found sample files:" -ForegroundColor Green
             foreach ($file in $sampleFiles) {
-                Write-Host "  - $($file.Name) ($([math]::Round($file.Length / 1MB, 2)) MB)" -ForegroundColor Green
+                Write-Host ("  - {0}" -f $file.Name) -ForegroundColor Green
             }
             Write-Host "`nYou can use these files for testing the shell extension." -ForegroundColor Cyan
         } else {
@@ -187,9 +247,27 @@ function Test-SampleFiles {
 }
 
 # Main execution
-if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Error "This script must be run as Administrator for proper registration."
-    exit 1
+# Elevate to Administrator if needed
+if ((-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) -and (-not ($Test -or $ResetOpenWith))) {
+    Write-Host "Requesting elevation..." -ForegroundColor Yellow
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName = (Get-Process -Id $PID).Path
+    $argList = @('-NoProfile','-ExecutionPolicy','Bypass','-File', $PSCommandPath) + (
+        $PSBoundParameters.GetEnumerator() | ForEach-Object {
+            if ($_.Value -is [switch] -or $_.Value -eq $true) { '-{0}' -f $_.Key }
+            elseif ($_.Value) { '-{0}' -f $_.Key; ('{0}' -f $_.Value) }
+        }
+    )
+    $psi.Arguments = ($argList | ForEach-Object { if ($_ -match "\s") { '"{0}"' -f $_ } else { $_ } }) -join ' '
+    $psi.Verb = 'runas'
+    try {
+        $p = [System.Diagnostics.Process]::Start($psi)
+        $p.WaitForExit()
+        exit $p.ExitCode
+    } catch {
+        Write-Error "Elevation cancelled or failed: $_"
+        exit 1
+    }
 }
 
 Write-Host "Point Cloud Shell Extension Manager for Windows 11" -ForegroundColor Cyan
@@ -203,9 +281,11 @@ if ($Unregister) {
     Unregister-Extension
 } elseif ($Test) {
     Test-Extension
+    if ($ResetOpenWith) { Reset-OpenWithList -Extensions @('.las','.laz') }
     Test-SampleFiles
+} elseif ($ResetOpenWith) {
+    Reset-OpenWithList -Extensions @('.las','.laz')
 } else {
-    Register-Extension
     Write-Host "`nRecommended next steps:" -ForegroundColor Yellow
     Write-Host "1. Run: .\Register-Win11-PointCloud.ps1 -ClearCache" -ForegroundColor Yellow
     Write-Host "2. Run: .\Register-Win11-PointCloud.ps1 -Test" -ForegroundColor Yellow

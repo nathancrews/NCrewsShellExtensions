@@ -6,15 +6,34 @@ param(
     [switch]$Test,
     [switch]$ClearCache,
     [switch]$PointCloudOnly,
-    [switch]$GLTFOnly
+    [switch]$GLTFOnly,
+    [switch]$ResetOpenWith,
+    [switch]$ResetUserChoice
 )
 
 $ErrorActionPreference = "Continue"
 
-# Main execution
-if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Error "This script must be run as Administrator for proper registration."
-    exit 1
+# Elevate to Administrator if needed
+if ((-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) -and (-not ($Test -or $ResetOpenWith -or $ResetUserChoice))) {
+    Write-Host "Requesting elevation..." -ForegroundColor Yellow
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName = (Get-Process -Id $PID).Path
+    $argList = @('-NoProfile','-ExecutionPolicy','Bypass','-File', $PSCommandPath) + (
+        $PSBoundParameters.GetEnumerator() | ForEach-Object {
+            if ($_.Value -is [switch] -or $_.Value -eq $true) { '-{0}' -f $_.Key }
+            elseif ($_.Value) { '-{0}' -f $_.Key; ('{0}' -f $_.Value) }
+        }
+    )
+    $psi.Arguments = ($argList | ForEach-Object { if ($_ -match "\s") { '"{0}"' -f $_ } else { $_ } }) -join ' '
+    $psi.Verb = 'runas'
+    try {
+        $p = [System.Diagnostics.Process]::Start($psi)
+        $p.WaitForExit()
+        exit $p.ExitCode
+    } catch {
+        Write-Error "Elevation cancelled or failed: $_"
+        exit 1
+    }
 }
 
 Write-Host "NCraft Shell Extensions Manager for Windows 11" -ForegroundColor Cyan
@@ -47,13 +66,15 @@ if (-not $GLTFOnly) {
     Write-Host "POINT CLOUD SHELL EXTENSION (.las/.laz files)" -ForegroundColor Cyan
     Write-Host "="*60 -ForegroundColor Cyan
     
-    $pcScriptArgs = @()
-    if ($Unregister) { $pcScriptArgs += "-Unregister" }
-    if ($Test) { $pcScriptArgs += "-Test" }
+    $pcParams = @{}
+    if ($Unregister) { $pcParams.Unregister = $true }
+    if ($Test) { $pcParams.Test = $true }
+    if ($ResetOpenWith) { $pcParams.ResetOpenWith = $true }
+    if ($ResetUserChoice) { $pcParams.ResetUserChoice = $true }
     
     $pcScriptPath = Join-Path $ProjectRoot "Register-Win11-PointCloud.ps1"
     if (Test-Path $pcScriptPath) {
-        & $pcScriptPath @pcScriptArgs
+        & $pcScriptPath @pcParams
     } else {
         Write-Error "Point Cloud registration script not found: $pcScriptPath"
     }
@@ -65,13 +86,15 @@ if (-not $PointCloudOnly) {
     Write-Host "GLTF/GLB SHELL EXTENSION (.gltf/.glb files)" -ForegroundColor Cyan
     Write-Host "="*60 -ForegroundColor Cyan
     
-    $gltfScriptArgs = @()
-    if ($Unregister) { $gltfScriptArgs += "-Unregister" }
-    if ($Test) { $gltfScriptArgs += "-Test" }
+    $gltfParams = @{}
+    if ($Unregister) { $gltfParams.Unregister = $true }
+    if ($Test) { $gltfParams.Test = $true }
+    if ($ResetOpenWith) { $gltfParams.ResetOpenWith = $true }
+    if ($ResetUserChoice) { $gltfParams.ResetUserChoice = $true }
     
     $gltfScriptPath = Join-Path $ProjectRoot "Register-Win11-GLTF.ps1"
     if (Test-Path $gltfScriptPath) {
-        & $gltfScriptPath @gltfScriptArgs
+        & $gltfScriptPath @gltfParams
     } else {
         Write-Error "GLTF registration script not found: $gltfScriptPath"
     }
