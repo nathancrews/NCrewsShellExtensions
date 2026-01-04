@@ -1,7 +1,7 @@
 <h2>NCrews Windows shell extension projects:</h2>
 
 # NCrews GLTF/GLB Shell Extension
-
+Pre-built Windows 10/11 x64 installer: https://buymeacoffee.com/nathancrews/e/255640
 ## Browse your 3D models as easily as browsing photos. **Install once, preview forever.**
 The NCrews GLTF/GLB Windows Explorer Shell Extension provides professional 3D model visualization. 
 No more guessing which file contains the model you need - see beautiful, high-quality thumbnail previews of your GLTF and GLB files instantly, just like viewing photos. Browse your 3D models as easily as browsing photos. Install once, preview forever and supports multi-file select and fast directory processing.
@@ -56,4 +56,5 @@ The library files are not included in this project, but are required to build as
 Open3D: https://github.com/isl-org/Open3D
 OpenCV: https://github.com/opencv/opencv
 LASLib: https://github.com/LAStools/LAStools/tree/master/LASlib
+
 
