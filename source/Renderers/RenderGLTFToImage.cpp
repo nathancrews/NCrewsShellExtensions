@@ -29,6 +29,7 @@
 
 
 #include "Renderers/RenderGLTFToImage.h"
+#include "GLBTextureExtractor.h"
 
 namespace NCrewsImageGen
 {
@@ -173,6 +174,32 @@ UINT RenderModelToImage(FilamentRenderer* modelRenderer,
     {
         io::ReadTriangleModelOptions opt;
         model_success = io::ReadTriangleModel(fileInfo.m_FileName.string(), loaded_model, opt);
+        
+        // If model loaded but has no textures, try extracting WebP textures manually
+        if (model_success)
+        {
+            std::string file_ext = fileInfo.m_FileName.extension().string();
+            std::transform(file_ext.begin(), file_ext.end(), file_ext.begin(), ::tolower);
+            
+            if (file_ext == ".glb" || file_ext == ".gltf")
+            {
+                // Check if materials exist but have no textures
+                bool has_missing_textures = false;
+                for (const auto& mat : loaded_model.materials_)
+                {
+                    if (!mat.albedo_img)
+                    {
+                        has_missing_textures = true;
+                        break;
+                    }
+                }
+                
+                if (has_missing_textures)
+                {
+                    GLBTextureExtractor::ExtractTextures(fileInfo.m_FileName.string(), loaded_model);
+                }
+            }
+        }
     }
     catch (...)
     {
@@ -182,11 +209,20 @@ UINT RenderModelToImage(FilamentRenderer* modelRenderer,
 
     if (model_success)
     {
-        auto* scene = new Open3DScene(*modelRenderer);
+        std::unique_ptr<Open3DScene> scene(new Open3DScene(*modelRenderer));
 
         if (scene)
         {
             scene->AddModel(fileInfo.m_FileName.string(), loaded_model);
+
+            // Lighting: soften and brighten slightly (IBL + sun)
+            scene->SetLighting(Open3DScene::LightingProfile::SOFT_SHADOWS,
+                               Eigen::Vector3f(0.577f, -0.577f, -0.577f));
+            // Fine-tune intensities
+            scene->GetScene()->SetIndirectLightIntensity(36000.0f);
+            scene->GetScene()->SetSunLightIntensity(70000.0f);
+            scene->GetView()->SetAmbientOcclusion(true, true);
+            scene->GetView()->SetAntiAliasing(true, true);
 
             scene->ShowAxes(false);
 
@@ -220,10 +256,13 @@ UINT RenderModelToImage(FilamentRenderer* modelRenderer,
                 modelRenderer->BeginFrame();
                 modelRenderer->EndFrame();
 
-                io::WriteImage(fileInfo.m_ImageName.string(), *img);
+                if (img && img->HasData()) {
+                    io::WriteImage(fileInfo.m_ImageName.string(), *img);
+                } else {
+                    utility::LogWarning("[TEXTURE DEBUG] RenderToImage produced null/empty image");
+                    return 0;
+                }
             }
-
-            delete scene;
         }
     }
 
@@ -243,11 +282,40 @@ HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath,
     std::filesystem::path resourcePath = appPath;
     resourcePath += "resources";
 
+    // Compile-time switch for debug logging (default OFF)
+#ifndef NCRAFT_ENABLE_TEXTURE_DEBUG
+#define NCRAFT_ENABLE_TEXTURE_DEBUG 0
+#endif
+#if NCRAFT_ENABLE_TEXTURE_DEBUG
+    // Enable debug logging for texture loading to a file (use system temp directory)
+    namespace fs = std::filesystem;
+    const auto logPathFs = fs::temp_directory_path() / "Open3D_GLB_Debug.log";
+    const std::string logPath = logPathFs.string();
+    open3d::utility::SetVerbosityLevel(open3d::utility::VerbosityLevel::Debug);
+    
+    // Set log output to file
+    if (FILE* logFile = fopen(logPath.c_str(), "a"))
+    {
+        fclose(logFile);
+        utility::Logger::GetInstance().SetPrintFunction(
+            [logPath](const std::string& msg) {
+                if (FILE* f = fopen(logPath.c_str(), "a")) {
+                    fprintf(f, "%s\n", msg.c_str());
+                    fflush(f);
+                    fclose(f);
+                }
+            });
+    }
+#else
+    // Silence Open3D logs for production builds
+    open3d::utility::SetVerbosityLevel(open3d::utility::VerbosityLevel::Error);
+#endif
+    
     EngineInstance::SetResourcePath(resourcePath.string().c_str());
 
-    FilamentRenderer* renderer =
+    std::unique_ptr<FilamentRenderer> renderer(
         new FilamentRenderer(EngineInstance::GetInstance(), width, height,
-                             EngineInstance::GetResourceManager());
+                             EngineInstance::GetResourceManager()));
 
     if (!renderer)
     {
@@ -256,13 +324,72 @@ HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath,
 
     imagePath = imagePath.replace_extension("png");
 
+    utility::LogInfo("[TEXTURE DEBUG] Loading model from: {}", filePath.string());
+    
     try
     {
         io::ReadTriangleModelOptions opt;
         model_success = io::ReadTriangleModel(filePath.string(), loaded_model, opt);
+        
+        if (model_success)
+        {
+            utility::LogInfo("[TEXTURE DEBUG] Model loaded successfully");
+            utility::LogInfo("[TEXTURE DEBUG] Number of meshes: {}", loaded_model.meshes_.size());
+            utility::LogInfo("[TEXTURE DEBUG] Number of materials: {}", loaded_model.materials_.size());
+            
+            // Try extracting WebP textures if missing
+            std::string file_ext = filePath.extension().string();
+            std::transform(file_ext.begin(), file_ext.end(), file_ext.begin(), ::tolower);
+            
+            if (file_ext == ".glb" || file_ext == ".gltf")
+            {
+                bool has_missing_textures = false;
+                for (const auto& mat : loaded_model.materials_)
+                {
+                    if (!mat.albedo_img)
+                    {
+                        has_missing_textures = true;
+                        break;
+                    }
+                }
+                
+                if (has_missing_textures)
+                {
+                    utility::LogInfo("[TEXTURE DEBUG] Attempting to extract WebP textures...");
+                    GLBTextureExtractor::ExtractTextures(filePath.string(), loaded_model);
+                }
+            }
+            
+            // Log material details after extraction attempt
+            for (size_t i = 0; i < loaded_model.materials_.size(); ++i)
+            {
+                auto& mat = loaded_model.materials_[i];
+                utility::LogInfo("[TEXTURE DEBUG] Material {}: name='{}'", i, mat.name);
+                utility::LogInfo("[TEXTURE DEBUG]   - Has albedo map: {}", mat.albedo_img ? "YES" : "NO");
+                utility::LogInfo("[TEXTURE DEBUG]   - Has normal map: {}", mat.normal_img ? "YES" : "NO");
+                utility::LogInfo("[TEXTURE DEBUG]   - Has roughness map: {}", mat.roughness_img ? "YES" : "NO");
+                utility::LogInfo("[TEXTURE DEBUG]   - Has metallic map: {}", mat.metallic_img ? "YES" : "NO");
+                if (mat.albedo_img)
+                {
+                    utility::LogInfo("[TEXTURE DEBUG]   - Albedo map size: {}x{}", 
+                                     mat.albedo_img->width_, mat.albedo_img->height_);
+                }
+            }
+        }
+        else
+        {
+            utility::LogInfo("[TEXTURE DEBUG] Model loading FAILED");
+        }
+    }
+    catch (const std::exception& e)
+    {
+        utility::LogInfo("[TEXTURE DEBUG] Exception loading model: {}", e.what());
+        model_success = false;
+        return 0;
     }
     catch (...)
     {
+        utility::LogInfo("[TEXTURE DEBUG] Unknown exception loading model");
         model_success = false;
         return 0;
     }
@@ -273,7 +400,16 @@ HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath,
 
         if (scene)
         {
+            utility::LogInfo("[TEXTURE DEBUG] Adding model to scene...");
             scene->AddModel(filePath.string(), loaded_model);
+
+            // Lighting tweaks to better match glTF viewer
+            scene->SetLighting(Open3DScene::LightingProfile::SOFT_SHADOWS,
+                               Eigen::Vector3f(0.577f, -0.577f, -0.577f));
+            scene->GetScene()->SetIndirectLightIntensity(36000.0f);
+            scene->GetScene()->SetSunLightIntensity(70000.0f);
+            scene->GetView()->SetAmbientOcclusion(true, true);
+            scene->GetView()->SetAntiAliasing(true, true);
 
             scene->ShowAxes(false);
 
@@ -307,7 +443,12 @@ HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath,
                 renderer->BeginFrame();
                 renderer->EndFrame();
 
-                io::WriteImage(imagePath.string(), *img);
+                if (img && img->HasData()) {
+                    io::WriteImage(imagePath.string(), *img);
+                } else {
+                    utility::LogWarning("[TEXTURE DEBUG] RenderToImage produced null/empty image");
+                    return 0;
+                }
 
                 utility::LogInfo("Thumbnail: writing temp image file {}", imagePath.string().c_str());
 
@@ -319,15 +460,15 @@ HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath,
                     {
                         utility::LogInfo("got HBITMAP ok");
                     }
-
                     delete bitmap;
-
-                    std::filesystem::remove(imagePath);
                 }
-            }
 
-            delete scene;
+                // Best-effort cleanup of temp image file
+                try { std::filesystem::remove(imagePath); } catch (...) {}
+            }
         }
+
+        delete scene;
     }
 
     return result;

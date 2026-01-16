@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="21.3.1" version="23.1" Modules="simple" RootPath="." Language="en" Id="{FF3B5636-10A6-46E4-A34E-363C375FC5DC}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="21.3.1" version="21.7.1" Modules="simple" RootPath="." Language="en" Id="{FF3B5636-10A6-46E4-A34E-363C375FC5DC}">
+  <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
+    <ROW Name="HiddenItems" Value="AppXProductDetailsComponent;AppXDependenciesComponent;AppXAppDetailsComponent;AppXVisualAssetsComponent;AppXCapabilitiesComponent;AppXAppDeclarationsComponent;AppXUriRulesComponent;FixupComponent;MsiXDiffComponent;MsixManifestEditorComponent"/>
+  </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
     <ROW Property="ALLUSERS" Value="1"/>
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
     <ROW Property="ARPPRODUCTICON" Value="DesktopFolder.exe" Type="8"/>
     <ROW Property="Manufacturer" Value="NCrews Software"/>
-    <ROW Property="ProductCode" Value="1033:{2405192A-02A3-49FF-B02E-7CBA1E5E1465} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{578B5E68-C21A-4C72-BAB7-933F1854442E} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="NCrews Point Cloud Shell Extension"/>
-    <ROW Property="ProductVersion" Value="1.1.0" Options="32"/>
+    <ROW Property="ProductVersion" Value="1.0.0" Options="32"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{D5367029-34E7-40AD-B5E7-62A76AE6685E}"/>
     <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
@@ -339,8 +342,8 @@
     <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]." DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="DefaultBuild"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiMergeModsComponent">
-    <ROW Module="Microsoft_VC143_CRT_x64.msm" Path="C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\v143\MergeModules\Microsoft_VC143_CRT_x64.msm" Feature="MainFeature" Directory="APPDIR" Order="1"/>
-    <ROW Module="Microsoft_VC143_OpenMP_x64.msm" Path="C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\v143\MergeModules\Microsoft_VC143_OpenMP_x64.msm" Feature="MainFeature" Directory="APPDIR" Order="2"/>
+    <ROW Module="Microsoft_VC143_CRT_x64.msm_1" Path="C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.38.33135\MergeModules\Microsoft_VC143_CRT_x64.msm" Feature="MainFeature" Directory="APPDIR" Order="1"/>
+    <ROW Module="Microsoft_VC143_OpenMP_x64.msm_1" Path="C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.38.33135\MergeModules\Microsoft_VC143_OpenMP_x64.msm" Feature="MainFeature" Directory="APPDIR" Order="2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
     <ROW Registry="Approved" Root="2" Key="Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved" Name="\"/>

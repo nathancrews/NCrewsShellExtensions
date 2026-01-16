@@ -28,6 +28,7 @@
     <ClInclude Include="..\inc\ModelShellExtension\ModelThumbnailGUID.h" />
     <ClInclude Include="..\inc\Renderers\RenderGLTFToImage.h" />
     <ClInclude Include="..\inc\Renderers\RenderToImageCommon.h" />
+    <ClInclude Include="..\source\Renderers\GLBTextureExtractor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\3rdpartylibs\TinyXML\Source\tinyxml2.cpp" />
@@ -37,6 +38,7 @@
     <ClCompile Include="..\source\ModelShellExtension\ModelThumbnail.cpp" />
     <ClCompile Include="..\source\Renderers\RenderGLTFToImage.cpp" />
     <ClCompile Include="..\source\Renderers\RenderToImageCommon.cpp" />
+    <ClCompile Include="..\source\Renderers\GLBTextureExtractor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\ModelShellExtension\ModelShellExtension.def" />
@@ -147,7 +149,7 @@
       <PreprocessorDefinitions>NDEBUG;_WIN32;_WINDOWS;WIN32;WINDOWS;FMT_HEADER_ONLY=0;FMT_USE_WINDOWS_H=0;FMT_STRING_ALIAS=1;_CRT_SECURE_NO_WARNINGS;_GLIBCXX_USE_CXX11_ABI=1;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;NOMINMAX;_USE_MATH_DEFINES;_ENABLE_EXTENDED_ALIGNED_STORAGE;__TBB_LIB_NAME=tbb_static;NO_LOGGING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-<AdditionalIncludeDirectories>..\..\NCraftImageGen\inc\ModelShellExtension;..\..\NCraftImageGen\inc;D:\3rdpartylibs\Open3D18\include;D:/3rdpartylibs/Open3D18/include/open3d/3rdparty;D:\3rdpartylibs\Open3D18\build\tbb\src\ext_tbb\include;D:\3rdpartylibs\TinyXML\Inc</AdditionalIncludeDirectories>
+<AdditionalIncludeDirectories>..\..\NCraftImageGen\inc\ModelShellExtension;..\..\NCraftImageGen\inc;D:\3rdpartylibs\Open3D19\install\include;D:/3rdpartylibs/Open3D19/install/include/open3d/3rdparty;D:\3rdpartylibs\Open3D19\build\_deps\ext_tbb-src\include;D:\3rdpartylibs\Open3D19\build\tinygltf\src\ext_tinygltf;D:\github\vcpkg\installed\x64-windows\include;D:\3rdpartylibs\TinyXML\Inc</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
       <OpenMPSupport>true</OpenMPSupport>
@@ -163,12 +165,13 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <ModuleDefinitionFile>..\source\ModelShellExtension\ModelShellExtension.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>D:\3rdpartylibs\Open3D18\build\lib\Release;D:\3rdpartylibs\Open3D18\build\tbb\src\ext_tbb-build\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);Open3D.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\3rdpartylibs\Open3D19\install\lib;D:\3rdpartylibs\Open3D19\build\_deps\ext_tbb-build\Release;D:\github\vcpkg\installed\x64-windows\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);Open3D.lib;libwebp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy D:\3rdpartylibs\open3d18\build\bin\resources\*.* $(TargetDir)\resources\* /E /D /Y /I
-xcopy "D:\3rdpartylibs\open3d18\build\bin\Release\Open3D.dll" $(TargetDir)\* /E /D /Y</Command>
+      <Command>xcopy D:\3rdpartylibs\open3d19\build\bin\resources\*.* $(TargetDir)\resources\* /E /D /Y /I
+xcopy "D:\3rdpartylibs\open3d19\install\bin\Open3D.dll" $(TargetDir)\* /E /D /Y
+xcopy "D:\3rdpartylibs\open3d19\install\bin\tbb12.dll" $(TargetDir)\* /E /D /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
