@@ -275,6 +275,7 @@ HRESULT DllRegisterServer()
 
     RegCloseKey(hkey);
 
+
     lpSubKey = L"Software\\Classes\\.glb\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
 
     res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
@@ -303,7 +304,128 @@ HRESULT DllRegisterServer()
         return E_UNEXPECTED;
     }
 
+    RegCloseKey(hkey);
+
+    lpSubKey = L"Software\\Classes\\.stl\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
+
+    lpSubKey = L"Software\\Classes\\stl_auto_file\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
+
+    lpSubKey = L"Software\\Classes\\.obj\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
+
+    lpSubKey = L"Software\\Classes\\obj_auto_file\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
+
+    // FBX support intentionally disabled.
+    //lpSubKey = L"Software\\Classes\\.fbx\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+    //
+    //res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    //if (res != ERROR_SUCCESS)
+    //{
+    //    return E_UNEXPECTED;
+    //}
+    //res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+    //if (res != ERROR_SUCCESS)
+    //{
+    //    return E_UNEXPECTED;
+    //}
+    //
     //RegCloseKey(hkey);
+    //
+    //lpSubKey = L"Software\\Classes\\fbx_auto_file\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+    //
+    //res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    //if (res != ERROR_SUCCESS)
+    //{
+    //    return E_UNEXPECTED;
+    //}
+    //res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+    //if (res != ERROR_SUCCESS)
+    //{
+    //    return E_UNEXPECTED;
+    //}
+    //
+    //RegCloseKey(hkey);
+
+    lpSubKey = L"Software\\Classes\\.3mf\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
+
+    lpSubKey = L"Software\\Classes\\3mf_auto_file\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)std::wstring(menuExtGUID).c_str(), (DWORD)(std::wstring(menuExtGUID).size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
 
     lpSubKey = L"Software\\Classes\\Directory\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
 
@@ -334,6 +456,135 @@ HRESULT DllRegisterServer()
     }
 
     std::wstring thumbExtGUIDStr(thumbExtGUID);
+
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)thumbExtGUIDStr.c_str(), (DWORD)(thumbExtGUIDStr.size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
+
+    lpSubKey = L"Software\\Classes\\.stl\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)thumbExtGUIDStr.c_str(), (DWORD)(thumbExtGUIDStr.size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
+
+    lpSubKey = L"Software\\Classes\\stl_auto_file\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)thumbExtGUIDStr.c_str(), (DWORD)(thumbExtGUIDStr.size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
+
+    lpSubKey = L"Software\\Classes\\.obj\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)thumbExtGUIDStr.c_str(), (DWORD)(thumbExtGUIDStr.size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
+
+    lpSubKey = L"Software\\Classes\\obj_auto_file\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)thumbExtGUIDStr.c_str(), (DWORD)(thumbExtGUIDStr.size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
+
+    // FBX support intentionally disabled.
+    //lpSubKey = L"Software\\Classes\\.fbx\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+    //
+    //res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    //if (res != ERROR_SUCCESS)
+    //{
+    //    return E_UNEXPECTED;
+    //}
+    //
+    //res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)thumbExtGUIDStr.c_str(), (DWORD)(thumbExtGUIDStr.size() + 1U) * 2U);
+    //if (res != ERROR_SUCCESS)
+    //{
+    //    return E_UNEXPECTED;
+    //}
+    //
+    //RegCloseKey(hkey);
+    //
+    //lpSubKey = L"Software\\Classes\\fbx_auto_file\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+    //
+    //res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    //if (res != ERROR_SUCCESS)
+    //{
+    //    return E_UNEXPECTED;
+    //}
+    //
+    //res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)thumbExtGUIDStr.c_str(), (DWORD)(thumbExtGUIDStr.size() + 1U) * 2U);
+    //if (res != ERROR_SUCCESS)
+    //{
+    //    return E_UNEXPECTED;
+    //}
+    //
+    //RegCloseKey(hkey);
+
+    lpSubKey = L"Software\\Classes\\.3mf\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)thumbExtGUIDStr.c_str(), (DWORD)(thumbExtGUIDStr.size() + 1U) * 2U);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
+
+    RegCloseKey(hkey);
+
+    lpSubKey = L"Software\\Classes\\3mf_auto_file\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+
+    res = RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return E_UNEXPECTED;
+    }
 
     res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)thumbExtGUIDStr.c_str(), (DWORD)(thumbExtGUIDStr.size() + 1U) * 2U);
     if (res != ERROR_SUCCESS)
@@ -397,9 +648,71 @@ HRESULT DllRegisterServer()
         RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)thumbExtGUIDStr.c_str(), (DWORD)(thumbExtGUIDStr.size() + 1U) * 2U);
         RegCloseKey(hkey);
     }
+
+    lpSubKey = L"Software\\Classes\\.stl\\ShellEx\\{BB2E617C-0920-11D1-9A0B-00C04FC2D6C1}";
+    if (ERROR_SUCCESS == RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp))
+    {
+        RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)thumbExtGUIDStr.c_str(), (DWORD)(thumbExtGUIDStr.size() + 1U) * 2U);
+        RegCloseKey(hkey);
+    }
+    
+    lpSubKey = L"Software\\Classes\\.obj\\ShellEx\\{BB2E617C-0920-11D1-9A0B-00C04FC2D6C1}";
+    if (ERROR_SUCCESS == RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp))
+    {
+        RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)thumbExtGUIDStr.c_str(), (DWORD)(thumbExtGUIDStr.size() + 1U) * 2U);
+        RegCloseKey(hkey);
+    }
+
+    // FBX support intentionally disabled.
+    //lpSubKey = L"Software\\Classes\\.fbx\\ShellEx\\{BB2E617C-0920-11D1-9A0B-00C04FC2D6C1}";
+    //if (ERROR_SUCCESS == RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp))
+    //{
+    //    RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)thumbExtGUIDStr.c_str(), (DWORD)(thumbExtGUIDStr.size() + 1U) * 2U);
+    //    RegCloseKey(hkey);
+    //}
+
+    lpSubKey = L"Software\\Classes\\.3mf\\ShellEx\\{BB2E617C-0920-11D1-9A0B-00C04FC2D6C1}";
+    if (ERROR_SUCCESS == RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp))
+    {
+        RegSetValueEx(hkey, NULL, 0, REG_SZ, (BYTE*)thumbExtGUIDStr.c_str(), (DWORD)(thumbExtGUIDStr.size() + 1U) * 2U);
+        RegCloseKey(hkey);
+    }
     
     // Windows 11: Force thumbnail cache refresh by setting DisableThumbnailCache temporarily
     lpSubKey = L"Software\\Classes\\.glb";
+    if (ERROR_SUCCESS == RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp))
+    {
+        DWORD disableCache = 1;
+        RegSetValueEx(hkey, L"DisableThumbnailCache", 0, REG_DWORD, (BYTE*)&disableCache, sizeof(DWORD));
+        RegCloseKey(hkey);
+    }
+
+    lpSubKey = L"Software\\Classes\\.stl";
+    if (ERROR_SUCCESS == RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp))
+    {
+        DWORD disableCache = 1;
+        RegSetValueEx(hkey, L"DisableThumbnailCache", 0, REG_DWORD, (BYTE*)&disableCache, sizeof(DWORD));
+        RegCloseKey(hkey);
+    }
+
+    lpSubKey = L"Software\\Classes\\.obj";
+    if (ERROR_SUCCESS == RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp))
+    {
+        DWORD disableCache = 1;
+        RegSetValueEx(hkey, L"DisableThumbnailCache", 0, REG_DWORD, (BYTE*)&disableCache, sizeof(DWORD));
+        RegCloseKey(hkey);
+    }
+
+    // FBX support intentionally disabled.
+    //lpSubKey = L"Software\\Classes\\.fbx";
+    //if (ERROR_SUCCESS == RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp))
+    //{
+    //    DWORD disableCache = 1;
+    //    RegSetValueEx(hkey, L"DisableThumbnailCache", 0, REG_DWORD, (BYTE*)&disableCache, sizeof(DWORD));
+    //    RegCloseKey(hkey);
+    //}
+
+    lpSubKey = L"Software\\Classes\\.3mf";
     if (ERROR_SUCCESS == RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp))
     {
         DWORD disableCache = 1;
@@ -484,6 +797,79 @@ HRESULT DllUnregisterServer()
         RegCloseKey(hkey);
     }
 
+    lpSubKey = L"Software\\Classes\\.stl\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    lpSubKey = L"Software\\Classes\\stl_auto_file\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    lpSubKey = L"Software\\Classes\\.obj\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    lpSubKey = L"Software\\Classes\\obj_auto_file\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    // FBX support intentionally disabled.
+    //lpSubKey = L"Software\\Classes\\.fbx\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+    //
+    //if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    //{
+    //    res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+    //
+    //    RegCloseKey(hkey);
+    //}
+    //
+    //lpSubKey = L"Software\\Classes\\fbx_auto_file\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+    //
+    //if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    //{
+    //    res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+    //
+    //    RegCloseKey(hkey);
+    //}
+
+    lpSubKey = L"Software\\Classes\\.3mf\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    lpSubKey = L"Software\\Classes\\3mf_auto_file\\shellex\\{E357FCCD-A995-4576-B01F-234630154E96}";
+
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
     //******************************************************************************************************
     // Remove the context menu handlers for file types
 
@@ -513,6 +899,39 @@ HRESULT DllUnregisterServer()
         RegCloseKey(hkey);
     }
 
+    lpSubKey = L"Software\\Classes\\stl_auto_file\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    lpSubKey = L"Software\\Classes\\obj_auto_file\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    // FBX support intentionally disabled.
+    //lpSubKey = L"Software\\Classes\\fbx_auto_file\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+    //if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    //{
+    //    res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+    //
+    //    RegCloseKey(hkey);
+    //}
+
+    lpSubKey = L"Software\\Classes\\3mf_auto_file\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
     lpSubKey = L"Software\\Classes\\.glb\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
     if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
     {
@@ -522,6 +941,39 @@ HRESULT DllUnregisterServer()
     }
 
     lpSubKey = L"Software\\Classes\\.gltf\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    lpSubKey = L"Software\\Classes\\.stl\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    lpSubKey = L"Software\\Classes\\.obj\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+
+        RegCloseKey(hkey);
+    }
+
+    // FBX support intentionally disabled.
+    //lpSubKey = L"Software\\Classes\\.fbx\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+    //if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    //{
+    //    res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
+    //
+    //    RegCloseKey(hkey);
+    //}
+
+    lpSubKey = L"Software\\Classes\\.3mf\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
     if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpSubKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
     {
         res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());

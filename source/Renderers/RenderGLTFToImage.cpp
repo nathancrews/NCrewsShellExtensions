@@ -29,10 +29,148 @@
 
 
 #include "Renderers/RenderGLTFToImage.h"
+
+#ifndef NCRAFT_ENABLE_GLB_TEXTURE_EXTRACTOR
+#define NCRAFT_ENABLE_GLB_TEXTURE_EXTRACTOR 1
+#endif
+
+#if NCRAFT_ENABLE_GLB_TEXTURE_EXTRACTOR
 #include "GLBTextureExtractor.h"
+#endif
 
 namespace NCrewsImageGen
 {
+namespace
+{
+std::string GetLowerFileExtension(const std::filesystem::path& filePath)
+{
+    std::string fileExt = filePath.extension().string();
+    std::transform(fileExt.begin(), fileExt.end(), fileExt.begin(), ::tolower);
+    return fileExt;
+}
+bool BuildSingleMeshModelFromTriangleMesh(const std::filesystem::path& filePath,
+                                          geometry::TriangleMesh&& mesh,
+                                          visualization::rendering::TriangleMeshModel& outModel)
+{
+    if (mesh.IsEmpty() || !mesh.HasTriangles())
+    {
+        return false;
+    }
+
+    if (!mesh.HasTriangleNormals())
+    {
+        mesh.ComputeTriangleNormals();
+    }
+    if (!mesh.HasVertexNormals())
+    {
+        mesh.ComputeVertexNormals();
+    }
+
+    outModel.meshes_.clear();
+    outModel.materials_.clear();
+
+    visualization::rendering::TriangleMeshModel::MeshInfo meshInfo;
+    meshInfo.mesh = std::make_shared<geometry::TriangleMesh>(std::move(mesh));
+    meshInfo.mesh_name = filePath.filename().string();
+    meshInfo.material_idx = 0;
+    outModel.meshes_.push_back(meshInfo);
+
+    visualization::rendering::MaterialRecord defaultMaterial;
+    defaultMaterial.name = "default_material";
+    defaultMaterial.shader = "defaultLit";
+    defaultMaterial.base_color = Eigen::Vector4f(0.72f, 0.72f, 0.72f, 1.0f);
+    defaultMaterial.base_metallic = 0.0f;
+    defaultMaterial.base_roughness = 0.85f;
+    outModel.materials_.push_back(defaultMaterial);
+
+    return true;
+}
+
+bool HasRenderableGeometry(const visualization::rendering::TriangleMeshModel& model)
+{
+    for (const auto& meshInfo : model.meshes_)
+    {
+        if (meshInfo.mesh && !meshInfo.mesh->IsEmpty() && meshInfo.mesh->HasTriangles())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool LoadModelForRender(const std::filesystem::path& filePath,
+                        visualization::rendering::TriangleMeshModel& outModel,
+                        bool logTextureDebug = false)
+{
+    std::string fileExt = GetLowerFileExtension(filePath);
+
+    if (fileExt == ".stl")
+    {
+        geometry::TriangleMesh stlMesh;
+        io::ReadTriangleMeshOptions meshOptions;
+        meshOptions.enable_post_processing = true;
+
+        bool meshSuccess = io::ReadTriangleMesh(filePath.string(), stlMesh, meshOptions);
+        if (!meshSuccess)
+        {
+            return false;
+        }
+
+        return BuildSingleMeshModelFromTriangleMesh(filePath, std::move(stlMesh), outModel);
+    }
+
+    io::ReadTriangleModelOptions modelOptions;
+    bool modelSuccess = io::ReadTriangleModel(filePath.string(), outModel, modelOptions);
+
+    if (!modelSuccess || !HasRenderableGeometry(outModel))
+    {
+        utility::LogInfo("ReadTriangleModel failed or returned no renderable geometry for {}, trying ReadTriangleMesh fallback...",
+                         filePath.string().c_str());
+
+        geometry::TriangleMesh fallbackMesh;
+        io::ReadTriangleMeshOptions fallbackOptions;
+        fallbackOptions.enable_post_processing = true;
+
+        bool fallbackSuccess = io::ReadTriangleMesh(filePath.string(), fallbackMesh, fallbackOptions);
+        if (fallbackSuccess &&
+            BuildSingleMeshModelFromTriangleMesh(filePath, std::move(fallbackMesh), outModel))
+        {
+            utility::LogInfo("ReadTriangleMesh fallback succeeded for {}", filePath.string().c_str());
+            return true;
+        }
+
+        utility::LogInfo("ReadTriangleMesh fallback failed for {}", filePath.string().c_str());
+        return false;
+    }
+
+    if (fileExt == ".glb")
+    {
+        bool hasMissingTextures = false;
+        for (const auto& mat : outModel.materials_)
+        {
+            if (!mat.albedo_img)
+            {
+                hasMissingTextures = true;
+                break;
+            }
+        }
+
+        if (hasMissingTextures)
+        {
+#if NCRAFT_ENABLE_GLB_TEXTURE_EXTRACTOR
+            if (logTextureDebug)
+            {
+                utility::LogInfo("[TEXTURE DEBUG] Attempting to extract WebP textures...");
+            }
+            GLBTextureExtractor::ExtractTextures(filePath.string(), outModel);
+#endif
+        }
+    }
+
+    return true;
+}
+}
 
 UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::filesystem::path>& filePaths,
                           NCrewsImageGen::AppSettings& imageSettings,
@@ -138,13 +276,33 @@ UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::files
             if (outRenderResults[sz].m_imageFileCacheOk == false)
             {
                 timer.Start();
-                RenderModelToImage(renderer, imageSettings, outRenderResults[sz]);
+                UINT renderStatus = RenderModelToImage(renderer, imageSettings, outRenderResults[sz]);
                 timer.Stop();
 
                 exeTime = timer.GetDurationInSecond();
                 execExecTotal += exeTime;
 
                 outRenderResults[sz].m_processTimeSeconds = exeTime;
+
+                if (renderStatus == 0)
+                {
+                    utility::LogInfo("Render failed for {}", outRenderResults[sz].m_FileName.string().c_str());
+                    try
+                    {
+                        if (std::filesystem::exists(outRenderResults[sz].m_ImageName))
+                        {
+                            uintmax_t outputSize = std::filesystem::file_size(outRenderResults[sz].m_ImageName);
+                            if (outputSize == 0)
+                            {
+                                std::filesystem::remove(outRenderResults[sz].m_ImageName);
+                            }
+                        }
+                    }
+                    catch (...)
+                    {
+                        utility::LogInfo("Failed to inspect/cleanup output image {}", outRenderResults[sz].m_ImageName.string().c_str());
+                    }
+                }
             }
             utility::LogInfo("Load/Render process duration for {}, {}s", outRenderResults[sz].m_FileName.string(), exeTime);
         }
@@ -168,38 +326,12 @@ UINT RenderModelToImage(FilamentRenderer* modelRenderer,
     const int width = imageSettings.imageWidth;
     const int height = imageSettings.imageHeight;
     bool model_success = false;
+    bool image_written = false;
     visualization::rendering::TriangleMeshModel loaded_model;
 
     try
     {
-        io::ReadTriangleModelOptions opt;
-        model_success = io::ReadTriangleModel(fileInfo.m_FileName.string(), loaded_model, opt);
-        
-        // If model loaded but has no textures, try extracting WebP textures manually
-        if (model_success)
-        {
-            std::string file_ext = fileInfo.m_FileName.extension().string();
-            std::transform(file_ext.begin(), file_ext.end(), file_ext.begin(), ::tolower);
-            
-            if (file_ext == ".glb" || file_ext == ".gltf")
-            {
-                // Check if materials exist but have no textures
-                bool has_missing_textures = false;
-                for (const auto& mat : loaded_model.materials_)
-                {
-                    if (!mat.albedo_img)
-                    {
-                        has_missing_textures = true;
-                        break;
-                    }
-                }
-                
-                if (has_missing_textures)
-                {
-                    GLBTextureExtractor::ExtractTextures(fileInfo.m_FileName.string(), loaded_model);
-                }
-            }
-        }
+        model_success = LoadModelForRender(fileInfo.m_FileName, loaded_model, false);
     }
     catch (...)
     {
@@ -257,16 +389,27 @@ UINT RenderModelToImage(FilamentRenderer* modelRenderer,
                 modelRenderer->EndFrame();
 
                 if (img && img->HasData()) {
-                    io::WriteImage(fileInfo.m_ImageName.string(), *img);
+                    if (!io::WriteImage(fileInfo.m_ImageName.string(), *img))
+                    {
+                        utility::LogInfo("Failed writing output image {}", fileInfo.m_ImageName.string().c_str());
+                        return 0;
+                    }
+                    image_written = true;
                 } else {
                     utility::LogWarning("[TEXTURE DEBUG] RenderToImage produced null/empty image");
                     return 0;
                 }
             }
+            else
+            {
+                utility::LogInfo("Skipping render for {} because bounding box extent is zero",
+                                 fileInfo.m_FileName.string().c_str());
+                return 0;
+            }
         }
     }
 
-    return 1;
+    return image_written ? 1U : 0U;
 }
 
 HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath,
@@ -328,37 +471,13 @@ HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath,
     
     try
     {
-        io::ReadTriangleModelOptions opt;
-        model_success = io::ReadTriangleModel(filePath.string(), loaded_model, opt);
+        model_success = LoadModelForRender(filePath, loaded_model, true);
         
         if (model_success)
         {
             utility::LogInfo("[TEXTURE DEBUG] Model loaded successfully");
             utility::LogInfo("[TEXTURE DEBUG] Number of meshes: {}", loaded_model.meshes_.size());
             utility::LogInfo("[TEXTURE DEBUG] Number of materials: {}", loaded_model.materials_.size());
-            
-            // Try extracting WebP textures if missing
-            std::string file_ext = filePath.extension().string();
-            std::transform(file_ext.begin(), file_ext.end(), file_ext.begin(), ::tolower);
-            
-            if (file_ext == ".glb" || file_ext == ".gltf")
-            {
-                bool has_missing_textures = false;
-                for (const auto& mat : loaded_model.materials_)
-                {
-                    if (!mat.albedo_img)
-                    {
-                        has_missing_textures = true;
-                        break;
-                    }
-                }
-                
-                if (has_missing_textures)
-                {
-                    utility::LogInfo("[TEXTURE DEBUG] Attempting to extract WebP textures...");
-                    GLBTextureExtractor::ExtractTextures(filePath.string(), loaded_model);
-                }
-            }
             
             // Log material details after extraction attempt
             for (size_t i = 0; i < loaded_model.materials_.size(); ++i)
@@ -444,7 +563,11 @@ HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath,
                 renderer->EndFrame();
 
                 if (img && img->HasData()) {
-                    io::WriteImage(imagePath.string(), *img);
+                    if (!io::WriteImage(imagePath.string(), *img))
+                    {
+                        utility::LogInfo("Thumbnail: failed writing temp image file {}", imagePath.string().c_str());
+                        return 0;
+                    }
                 } else {
                     utility::LogWarning("[TEXTURE DEBUG] RenderToImage produced null/empty image");
                     return 0;
@@ -465,6 +588,12 @@ HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath,
 
                 // Best-effort cleanup of temp image file
                 try { std::filesystem::remove(imagePath); } catch (...) {}
+            }
+            else
+            {
+                utility::LogInfo("Thumbnail: skipping render for {} because bounding box extent is zero",
+                                 filePath.string().c_str());
+                return 0;
             }
         }
 

@@ -34,7 +34,11 @@
 namespace NCrewsImageGen
 {
 
-std::vector<std::string> ModelFileExtensions{ ".gltf", ".glb",".GLTF", ".GLB" };
+std::vector<std::string> ModelFileExtensions{
+    ".gltf", ".glb", ".stl", ".obj", ".3mf",
+    ".GLTF", ".GLB", ".STL", ".OBJ", ".3MF"
+    // FBX support intentionally disabled.
+};
 std::vector<std::string> PointcloudFileExtensions{ ".las", ".laz", ".LAS", ".LAZ" };
 
 /* OLD file support

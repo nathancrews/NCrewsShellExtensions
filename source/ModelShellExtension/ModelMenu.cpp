@@ -159,14 +159,14 @@ HRESULT ModelMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst
 
             m_idCmdFirst = idCmdFirst;
 
-            std::wstring menuItemName = L"Generate glTF/GLB Image";
+            std::wstring menuItemName = L"Generate 3D Model Image";
 
             if (m_filePaths.size() > 1)
             {
                 WCHAR fileCountStr[MAX_PATH] = { 0 };
                 _swprintf(fileCountStr, L"%zd", m_filePaths.size());
 
-                menuItemName = L"Generate " + std::wstring(fileCountStr) + L" glTF/GLB Images";
+                menuItemName = L"Generate " + std::wstring(fileCountStr) + L" 3D Model Images";
             }
 
             LPWSTR menuItemNameStr = nullptr;

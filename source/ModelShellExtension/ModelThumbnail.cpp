@@ -32,6 +32,11 @@
 #include "ModelShellExtension.h"
 #include "ModelThumbnail.h"
 #include "Renderers/RenderGLTFToImage.h"
+#include <cstdint>
+#include <cctype>
+#include <cstring>
+#include <algorithm>
+#include <cwctype>
 
 
 ModelThumbnail::ModelThumbnail() : m_ObjRefCount(1)
@@ -49,6 +54,7 @@ STDMETHODIMP ModelThumbnail::Initialize(IStream* pstream, DWORD grfMode)
     ULONG len = 0;
     STATSTG stat;
     WCHAR  tempFileName[MAX_PATH] = { 0 };
+    std::wstring inferredExt = L".glb";
 
     try
     {
@@ -75,6 +81,52 @@ STDMETHODIMP ModelThumbnail::Initialize(IStream* pstream, DWORD grfMode)
         {
             if (pstream->Read(data, stat.cbSize.QuadPart, &len) == S_OK)
             {
+                // Infer extension for stream-backed thumbnails to support STL and GLTF/GLB.
+                if (len >= 4 && std::memcmp(data, "glTF", 4) == 0)
+                {
+                    inferredExt = L".glb";
+                }
+                else
+                {
+                    size_t firstNonWhitespace = 0;
+                    while (firstNonWhitespace < len &&
+                           std::isspace(static_cast<unsigned char>(data[firstNonWhitespace])))
+                    {
+                        ++firstNonWhitespace;
+                    }
+
+                    if (firstNonWhitespace < len && data[firstNonWhitespace] == '{')
+                    {
+                        inferredExt = L".gltf";
+                    }
+                    else
+                    {
+                        bool looksAsciiStl = false;
+                        if (len >= 5)
+                        {
+                            looksAsciiStl =
+                                std::tolower(static_cast<unsigned char>(data[0])) == 's' &&
+                                std::tolower(static_cast<unsigned char>(data[1])) == 'o' &&
+                                std::tolower(static_cast<unsigned char>(data[2])) == 'l' &&
+                                std::tolower(static_cast<unsigned char>(data[3])) == 'i' &&
+                                std::tolower(static_cast<unsigned char>(data[4])) == 'd';
+                        }
+
+                        bool looksBinaryStl = false;
+                        if (len >= 84)
+                        {
+                            std::uint32_t triCount = 0;
+                            std::memcpy(&triCount, data + 80, sizeof(std::uint32_t));
+                            std::uint64_t expectedSize = 84ULL + (static_cast<std::uint64_t>(triCount) * 50ULL);
+                            looksBinaryStl = expectedSize == static_cast<std::uint64_t>(len);
+                        }
+
+                        if (looksAsciiStl || looksBinaryStl)
+                        {
+                            inferredExt = L".stl";
+                        }
+                    }
+                }
                 FILE* myfile = nullptr;
 
                 if (GetTempFileNameW(m_filePath.c_str(), L"thumb", 0, tempFileName))
@@ -82,7 +134,7 @@ STDMETHODIMP ModelThumbnail::Initialize(IStream* pstream, DWORD grfMode)
                     DeleteFile(tempFileName);
 
                     m_filePath = m_filePath.append(tempFileName);
-                    m_filePath = m_filePath.replace_extension(L".glb");
+                    m_filePath = m_filePath.replace_extension(inferredExt);
 
                     myfile = fopen(m_filePath.string().c_str(), "wb+");
 
@@ -143,6 +195,16 @@ STDMETHODIMP ModelThumbnail::GetThumbnail(UINT flag, HBITMAP* outHBITMAP, WTS_AL
         if (m_filePath.empty() || !std::filesystem::exists(m_filePath))
         {
             utility::LogInfo("Invalid or missing file path");
+            return E_FAIL;
+        }
+
+        std::wstring fileExt = m_filePath.extension().wstring();
+        std::transform(fileExt.begin(), fileExt.end(), fileExt.begin(),
+            [](wchar_t ch) { return static_cast<wchar_t>(std::towlower(ch)); });
+
+        if (fileExt == L".gltf")
+        {
+            utility::LogInfo("GLTF thumbnail requests are intentionally unsupported due to external file dependencies.");
             return E_FAIL;
         }
 
