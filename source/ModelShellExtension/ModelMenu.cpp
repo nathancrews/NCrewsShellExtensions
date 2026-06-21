@@ -37,6 +37,12 @@
 #include "Renderers/RenderGLTFToImage.h"
 #include "NCraftImageGen.h"
 #include "ModelMenu.h"
+#include "ModelMenuGUID.h"
+
+namespace
+{
+const wchar_t* kModelExplorerCommandTitle = L"Generate 3D Model Image";
+}
 
 
 ModelMenu::ModelMenu() : m_ObjRefCount(1)
@@ -49,10 +55,109 @@ ModelMenu::~ModelMenu()
     DllRelease();
 }
 
+bool ModelMenu::IsSupportedModelPath(const std::filesystem::path& path) const
+{
+    if (std::filesystem::is_directory(path))
+    {
+        return true;
+    }
+
+    for (const std::string& modelExtension : NCrewsImageGen::ModelFileExtensions)
+    {
+        if (!path.extension().compare(modelExtension))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+HRESULT ModelMenu::CollectFilePathsFromShellItemArray(IShellItemArray* items, std::vector<std::filesystem::path>& outFilePaths) const
+{
+    if (!items)
+    {
+        return E_INVALIDARG;
+    }
+
+    outFilePaths.clear();
+
+    DWORD itemCount = 0;
+    HRESULT hr = items->GetCount(&itemCount);
+    if (FAILED(hr))
+    {
+        return hr;
+    }
+
+    for (DWORD index = 0; index < itemCount; ++index)
+    {
+        IShellItem* shellItem = nullptr;
+        hr = items->GetItemAt(index, &shellItem);
+        if (FAILED(hr) || !shellItem)
+        {
+            continue;
+        }
+
+        LPWSTR nameBuffer = nullptr;
+        hr = shellItem->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &nameBuffer);
+        if (SUCCEEDED(hr) && nameBuffer && wcslen(nameBuffer) > 0)
+        {
+            std::filesystem::path itemPath = nameBuffer;
+            if (IsSupportedModelPath(itemPath))
+            {
+                outFilePaths.push_back(itemPath);
+            }
+        }
+
+        if (nameBuffer)
+        {
+            CoTaskMemFree(nameBuffer);
+        }
+
+        shellItem->Release();
+    }
+
+    if (outFilePaths.empty())
+    {
+        return E_FAIL;
+    }
+
+    return S_OK;
+}
+
+HRESULT ModelMenu::RenderFilePaths(const std::vector<std::filesystem::path>& filePaths)
+{
+    if (filePaths.empty())
+    {
+        return E_INVALIDARG;
+    }
+
+    std::vector<std::filesystem::path> filesToImage;
+    filesToImage.reserve(filePaths.size());
+    for (const std::filesystem::path& filePath : filePaths)
+    {
+        filesToImage.push_back(filePath);
+    }
+
+    std::filesystem::path settingsFilePath = g_AppDataPath;
+    settingsFilePath = settingsFilePath.concat(g_SettingsFileName.c_str());
+
+    if (!NCrewsImageGen::ReadImageGenSettings(settingsFilePath, m_imageGenSettings))
+    {
+        utility::LogInfo("Error loading settings");
+    }
+
+    tbb::concurrent_vector<NCrewsImageGen::FileProcessPackage> renderResults;
+    NCrewsImageGen::RenderModelsToImages(g_AppPath, filesToImage, m_imageGenSettings, renderResults);
+
+    return S_OK;
+}
+
 // IShellExtInit
 HRESULT ModelMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj, HKEY hkeyProgID)
 {
     HRESULT hr = E_FAIL;
+    IShellItemArray* items = nullptr;
 
     try
     {
@@ -60,74 +165,17 @@ HRESULT ModelMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj,
 
         if (!pdtobj)
         {
-            return hr;
+            return E_INVALIDARG;
         }
 
-        IShellItemArray* items = nullptr;
         hr = SHCreateShellItemArrayFromDataObject(pdtobj, IID_IShellItemArray, (void**)&items);
-
-        if (!SUCCEEDED(hr) || !items)
+        if (FAILED(hr) || !items)
         {
             return hr;
         }
 
         utility::LogInfo("Model: Initialize Context Menu...");
-
-        m_filePaths.clear();
-
-        DWORD fcount = 0;
-        items->GetCount(&fcount);
-
-        for (DWORD i = 0; i < fcount; i++)
-        {
-            IShellItem* pRet = nullptr;
-            LPWSTR nameBuffer = nullptr;
-
-            items->GetItemAt(i, &pRet);
-            if (pRet)
-            {
-                pRet->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &nameBuffer);
-            }
-
-            if (nameBuffer && wcslen(nameBuffer) > 0)
-            {
-                LPWSTR nameBufferCopy = new WCHAR[wcslen(nameBuffer) + 2];
-                if (nameBufferCopy)
-                {
-                    wcscpy(nameBufferCopy, nameBuffer);
-                    CoTaskMemFree(nameBuffer);
-
-                    std::filesystem::path testPath = nameBufferCopy;
-
-                    if (std::filesystem::is_directory(testPath))
-                    {
-                        m_filePaths.push_back(testPath);
-                    }
-                    else
-                    {
-                        for (std::string pcext : NCrewsImageGen::ModelFileExtensions)
-                        {
-                            if (!testPath.extension().compare(pcext))
-                            {
-                                m_filePaths.push_back(testPath);
-                                break;
-                            }
-                        }
-                    }
-
-                    delete[]nameBufferCopy;
-                }
-            }
-
-            pRet->Release();
-        }
-
-        items->Release();
-
-        if (m_filePaths.size() == 0)
-        {
-            hr = E_FAIL;
-        }
+        hr = CollectFilePathsFromShellItemArray(items, m_filePaths);
 
         utility::LogInfo("Model: Initialize Context Menu...finished");
     }
@@ -137,7 +185,130 @@ HRESULT ModelMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj,
         hr = E_FAIL;
     }
 
+    if (items)
+    {
+        items->Release();
+    }
+
     return hr;
+}
+
+IFACEMETHODIMP ModelMenu::GetTitle(IShellItemArray* psiItemArray, LPWSTR* ppszName)
+{
+    UNREFERENCED_PARAMETER(psiItemArray);
+    if (!ppszName)
+    {
+        return E_INVALIDARG;
+    }
+
+    *ppszName = nullptr;
+    return SHStrDupW(kModelExplorerCommandTitle, ppszName);
+}
+
+IFACEMETHODIMP ModelMenu::GetIcon(IShellItemArray* psiItemArray, LPWSTR* ppszIcon)
+{
+    UNREFERENCED_PARAMETER(psiItemArray);
+    if (!ppszIcon)
+    {
+        return E_INVALIDARG;
+    }
+
+    *ppszIcon = nullptr;
+    return E_NOTIMPL;
+}
+
+IFACEMETHODIMP ModelMenu::GetToolTip(IShellItemArray* psiItemArray, LPWSTR* ppszInfotip)
+{
+    UNREFERENCED_PARAMETER(psiItemArray);
+    if (!ppszInfotip)
+    {
+        return E_INVALIDARG;
+    }
+
+    *ppszInfotip = nullptr;
+    return E_NOTIMPL;
+}
+
+IFACEMETHODIMP ModelMenu::GetCanonicalName(GUID* pguidCommandName)
+{
+    if (!pguidCommandName)
+    {
+        return E_INVALIDARG;
+    }
+
+    *pguidCommandName = ModelMenuGUID;
+    return S_OK;
+}
+
+IFACEMETHODIMP ModelMenu::GetState(IShellItemArray* psiItemArray, BOOL fOkToBeSlow, EXPCMDSTATE* pCmdState)
+{
+    UNREFERENCED_PARAMETER(fOkToBeSlow);
+    if (!pCmdState)
+    {
+        return E_INVALIDARG;
+    }
+
+    *pCmdState = ECS_HIDDEN;
+    if (!psiItemArray)
+    {
+        return S_OK;
+    }
+
+    std::vector<std::filesystem::path> selectedFilePaths;
+    HRESULT hr = CollectFilePathsFromShellItemArray(psiItemArray, selectedFilePaths);
+    if (SUCCEEDED(hr) && !selectedFilePaths.empty())
+    {
+        *pCmdState = ECS_ENABLED;
+    }
+
+    return S_OK;
+}
+
+IFACEMETHODIMP ModelMenu::Invoke(IShellItemArray* psiItemArray, IBindCtx* pbc)
+{
+    UNREFERENCED_PARAMETER(pbc);
+    open3d::utility::Logger::GetInstance().SetPrintFunction(model_print_fcn);
+
+    if (!psiItemArray)
+    {
+        utility::LogInfo("Model: ExplorerCommand Invoke missing selection.");
+        return E_INVALIDARG;
+    }
+
+    std::vector<std::filesystem::path> selectedFilePaths;
+    HRESULT hr = CollectFilePathsFromShellItemArray(psiItemArray, selectedFilePaths);
+    if (FAILED(hr) || selectedFilePaths.empty())
+    {
+        utility::LogInfo("Model: ExplorerCommand Invoke has no supported files.");
+        return E_FAIL;
+    }
+
+    utility::LogInfo("Model: ExplorerCommand Invoke called....");
+    hr = RenderFilePaths(selectedFilePaths);
+    utility::LogInfo("Model: ExplorerCommand Invoke called....Finished");
+    return hr;
+}
+
+IFACEMETHODIMP ModelMenu::GetFlags(EXPCMDFLAGS* pFlags)
+{
+    if (!pFlags)
+    {
+        return E_INVALIDARG;
+    }
+
+    *pFlags = ECF_DEFAULT;
+    return S_OK;
+}
+
+IFACEMETHODIMP ModelMenu::EnumSubCommands(IEnumExplorerCommand** ppEnum)
+{
+    if (!ppEnum)
+    {
+        return E_INVALIDARG;
+    }
+
+    *ppEnum = nullptr;
+    return E_NOTIMPL;
 }
 
 // IContextMenu
@@ -240,31 +411,7 @@ HRESULT ModelMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
         }
 
         utility::LogInfo("Model: Menu Invoke Command called....");
-
-        std::vector<std::filesystem::path> filesToImage;
-
-        for (std::wstring fPath : m_filePaths)
-        {
-            std::filesystem::path cmdPath = fPath;
-            filesToImage.push_back(cmdPath);
-        }
-
-        tbb::concurrent_vector<NCrewsImageGen::FileProcessPackage> renderResults;
-
-        hr = S_OK;
-        std::filesystem::path settingsFilePath = g_AppDataPath;
-        settingsFilePath = settingsFilePath.concat(g_SettingsFileName.c_str());
-
-        if (!NCrewsImageGen::ReadImageGenSettings(settingsFilePath, m_imageGenSettings))
-        {
-            utility::LogInfo("Error loading settings");
-        }
-
-        //std::string myCmd = "D:\\Projects\\LandXML2glTF\\LandXML2glTF\\build2\\bin\\Release\\LXML2GLTF.exe D:\\Projects\\LandXML2glTF\\LandXML2glTF\\LandXML\\subdivision-2.0\\subdivision-2.0.xml";
-        //std::system(myCmd.c_str());
-        //filesToImage.push_back(std::filesystem::path("D:\\Projects\\LandXML2glTF\\LandXML2glTF\\LandXML\\subdivision-2.0\\subdivision-2.0.gltf"));
-
-        NCrewsImageGen::RenderModelsToImages(g_AppPath, filesToImage, m_imageGenSettings, renderResults);
+        hr = RenderFilePaths(m_filePaths);
 
         m_filePaths.clear();
 

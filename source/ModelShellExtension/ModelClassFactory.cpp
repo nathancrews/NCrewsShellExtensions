@@ -123,7 +123,7 @@ HRESULT ModelClassFactory::CreateInstance(_In_opt_ IUnknown* pUnkOuter, _In_ REF
         }
     }
 
-    if (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IContextMenu))
+    if (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IContextMenu) || IsEqualIID(riid, IID_IExplorerCommand))
     {
         ModelMenu* cMenu = new ModelMenu();
         if (cMenu)

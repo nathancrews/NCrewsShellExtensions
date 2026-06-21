@@ -34,7 +34,7 @@
 #include "ModelClassFactory.h"
 #include "Renderers/RenderToImageCommon.h"
 
-class ModelMenu : public IContextMenu,  public IShellExtInit
+class ModelMenu : public IContextMenu, public IShellExtInit, public IExplorerCommand
 {
 public:
 
@@ -69,6 +69,12 @@ public:
             this->AddRef();
             return S_OK;
         }
+        else if (IsEqualIID(riid, IID_IExplorerCommand))
+        {
+            *ppvObject = (IExplorerCommand*)this;
+            this->AddRef();
+            return S_OK;
+        }
         else
         {
             return E_NOINTERFACE;
@@ -94,12 +100,24 @@ public:
     HRESULT __stdcall QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT uFlags);
     HRESULT __stdcall InvokeCommand(LPCMINVOKECOMMANDINFO lpici);
     HRESULT __stdcall GetCommandString(UINT_PTR /*idCmd*/, UINT /*uType*/, UINT* /*pRes*/, LPSTR /*pszName*/, UINT /*cchMax*/) { return E_NOTIMPL; }
+    // IExplorerCommand
+    IFACEMETHODIMP GetTitle(IShellItemArray* psiItemArray, LPWSTR* ppszName);
+    IFACEMETHODIMP GetIcon(IShellItemArray* psiItemArray, LPWSTR* ppszIcon);
+    IFACEMETHODIMP GetToolTip(IShellItemArray* psiItemArray, LPWSTR* ppszInfotip);
+    IFACEMETHODIMP GetCanonicalName(GUID* pguidCommandName);
+    IFACEMETHODIMP GetState(IShellItemArray* psiItemArray, BOOL fOkToBeSlow, EXPCMDSTATE* pCmdState);
+    IFACEMETHODIMP Invoke(IShellItemArray* psiItemArray, IBindCtx* pbc);
+    IFACEMETHODIMP GetFlags(EXPCMDFLAGS* pFlags);
+    IFACEMETHODIMP EnumSubCommands(IEnumExplorerCommand** ppEnum);
 
     // IShellExtInit
     IFACEMETHODIMP Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj, HKEY hkeyProgID);
 
 private:
     ~ModelMenu();
+    bool IsSupportedModelPath(const std::filesystem::path& path) const;
+    HRESULT CollectFilePathsFromShellItemArray(IShellItemArray* items, std::vector<std::filesystem::path>& outFilePaths) const;
+    HRESULT RenderFilePaths(const std::vector<std::filesystem::path>& filePaths);
 
     long        m_ObjRefCount = 0;
     std::vector<std::filesystem::path>  m_filePaths;

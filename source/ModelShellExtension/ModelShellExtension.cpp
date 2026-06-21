@@ -36,6 +36,7 @@
 #include "Renderers/RenderGLTFToImage.h"
 namespace
 {
+const wchar_t* kExplorerCommandVerbName = L"ModelShellExtension.Generate3DModelImage";
 bool TryWriteDefaultRegistryString(HKEY root, const std::wstring& subKey, const std::wstring& value)
 {
     HKEY hkey = nullptr;
@@ -51,6 +52,23 @@ bool TryWriteDefaultRegistryString(HKEY root, const std::wstring& subKey, const 
 
     return (res == ERROR_SUCCESS);
 }
+
+bool TryWriteRegistryStringValue(HKEY root, const std::wstring& subKey, const wchar_t* valueName, const std::wstring& value)
+{
+    HKEY hkey = nullptr;
+    DWORD lpDisp = 0;
+    LONG res = RegCreateKeyEx(root, subKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return false;
+    }
+
+    res = RegSetValueEx(hkey, valueName, 0, REG_SZ, (const BYTE*)value.c_str(), (DWORD)((value.size() + 1U) * sizeof(wchar_t)));
+    RegCloseKey(hkey);
+
+    return (res == ERROR_SUCCESS);
+}
+
 
 bool TryReadRegistryStringValue(HKEY root, const std::wstring& subKey, const wchar_t* valueName, std::wstring& outValue)
 {
@@ -118,6 +136,11 @@ void DeleteRegistryKeyIfExists(HKEY root, const std::wstring& subKey)
         RegDeleteKey(root, subKey.c_str());
         RegCloseKey(hkey);
     }
+}
+
+void DeleteRegistryTreeIfExists(HKEY root, const std::wstring& subKey)
+{
+    RegDeleteTree(root, subKey.c_str());
 }
 }
 
@@ -546,7 +569,6 @@ HRESULT DllRegisterServer()
 
     RegCloseKey(hkey);
 
-    //*****************************************************************************************
 
     //*****************************************************************************************
     // Register Thumbnail generator file types
@@ -1096,6 +1118,32 @@ HRESULT DllUnregisterServer()
         {
             std::wstring progIdSubKey = L"Software\\Classes\\" + progId + L"\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
             DeleteRegistryKeyIfExists(HKEY_CURRENT_USER, progIdSubKey);
+        }
+    }
+    const std::wstring explorerCommandClasses[] = {
+        L".glb", L"glb_auto_file",
+        L".gltf", L"gltf_auto_file",
+        L".stl", L"stl_auto_file",
+        L".obj", L"obj_auto_file",
+        L".3mf", L"3mf_auto_file",
+        L"Directory"
+    };
+    for (const std::wstring& classKey : explorerCommandClasses)
+    {
+        std::wstring explorerCommandVerbSubKey = L"Software\\Classes\\" + classKey + L"\\shell\\" + kExplorerCommandVerbName;
+        DeleteRegistryTreeIfExists(HKEY_CURRENT_USER, explorerCommandVerbSubKey);
+    }
+
+    for (const std::wstring& extension : contextMenuExtensions)
+    {
+        std::wstring systemAssociationVerbSubKey = L"Software\\Classes\\SystemFileAssociations\\" + extension + L"\\shell\\" + kExplorerCommandVerbName;
+        DeleteRegistryTreeIfExists(HKEY_CURRENT_USER, systemAssociationVerbSubKey);
+
+        std::wstring progId = ResolveProgIdForExtension(extension);
+        if (!progId.empty())
+        {
+            std::wstring progIdVerbSubKey = L"Software\\Classes\\" + progId + L"\\shell\\" + kExplorerCommandVerbName;
+            DeleteRegistryTreeIfExists(HKEY_CURRENT_USER, progIdVerbSubKey);
         }
     }
 
