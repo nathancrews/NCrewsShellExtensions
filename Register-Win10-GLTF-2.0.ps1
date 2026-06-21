@@ -1,6 +1,6 @@
 # Register-Win10-GLTF.ps1
 # Registers model file shell integration on Windows 10 for:
-# .glb, .gltf, .stl, .obj, .fbx, .3mf
+# .glb, .gltf, .stl, .obj, .3mf
 #
 # Root cause: Windows 10 writes a UserChoice ProgId when a file type is opened with any app.
 # If that ProgId points to a UWP/Store app, Windows 10 suppresses third-party context menu
@@ -23,8 +23,8 @@ $InstalledDllPath       = "C:\Program Files\NCrews Software\NCrews GLTF Shell Ex
 $MenuGUID               = "{CB7B16EE-63F0-498A-AD7E-857BD1B560C6}"
 $ThumbnailGUID          = "{0C6D56CF-1C57-4BE1-8736-5A3D02A68187}"
 $ThumbProviderKey       = "{E357FCCD-A995-4576-B01F-234630154E96}"
-$ContextMenuExtensions  = @('.glb', '.gltf', '.stl', '.obj', '.fbx', '.3mf')
-$ThumbnailExtensions    = @('.glb', '.stl', '.obj', '.fbx', '.3mf')
+$ContextMenuExtensions  = @('.glb', '.gltf', '.stl', '.obj', '.3mf')
+$ThumbnailExtensions    = @('.glb', '.stl', '.obj', '.3mf')
 
 # Warn if this is not Windows 10
 $osBuild = [System.Environment]::OSVersion.Version.Build
@@ -44,6 +44,35 @@ function Register-ThumbnailAssociations {
             Write-Host "    Registered thumbnail provider for $Ext under $root" -ForegroundColor Green
         } catch {
             Write-Host "    Skipped thumbnail key under $root (no write access - expected without admin): $_" -ForegroundColor Yellow
+        }
+    }
+}
+function Remove-StaleExplorerCommandVerbs {
+    $legacyVerb = 'ModelShellExtension.Generate3DModelImage'
+    $legacyVerbClasses = @(
+        '.glb', 'glb_auto_file',
+        '.gltf', 'gltf_auto_file',
+        '.stl', 'stl_auto_file',
+        '.obj', 'obj_auto_file',
+        '.3mf', '3mf_auto_file',
+        'Directory',
+        'SystemFileAssociations\.glb',
+        'SystemFileAssociations\.gltf',
+        'SystemFileAssociations\.stl',
+        'SystemFileAssociations\.obj',
+        'SystemFileAssociations\.3mf',
+        'AppXvhc4p7vz4b485xfp46hhk3grkdgjg',
+        'AppXvhc4p7vz4b485xfp46hhk3fq3grkdgjg',
+        'AppXmgw6pxxs62rbgfp9petmdyb4fx7rnd4k'
+    )
+
+    foreach ($root in @('HKCU:', 'HKLM:')) {
+        foreach ($class in $legacyVerbClasses) {
+            $regPath = "$root\Software\Classes\$class\shell\$legacyVerb"
+            if (Test-Path $regPath) {
+                Remove-Item -Path $regPath -Recurse -Force -ErrorAction SilentlyContinue
+                Write-Host "  Removed stale legacy shell-verb key: $regPath" -ForegroundColor Green
+            }
         }
     }
 }
@@ -128,6 +157,7 @@ function Register-Extension {
     Write-Host "Re-registering shell extension DLL..." -ForegroundColor Yellow
     & "$env:WINDIR\System32\regsvr32.exe" /s $InstalledDllPath
     Write-Host "  DLL registered." -ForegroundColor Green
+    Remove-StaleExplorerCommandVerbs
 
     foreach ($ext in $ContextMenuExtensions) {
         Write-Host ""
@@ -169,6 +199,7 @@ function Unregister-Extension {
             }
         }
     }
+    Remove-StaleExplorerCommandVerbs
 
     Invoke-ShellRefresh
     Write-Host "Done." -ForegroundColor Green
