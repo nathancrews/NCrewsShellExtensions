@@ -34,6 +34,92 @@
 #include "ModelThumbnailGUID.h"
 #include "ModelClassFactory.h"
 #include "Renderers/RenderGLTFToImage.h"
+namespace
+{
+bool TryWriteDefaultRegistryString(HKEY root, const std::wstring& subKey, const std::wstring& value)
+{
+    HKEY hkey = nullptr;
+    DWORD lpDisp = 0;
+    LONG res = RegCreateKeyEx(root, subKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkey, &lpDisp);
+    if (res != ERROR_SUCCESS)
+    {
+        return false;
+    }
+
+    res = RegSetValueEx(hkey, NULL, 0, REG_SZ, (const BYTE*)value.c_str(), (DWORD)((value.size() + 1U) * sizeof(wchar_t)));
+    RegCloseKey(hkey);
+
+    return (res == ERROR_SUCCESS);
+}
+
+bool TryReadRegistryStringValue(HKEY root, const std::wstring& subKey, const wchar_t* valueName, std::wstring& outValue)
+{
+    HKEY hkey = nullptr;
+    LONG res = RegOpenKeyEx(root, subKey.c_str(), 0, KEY_READ, &hkey);
+    if (res != ERROR_SUCCESS)
+    {
+        return false;
+    }
+
+    DWORD type = 0;
+    DWORD bytes = 0;
+    res = RegQueryValueEx(hkey, valueName, nullptr, &type, nullptr, &bytes);
+    if ((res != ERROR_SUCCESS) || (bytes == 0) || ((type != REG_SZ) && (type != REG_EXPAND_SZ)))
+    {
+        RegCloseKey(hkey);
+        return false;
+    }
+
+    std::wstring value;
+    value.resize(bytes / sizeof(wchar_t));
+    res = RegQueryValueEx(hkey, valueName, nullptr, &type, reinterpret_cast<LPBYTE>(&value[0]), &bytes);
+    RegCloseKey(hkey);
+    if (res != ERROR_SUCCESS)
+    {
+        return false;
+    }
+
+    if (!value.empty() && value.back() == L'\0')
+    {
+        value.pop_back();
+    }
+
+    if (value.empty())
+    {
+        return false;
+    }
+
+    outValue = value;
+    return true;
+}
+
+std::wstring ResolveProgIdForExtension(const std::wstring& extension)
+{
+    std::wstring progId;
+    std::wstring userChoiceSubKey = L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\" + extension + L"\\UserChoice";
+    if (TryReadRegistryStringValue(HKEY_CURRENT_USER, userChoiceSubKey, L"ProgId", progId))
+    {
+        return progId;
+    }
+
+    if (TryReadRegistryStringValue(HKEY_CLASSES_ROOT, extension, nullptr, progId))
+    {
+        return progId;
+    }
+
+    return L"";
+}
+
+void DeleteRegistryKeyIfExists(HKEY root, const std::wstring& subKey)
+{
+    HKEY hkey = nullptr;
+    if (ERROR_SUCCESS == RegOpenKeyEx(root, subKey.c_str(), 0, KEY_ALL_ACCESS, &hkey))
+    {
+        RegDeleteKey(root, subKey.c_str());
+        RegCloseKey(hkey);
+    }
+}
+}
 
 void model_print_fcn(const std::string& logString)
 {
@@ -170,6 +256,7 @@ HRESULT DllRegisterServer()
     wchar_t* menuExtGUID = nullptr;
     DWORD res = StringFromCLSID(ModelMenuGUID, &menuExtGUID);
     res = StringFromCLSID(ModelThumbnailGUID, &thumbExtGUID);
+    const std::wstring menuExtGUIDStr(menuExtGUID);
 
     //*****************************************************************************************
     // Register COM content menu
@@ -426,6 +513,23 @@ HRESULT DllRegisterServer()
     }
 
     RegCloseKey(hkey);
+
+    const std::wstring contextMenuExtensions[] = { L".glb", L".gltf", L".stl", L".obj", L".3mf" };
+    for (const std::wstring& extension : contextMenuExtensions)
+    {
+        std::wstring systemAssociationSubKey = L"Software\\Classes\\SystemFileAssociations\\" + extension + L"\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+        if (!TryWriteDefaultRegistryString(HKEY_CURRENT_USER, systemAssociationSubKey, menuExtGUIDStr))
+        {
+            return E_UNEXPECTED;
+        }
+
+        std::wstring progId = ResolveProgIdForExtension(extension);
+        if (!progId.empty())
+        {
+            std::wstring progIdSubKey = L"Software\\Classes\\" + progId + L"\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+            TryWriteDefaultRegistryString(HKEY_CURRENT_USER, progIdSubKey, menuExtGUIDStr);
+        }
+    }
 
     lpSubKey = L"Software\\Classes\\Directory\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
 
@@ -979,6 +1083,20 @@ HRESULT DllUnregisterServer()
         res = RegDeleteKey(HKEY_CURRENT_USER, lpSubKey.c_str());
 
         RegCloseKey(hkey);
+    }
+
+    const std::wstring contextMenuExtensions[] = { L".glb", L".gltf", L".stl", L".obj", L".3mf" };
+    for (const std::wstring& extension : contextMenuExtensions)
+    {
+        std::wstring systemAssociationSubKey = L"Software\\Classes\\SystemFileAssociations\\" + extension + L"\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+        DeleteRegistryKeyIfExists(HKEY_CURRENT_USER, systemAssociationSubKey);
+
+        std::wstring progId = ResolveProgIdForExtension(extension);
+        if (!progId.empty())
+        {
+            std::wstring progIdSubKey = L"Software\\Classes\\" + progId + L"\\ShellEx\\ContextMenuHandlers\\ModelShellExtension";
+            DeleteRegistryKeyIfExists(HKEY_CURRENT_USER, progIdSubKey);
+        }
     }
 
     //*****************************************************************************************************

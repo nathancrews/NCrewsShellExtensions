@@ -157,6 +157,8 @@
     <ROW File="DBenchy.stl" Component_="Buggy.glb" FileName="3DBenchy.stl" Attributes="0" SourcePath="Release\ModelShellExtension\samples\3DBenchy.stl" SelfReg="false"/>
     <ROW File="box.obj" Component_="Buggy.glb" FileName="box.obj" Attributes="0" SourcePath="Release\ModelShellExtension\samples\box.obj" SelfReg="false"/>
     <ROW File="cube_gears_prod.3mf" Component_="Buggy.glb" FileName="CUBE_G~1.3MF|cube_gears_prod.3mf" Attributes="0" SourcePath="Release\ModelShellExtension\samples\cube_gears_prod.3mf" SelfReg="false"/>
+    <ROW File="spider.obj" Component_="Buggy.glb" FileName="spider.obj" Attributes="0" SourcePath="Release\ModelShellExtension\samples\spider.obj" SelfReg="false"/>
+    <ROW File="Spider_ascii.stl" Component_="Buggy.glb" FileName="SPIDER~1.STL|Spider_ascii.stl" Attributes="0" SourcePath="Release\ModelShellExtension\samples\Spider_ascii.stl" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
     <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
@@ -416,6 +418,20 @@
     <ROW Registry="stl_context_handler_value_2" Root="1" Key="Software\Classes\stl_auto_file\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__2"/>
     <ROW Registry="stl_thumbnail_handler_value_1" Root="1" Key="Software\Classes\.stl\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="__4"/>
     <ROW Registry="stl_thumbnail_handler_value_2" Root="1" Key="Software\Classes\stl_auto_file\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="__4"/>
+    <ROW Registry="SFA_GLB_CTX_HKCU" Root="1" Key="Software\Classes\SystemFileAssociations\.glb\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__2"/>
+    <ROW Registry="SFA_GLTF_CTX_HKCU" Root="1" Key="Software\Classes\SystemFileAssociations\.gltf\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__2"/>
+    <ROW Registry="SFA_STL_CTX_HKCU" Root="1" Key="Software\Classes\SystemFileAssociations\.stl\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__2"/>
+    <ROW Registry="SFA_OBJ_CTX_HKCU" Root="1" Key="Software\Classes\SystemFileAssociations\.obj\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__2"/>
+    <ROW Registry="SFA_3MF_CTX_HKCU" Root="1" Key="Software\Classes\SystemFileAssociations\.3mf\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__2"/>
+    <ROW Registry="SFA_GLB_CTX_HKLM" Root="2" Key="Software\Classes\SystemFileAssociations\.glb\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
+    <ROW Registry="SFA_GLTF_CTX_HKLM" Root="2" Key="Software\Classes\SystemFileAssociations\.gltf\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
+    <ROW Registry="SFA_STL_CTX_HKLM" Root="2" Key="Software\Classes\SystemFileAssociations\.stl\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
+    <ROW Registry="SFA_OBJ_CTX_HKLM" Root="2" Key="Software\Classes\SystemFileAssociations\.obj\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
+    <ROW Registry="SFA_3MF_CTX_HKLM" Root="2" Key="Software\Classes\SystemFileAssociations\.3mf\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
+    <ROW Registry="APPX_VHC_CTX_HKCU" Root="1" Key="Software\Classes\AppXvhc4p7vz4b485xfp46hhk3fq3grkdgjg\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__2"/>
+    <ROW Registry="APPX_MGW_CTX_HKCU" Root="1" Key="Software\Classes\AppXmgw6pxxs62rbgfp9petmdyb4fx7rnd4k\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__2"/>
+    <ROW Registry="APPX_VHC_CTX_HKLM" Root="2" Key="Software\Classes\AppXvhc4p7vz4b485xfp46hhk3fq3grkdgjg\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
+    <ROW Registry="APPX_MGW_CTX_HKLM" Root="2" Key="Software\Classes\AppXmgw6pxxs62rbgfp9petmdyb4fx7rnd4k\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
     <ROW Shortcut="GLTFExtensionOptions" Directory_="NCraftSoftware_2_Dir" Name="GLTFEX~1|GLTFExtensionOptions" Component_="GLTFExtensionOptions.exe" Target="[#GLTFExtensionOptions.exe]" Hotkey="0" Icon_="samples_Dir.exe" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
