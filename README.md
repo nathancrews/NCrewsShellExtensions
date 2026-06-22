@@ -1,9 +1,9 @@
 <h2>NCrews Windows File Explorer shell extension projects:</h2>
 ---
-#NCrews GLTF/GLB Shell Extension Version 2.0 
+# NCrews GLTF/GLB Shell Extension Version 2.0 
 The NCrews GLTF/GLB/STL/OBJ/3MF Shell Extension 2.0  — Now Supports 5 Formats.
 
-##Key Features:
+## Key Features:
 Automatic Thumbnail Generation - Every STL/OBJ/3MF/GLB file displays a rendered 3D thumbnail in Windows Explorer.
 Right-Click Context Menu - Generate custom preview images on demand with configurable settings.
 Seamless Integration - Works natively with Windows File Explorer - no other viewer needed.
