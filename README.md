@@ -1,6 +1,25 @@
-<h2>NCrews Windows shell extension projects:</h2>
+<h2>NCrews Windows File Explorer shell extension projects:</h2>
 
-# NCrews GLTF/GLB Shell Extension
+NCrews GLTF/GLB Shell Extension Version 2.0 
+The NCrews GLTF/GLB/STL/OBJ/3MF Shell Extension 2.0  — Now Supports 5 Formats.
+Instant Windows File Explorer thumbnails for 3D Model GLB/STL/OBJ/3MF
+No more opening files one by one just to find the right model!
+Professional 3D model visualization directly into Windows Explorer. 
+No more guessing which file contains the model you need - see high-quality thumbnails of your STL/OBJ/3MF/GLB files instantly, 
+just like viewing photos.
+
+Pre-built Windows 10/11 x64 installer: https://buymeacoffee.com/nathancrews/e/549816
+
+Key Features:
+Automatic Thumbnail Generation - Every STL/OBJ/3MF/GLB file displays a rendered 3D thumbnail in Windows Explorer.
+Right-Click Context Menu - Generate custom preview images on demand with configurable settings.
+Seamless Integration - Works natively with Windows File Explorer - no other viewer needed.
+Windows 10 and 11 Compatible.
+Lightning Fast - Optimized rendering powered by Open3D delivers crisp previews.
+Professional Quality - High-resolution output suitable for presentations and documentation.
+
+---
+# NCrews GLTF/GLB Shell Extension Version 1.0
 Pre-built Windows 10/11 x64 installer: https://buymeacoffee.com/nathancrews/e/255640
 ## Browse your 3D models as easily as browsing photos. **Install once, preview forever.**
 The NCrews GLTF/GLB Windows Explorer Shell Extension provides professional 3D model visualization. 
