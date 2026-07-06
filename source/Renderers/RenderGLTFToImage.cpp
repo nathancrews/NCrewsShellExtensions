@@ -104,6 +104,7 @@ bool LoadModelForRender(const std::filesystem::path& filePath,
                         bool logTextureDebug = false)
 {
     std::string fileExt = GetLowerFileExtension(filePath);
+    utility::LogInfo("LoadModelForRender: begin file={} extension={}", filePath.string().c_str(), fileExt.c_str());
 
     if (fileExt == ".stl")
     {
@@ -114,14 +115,29 @@ bool LoadModelForRender(const std::filesystem::path& filePath,
         bool meshSuccess = io::ReadTriangleMesh(filePath.string(), stlMesh, meshOptions);
         if (!meshSuccess)
         {
+            utility::LogInfo("LoadModelForRender: STL read failed for {}", filePath.string().c_str());
+            return false;
+        }
+        const bool builtStlModel = BuildSingleMeshModelFromTriangleMesh(filePath, std::move(stlMesh), outModel);
+        if (!builtStlModel)
+        {
+            utility::LogInfo("LoadModelForRender: STL mesh conversion failed for {}", filePath.string().c_str());
             return false;
         }
 
-        return BuildSingleMeshModelFromTriangleMesh(filePath, std::move(stlMesh), outModel);
+        utility::LogInfo("LoadModelForRender: STL read/conversion succeeded for {}", filePath.string().c_str());
+        return true;
     }
 
     io::ReadTriangleModelOptions modelOptions;
     bool modelSuccess = io::ReadTriangleModel(filePath.string(), outModel, modelOptions);
+    if (modelSuccess)
+    {
+        utility::LogInfo("LoadModelForRender: ReadTriangleModel succeeded for {} (meshes={}, materials={})",
+            filePath.string().c_str(),
+            outModel.meshes_.size(),
+            outModel.materials_.size());
+    }
 
     if (!modelSuccess || !HasRenderableGeometry(outModel))
     {
@@ -137,6 +153,10 @@ bool LoadModelForRender(const std::filesystem::path& filePath,
             BuildSingleMeshModelFromTriangleMesh(filePath, std::move(fallbackMesh), outModel))
         {
             utility::LogInfo("ReadTriangleMesh fallback succeeded for {}", filePath.string().c_str());
+            utility::LogInfo("LoadModelForRender: fallback produced model for {} (meshes={}, materials={})",
+                filePath.string().c_str(),
+                outModel.meshes_.size(),
+                outModel.materials_.size());
             return true;
         }
 
@@ -147,17 +167,21 @@ bool LoadModelForRender(const std::filesystem::path& filePath,
     if (fileExt == ".glb")
     {
         bool hasMissingTextures = false;
+        std::size_t missingTextureMaterialCount = 0;
         for (const auto& mat : outModel.materials_)
         {
             if (!mat.albedo_img)
             {
                 hasMissingTextures = true;
-                break;
+                ++missingTextureMaterialCount;
             }
         }
 
         if (hasMissingTextures)
         {
+            utility::LogInfo("LoadModelForRender: GLB has missing albedo textures (materials_missing={}) for {}",
+                missingTextureMaterialCount,
+                filePath.string().c_str());
 #if NCRAFT_ENABLE_GLB_TEXTURE_EXTRACTOR
             if (logTextureDebug)
             {
@@ -167,6 +191,9 @@ bool LoadModelForRender(const std::filesystem::path& filePath,
 #endif
         }
     }
+    utility::LogInfo("LoadModelForRender: completed successfully for {} (extension={})",
+        filePath.string().c_str(),
+        fileExt.c_str());
 
     return true;
 }
@@ -226,6 +253,10 @@ UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::files
 
     for (std::filesystem::path reqPath : batchModeFilenames)
     {
+        const std::string reqFileExt = GetLowerFileExtension(reqPath);
+        utility::LogInfo("RenderModelsToImages: render attempt queued file={} extension={}",
+                         reqPath.string().c_str(),
+                         reqFileExt.c_str());
         utility::LogInfo("Checking image cache for {}", reqPath.string().c_str());
 
         NCrewsImageGen::FileProcessPackage toAddResult(reqPath);
@@ -249,7 +280,9 @@ UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::files
 
             if (sourceFiletime <= imageFiletime)
             {
-                utility::LogInfo("Skipping image, file up to date: {}", imagePath.string().c_str());
+                utility::LogInfo("Skipping image, file up to date: {} (extension={})",
+                                 imagePath.string().c_str(),
+                                 reqFileExt.c_str());
                 toAddResult.m_imageFileCacheOk = true;
             }
         }
@@ -275,6 +308,10 @@ UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::files
         {
             if (outRenderResults[sz].m_imageFileCacheOk == false)
             {
+                const std::string renderFileExt = GetLowerFileExtension(outRenderResults[sz].m_FileName);
+                utility::LogInfo("RenderModelsToImages: rendering file={} extension={}",
+                                 outRenderResults[sz].m_FileName.string().c_str(),
+                                 renderFileExt.c_str());
                 timer.Start();
                 UINT renderStatus = RenderModelToImage(renderer, imageSettings, outRenderResults[sz]);
                 timer.Stop();
@@ -303,6 +340,10 @@ UINT RenderModelsToImages(std::filesystem::path& appPath, std::vector<std::files
                         utility::LogInfo("Failed to inspect/cleanup output image {}", outRenderResults[sz].m_ImageName.string().c_str());
                     }
                 }
+                else
+                {
+                    utility::LogInfo("Render succeeded for {}", outRenderResults[sz].m_FileName.string().c_str());
+                }
             }
             utility::LogInfo("Load/Render process duration for {}, {}s", outRenderResults[sz].m_FileName.string(), exeTime);
         }
@@ -328,6 +369,8 @@ UINT RenderModelToImage(FilamentRenderer* modelRenderer,
     bool model_success = false;
     bool image_written = false;
     visualization::rendering::TriangleMeshModel loaded_model;
+    const std::string fileExt = GetLowerFileExtension(fileInfo.m_FileName);
+    utility::LogInfo("RenderModelToImage: begin file={} extension={}", fileInfo.m_FileName.string().c_str(), fileExt.c_str());
 
     try
     {
@@ -336,6 +379,13 @@ UINT RenderModelToImage(FilamentRenderer* modelRenderer,
     catch (...)
     {
         model_success = false;
+        utility::LogInfo("RenderModelToImage: exception while loading model {}", fileInfo.m_FileName.string().c_str());
+        return 0;
+    }
+
+    if (!model_success)
+    {
+        utility::LogInfo("RenderModelToImage: model load failed for {} (extension={})", fileInfo.m_FileName.string().c_str(), fileExt.c_str());
         return 0;
     }
 
@@ -396,7 +446,9 @@ UINT RenderModelToImage(FilamentRenderer* modelRenderer,
                     }
                     image_written = true;
                 } else {
-                    utility::LogWarning("[TEXTURE DEBUG] RenderToImage produced null/empty image");
+                    utility::LogWarning("RenderModelToImage: RenderToImage produced null/empty image for {} (extension={})",
+                        fileInfo.m_FileName.string().c_str(),
+                        fileExt.c_str());
                     return 0;
                 }
             }
@@ -407,8 +459,16 @@ UINT RenderModelToImage(FilamentRenderer* modelRenderer,
                 return 0;
             }
         }
+        else
+        {
+            utility::LogInfo("RenderModelToImage: failed to create Open3D scene for {}", fileInfo.m_FileName.string().c_str());
+            return 0;
+        }
     }
 
+    utility::LogInfo("RenderModelToImage: completed for {} (status={})",
+        fileInfo.m_FileName.string().c_str(),
+        image_written ? "success" : "failed");
     return image_written ? 1U : 0U;
 }
 
@@ -421,6 +481,8 @@ HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath,
     bool model_success = false;
     visualization::rendering::TriangleMeshModel loaded_model;
     std::filesystem::path imagePath = filePath;
+    const std::string fileExt = GetLowerFileExtension(filePath);
+    utility::LogInfo("RenderModelToHBITMAP: begin file={} extension={}", filePath.string().c_str(), fileExt.c_str());
 
     std::filesystem::path resourcePath = appPath;
     resourcePath += "resources";
@@ -462,6 +524,9 @@ HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath,
 
     if (!renderer)
     {
+        utility::LogInfo("RenderModelToHBITMAP: renderer allocation failed for {} (extension={})",
+                         filePath.string().c_str(),
+                         fileExt.c_str());
         return 0;
     }
 
@@ -475,6 +540,9 @@ HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath,
         
         if (model_success)
         {
+            utility::LogInfo("RenderModelToHBITMAP: model load succeeded for {} (extension={})",
+                             filePath.string().c_str(),
+                             fileExt.c_str());
             utility::LogInfo("[TEXTURE DEBUG] Model loaded successfully");
             utility::LogInfo("[TEXTURE DEBUG] Number of meshes: {}", loaded_model.meshes_.size());
             utility::LogInfo("[TEXTURE DEBUG] Number of materials: {}", loaded_model.materials_.size());
@@ -497,6 +565,9 @@ HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath,
         }
         else
         {
+            utility::LogInfo("RenderModelToHBITMAP: model load failed for {} (extension={})",
+                             filePath.string().c_str(),
+                             fileExt.c_str());
             utility::LogInfo("[TEXTURE DEBUG] Model loading FAILED");
         }
     }
@@ -600,6 +671,10 @@ HBITMAP RenderModelToHBITMAP(std::filesystem::path& appPath,
         delete scene;
     }
 
+    utility::LogInfo("RenderModelToHBITMAP: completed file={} extension={} status={}",
+                     filePath.string().c_str(),
+                     fileExt.c_str(),
+                     result ? "success" : "failed");
     return result;
 }
 

@@ -106,8 +106,7 @@ HRESULT ModelClassFactory::CreateInstance(_In_opt_ IUnknown* pUnkOuter, _In_ REF
 
     HRESULT hres = E_NOINTERFACE;
 
-    if (IsEqualIID(riid, IID_IThumbnailProvider) || 
-        IsEqualIID(riid, IID_IInitializeWithStream) || 
+    if (IsEqualIID(riid, IID_IThumbnailProvider) ||
         IsEqualIID(riid, IID_IInitializeWithFile) ||
         IsEqualIID(riid, IID_IInitializeWithItem))
     {

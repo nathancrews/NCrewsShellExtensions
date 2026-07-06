@@ -34,9 +34,44 @@
 #include "ModelThumbnailGUID.h"
 #include "ModelClassFactory.h"
 #include "Renderers/RenderGLTFToImage.h"
+#include <cstdint>
+#include <mutex>
+#include <system_error>
 namespace
 {
 const wchar_t* kExplorerCommandVerbName = L"ModelShellExtension.Generate3DModelImage";
+constexpr std::uintmax_t kModelShellLogMaxBytes = 5ULL * 1024ULL * 1024ULL;
+std::mutex g_ModelShellLogMutex;
+
+std::filesystem::path GetModelShellLogPath()
+{
+    std::filesystem::path logFilePath = std::filesystem::temp_directory_path();
+    logFilePath.replace_filename("ModelShellExtension");
+    logFilePath.replace_extension("log");
+    return logFilePath;
+}
+
+void RotateModelShellLogIfNeeded(const std::filesystem::path& logFilePath)
+{
+    if (!std::filesystem::exists(logFilePath))
+    {
+        return;
+    }
+
+    std::error_code fileSizeError;
+    const std::uintmax_t currentLogSizeBytes = std::filesystem::file_size(logFilePath, fileSizeError);
+    if (fileSizeError || (currentLogSizeBytes <= kModelShellLogMaxBytes))
+    {
+        return;
+    }
+
+    std::ofstream resetStream(logFilePath, std::ofstream::out | std::ofstream::trunc);
+    if (resetStream.is_open())
+    {
+        resetStream << "[LOG RESET] ModelShellExtension.log exceeded 5 MB and was reset.\n";
+        resetStream.flush();
+    }
+}
 bool TryWriteDefaultRegistryString(HKEY root, const std::wstring& subKey, const std::wstring& value)
 {
     HKEY hkey = nullptr;
@@ -149,20 +184,26 @@ void model_print_fcn(const std::string& logString)
 #ifdef NO_LOGGING
     return;
 #endif // NO_LOGGING
+    std::lock_guard<std::mutex> logGuard(g_ModelShellLogMutex);
 
-    std::filesystem::path logFilePath = std::filesystem::temp_directory_path();
+    try
+    {
+        const std::filesystem::path logFilePath = GetModelShellLogPath();
+        RotateModelShellLogIfNeeded(logFilePath);
 
-    logFilePath.replace_filename("ModelShellExtension");
-    logFilePath.replace_extension("log");
-
-    std::fstream fs;
-    fs.open(logFilePath, std::fstream::out | std::fstream::app);
-
-    fs << logString;
-    fs << "\n";
-
-    fs.flush();
-    fs.close();
+        std::fstream fs;
+        fs.open(logFilePath, std::fstream::out | std::fstream::app);
+        if (fs.is_open())
+        {
+            fs << logString;
+            fs << "\n";
+            fs.flush();
+            fs.close();
+        }
+    }
+    catch (...)
+    {
+    }
 }
 
 // Standard DLL functions

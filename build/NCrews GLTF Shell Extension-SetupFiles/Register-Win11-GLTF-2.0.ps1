@@ -46,6 +46,29 @@ function Clear-ThumbnailCache {
     Write-Host "Thumbnail cache cleared successfully." -ForegroundColor Green
 }
 
+function Show-DiagnosticLogInfo {
+    $modelShellLogPath = Join-Path $env:TEMP "ModelShellExtension.log"
+    $open3dDebugLogPath = Join-Path $env:TEMP "Open3D_GLB_Debug.log"
+    $desktopPath = Join-Path $env:USERPROFILE "Desktop"
+
+    Write-Host "`nDiagnostic logs (share these with support):" -ForegroundColor Cyan
+    foreach ($logPath in @($modelShellLogPath, $open3dDebugLogPath)) {
+        if (Test-Path $logPath) {
+            $logInfo = Get-Item $logPath -ErrorAction SilentlyContinue
+            if ($logInfo) {
+                Write-Host ("- {0} (exists, {1} bytes, updated {2})" -f $logPath, $logInfo.Length, $logInfo.LastWriteTime) -ForegroundColor Green
+            } else {
+                Write-Host ("- {0} (exists)" -f $logPath) -ForegroundColor Green
+            }
+        } else {
+            Write-Host ("- {0} (not present yet)" -f $logPath) -ForegroundColor DarkYellow
+        }
+    }
+
+    Write-Host "Copy any existing log file from the paths above and send it to support." -ForegroundColor Yellow
+    Write-Host ("Example: Copy-Item -Path ""{0}"" -Destination ""{1}"" -Force" -f $modelShellLogPath, $desktopPath) -ForegroundColor Yellow
+}
+
 function Add-HandlerToProgId {
     param(
         [Parameter(Mandatory)] [string]$Ext,
@@ -112,7 +135,7 @@ function Register-Extension {
             if (-not (Test-Path $regPath)) { New-Item -Path $regPath -Force | Out-Null }
             Set-ItemProperty -Path $regPath -Name "(default)" -Value $ThumbnailGUID
 
-            foreach ($ext in @('.obj', '.fbx', '.3mf')) {
+            foreach ($ext in @('.obj', '.3mf')) {
                 $regPath = "$root\Software\Classes\$ext\ShellEx\ContextMenuHandlers\ModelShellExtension"
                 if (-not (Test-Path $regPath)) { New-Item -Path $regPath -Force | Out-Null }
                 Set-ItemProperty -Path $regPath -Name "(default)" -Value $MenuGUID
@@ -132,7 +155,6 @@ function Register-Extension {
         Add-HandlerToProgId -Ext '.gltf' -HandlerName 'ModelShellExtension' -Guid $MenuGUID
         Add-HandlerToProgId -Ext '.stl' -HandlerName 'ModelShellExtension' -Guid $MenuGUID
         Add-HandlerToProgId -Ext '.obj' -HandlerName 'ModelShellExtension' -Guid $MenuGUID
-        Add-HandlerToProgId -Ext '.fbx' -HandlerName 'ModelShellExtension' -Guid $MenuGUID
         Add-HandlerToProgId -Ext '.3mf' -HandlerName 'ModelShellExtension' -Guid $MenuGUID
         
         # Add to approved shell extensions (system-wide)
@@ -186,14 +208,11 @@ function Unregister-Extension {
             Remove-Item -Path "$root\Software\Classes\.stl\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" -Recurse -Force -ErrorAction SilentlyContinue
             Remove-Item -Path "$root\Software\Classes\.obj\ShellEx\ContextMenuHandlers\ModelShellExtension" -Recurse -Force -ErrorAction SilentlyContinue
             Remove-Item -Path "$root\Software\Classes\SystemFileAssociations\.obj\ShellEx\ContextMenuHandlers\ModelShellExtension" -Recurse -Force -ErrorAction SilentlyContinue
-            Remove-Item -Path "$root\Software\Classes\.fbx\ShellEx\ContextMenuHandlers\ModelShellExtension" -Recurse -Force -ErrorAction SilentlyContinue
-            Remove-Item -Path "$root\Software\Classes\SystemFileAssociations\.fbx\ShellEx\ContextMenuHandlers\ModelShellExtension" -Recurse -Force -ErrorAction SilentlyContinue
             Remove-Item -Path "$root\Software\Classes\.3mf\ShellEx\ContextMenuHandlers\ModelShellExtension" -Recurse -Force -ErrorAction SilentlyContinue
             Remove-Item -Path "$root\Software\Classes\SystemFileAssociations\.3mf\ShellEx\ContextMenuHandlers\ModelShellExtension" -Recurse -Force -ErrorAction SilentlyContinue
             Remove-Item -Path "$root\Software\Classes\.obj\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" -Recurse -Force -ErrorAction SilentlyContinue
-            Remove-Item -Path "$root\Software\Classes\.fbx\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" -Recurse -Force -ErrorAction SilentlyContinue
             Remove-Item -Path "$root\Software\Classes\.3mf\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" -Recurse -Force -ErrorAction SilentlyContinue
-            foreach($ext in '.glb','.gltf','.stl','.obj','.fbx','.3mf'){
+            foreach($ext in '.glb','.gltf','.stl','.obj','.3mf'){
                 $hkcrDefault = (Get-ItemProperty -Path ("Registry::HKEY_CLASSES_ROOT\\$ext") -ErrorAction SilentlyContinue)."(default)"
                 $userChoice = (Get-ItemProperty -Path ("HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\$ext\\UserChoice") -ErrorAction SilentlyContinue).ProgId
                 $progId = if ($userChoice) { $userChoice } else { $hkcrDefault }
@@ -236,9 +255,6 @@ function Test-Extension {
         "HKCU:\Software\Classes\.obj\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}",
         "HKCU:\Software\Classes\.obj\ShellEx\ContextMenuHandlers\ModelShellExtension",
         "HKCU:\Software\Classes\SystemFileAssociations\.obj\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKCU:\Software\Classes\.fbx\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}",
-        "HKCU:\Software\Classes\.fbx\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKCU:\Software\Classes\SystemFileAssociations\.fbx\ShellEx\ContextMenuHandlers\ModelShellExtension",
         "HKCU:\Software\Classes\.3mf\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}",
         "HKCU:\Software\Classes\.3mf\ShellEx\ContextMenuHandlers\ModelShellExtension",
         "HKCU:\Software\Classes\SystemFileAssociations\.3mf\ShellEx\ContextMenuHandlers\ModelShellExtension",
@@ -253,9 +269,6 @@ function Test-Extension {
         "HKLM:\Software\Classes\.obj\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}",
         "HKLM:\Software\Classes\.obj\ShellEx\ContextMenuHandlers\ModelShellExtension",
         "HKLM:\Software\Classes\SystemFileAssociations\.obj\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKLM:\Software\Classes\.fbx\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}",
-        "HKLM:\Software\Classes\.fbx\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKLM:\Software\Classes\SystemFileAssociations\.fbx\ShellEx\ContextMenuHandlers\ModelShellExtension",
         "HKLM:\Software\Classes\.3mf\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}",
         "HKLM:\Software\Classes\.3mf\ShellEx\ContextMenuHandlers\ModelShellExtension",
         "HKLM:\Software\Classes\SystemFileAssociations\.3mf\ShellEx\ContextMenuHandlers\ModelShellExtension"
@@ -308,9 +321,9 @@ if ($Unregister) {
     Unregister-Extension
 } elseif ($Test) {
     Test-Extension
-    if ($ResetOpenWith) { Reset-OpenWithList -Extensions @('.glb','.gltf','.stl','.obj','.fbx','.3mf') }
+    if ($ResetOpenWith) { Reset-OpenWithList -Extensions @('.glb','.gltf','.stl','.obj','.3mf') }
 } elseif ($ResetOpenWith) {
-    Reset-OpenWithList -Extensions @('.glb','.gltf','.stl','.obj','.fbx','.3mf')
+    Reset-OpenWithList -Extensions @('.glb','.gltf','.stl','.obj','.3mf')
 } else {
     Register-Extension
     # Automatically clear cache after registration
@@ -318,12 +331,14 @@ if ($Unregister) {
     Write-Host "`nRecommended next steps:" -ForegroundColor Yellow
     Write-Host "1. Refresh File Explorer or open a new window" -ForegroundColor Yellow
     Write-Host "2. Run: .\Register-Win11-GLTF.ps1 -Test" -ForegroundColor Yellow
-    Write-Host "3. Test with actual .glb/.gltf/.stl/.obj/.fbx/.3mf files" -ForegroundColor Yellow
+    Write-Host "3. Test with actual .glb/.gltf/.stl/.obj/.3mf files" -ForegroundColor Yellow
 }
 
 if ($ClearCache) {
     Clear-ThumbnailCache
 }
+
+Show-DiagnosticLogInfo
 
 Write-Host "`nDone!" -ForegroundColor Green
 Write-Host "`nPress any key to exit..." -ForegroundColor Cyan

@@ -34,6 +34,8 @@
 #include <iostream>
 #include <fstream>
 #include <process.h>
+#include <algorithm>
+#include <cctype>
 #include "Renderers/RenderGLTFToImage.h"
 #include "NCraftImageGen.h"
 #include "ModelMenu.h"
@@ -42,6 +44,19 @@
 namespace
 {
 const wchar_t* kModelExplorerCommandTitle = L"Generate 3D Model Image";
+
+std::string GetLowerExtension(const std::filesystem::path& filePath)
+{
+    std::string extension = filePath.extension().string();
+    std::transform(extension.begin(), extension.end(), extension.begin(),
+        [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+    return extension;
+}
+
+const char* GetPathKindLabel(const std::filesystem::path& filePath)
+{
+    return std::filesystem::is_directory(filePath) ? "directory" : "file";
+}
 }
 
 
@@ -106,6 +121,16 @@ HRESULT ModelMenu::CollectFilePathsFromShellItemArray(IShellItemArray* items, st
             if (IsSupportedModelPath(itemPath))
             {
                 outFilePaths.push_back(itemPath);
+                utility::LogInfo("Model: CollectFilePaths accepted {} path={} extension={}",
+                                 GetPathKindLabel(itemPath),
+                                 itemPath.string().c_str(),
+                                 GetLowerExtension(itemPath).c_str());
+            }
+            else
+            {
+                utility::LogInfo("Model: CollectFilePaths ignored unsupported path={} extension={}",
+                                 itemPath.string().c_str(),
+                                 GetLowerExtension(itemPath).c_str());
             }
         }
 
@@ -119,6 +144,7 @@ HRESULT ModelMenu::CollectFilePathsFromShellItemArray(IShellItemArray* items, st
 
     if (outFilePaths.empty())
     {
+        utility::LogInfo("Model: CollectFilePaths found no supported model files in the current selection.");
         return E_FAIL;
     }
 
@@ -131,12 +157,16 @@ HRESULT ModelMenu::RenderFilePaths(const std::vector<std::filesystem::path>& fil
     {
         return E_INVALIDARG;
     }
+    utility::LogInfo("Model: RenderFilePaths begin with {} selected path(s).", filePaths.size());
 
     std::vector<std::filesystem::path> filesToImage;
     filesToImage.reserve(filePaths.size());
     for (const std::filesystem::path& filePath : filePaths)
     {
         filesToImage.push_back(filePath);
+        utility::LogInfo("Model: Right-click render attempt queued path={} extension={}",
+                         filePath.string().c_str(),
+                         GetLowerExtension(filePath).c_str());
     }
 
     std::filesystem::path settingsFilePath = g_AppDataPath;
@@ -144,11 +174,23 @@ HRESULT ModelMenu::RenderFilePaths(const std::vector<std::filesystem::path>& fil
 
     if (!NCrewsImageGen::ReadImageGenSettings(settingsFilePath, m_imageGenSettings))
     {
-        utility::LogInfo("Error loading settings");
+        utility::LogInfo("Model: Right-click render failed to load settings from {}", settingsFilePath.string().c_str());
     }
 
     tbb::concurrent_vector<NCrewsImageGen::FileProcessPackage> renderResults;
-    NCrewsImageGen::RenderModelsToImages(g_AppPath, filesToImage, m_imageGenSettings, renderResults);
+    UINT renderStatus = NCrewsImageGen::RenderModelsToImages(g_AppPath, filesToImage, m_imageGenSettings, renderResults);
+    utility::LogInfo("Model: RenderFilePaths completed render call (status={}, result_count={})",
+                     renderStatus,
+                     renderResults.size());
+    for (const NCrewsImageGen::FileProcessPackage& renderResult : renderResults)
+    {
+        utility::LogInfo("Model: Right-click render result file={} extension={} cache_hit={} output={} duration_seconds={}",
+                         renderResult.m_FileName.string().c_str(),
+                         GetLowerExtension(renderResult.m_FileName).c_str(),
+                         renderResult.m_imageFileCacheOk ? "true" : "false",
+                         renderResult.m_ImageName.string().c_str(),
+                         renderResult.m_processTimeSeconds);
+    }
 
     return S_OK;
 }
@@ -284,6 +326,7 @@ IFACEMETHODIMP ModelMenu::Invoke(IShellItemArray* psiItemArray, IBindCtx* pbc)
     }
 
     utility::LogInfo("Model: ExplorerCommand Invoke called....");
+    utility::LogInfo("Model: ExplorerCommand Invoke supported file count={}", selectedFilePaths.size());
     hr = RenderFilePaths(selectedFilePaths);
     utility::LogInfo("Model: ExplorerCommand Invoke called....Finished");
     return hr;
@@ -411,6 +454,7 @@ HRESULT ModelMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
         }
 
         utility::LogInfo("Model: Menu Invoke Command called....");
+        utility::LogInfo("Model: Menu Invoke Command supported file count={}", m_filePaths.size());
         hr = RenderFilePaths(m_filePaths);
 
         m_filePaths.clear();

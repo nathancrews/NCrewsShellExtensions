@@ -1,6 +1,6 @@
 # Register-Win10-GLTF.ps1
 # Registers model file shell integration on Windows 10 for:
-# .glb, .gltf, .stl, .obj, .fbx, .3mf
+# .glb, .gltf, .stl, .obj, .3mf
 #
 # Root cause: Windows 10 writes a UserChoice ProgId when a file type is opened with any app.
 # If that ProgId points to a UWP/Store app, Windows 10 suppresses third-party context menu
@@ -23,8 +23,8 @@ $InstalledDllPath       = "C:\Program Files\NCrews Software\NCrews GLTF Shell Ex
 $MenuGUID               = "{CB7B16EE-63F0-498A-AD7E-857BD1B560C6}"
 $ThumbnailGUID          = "{0C6D56CF-1C57-4BE1-8736-5A3D02A68187}"
 $ThumbProviderKey       = "{E357FCCD-A995-4576-B01F-234630154E96}"
-$ContextMenuExtensions  = @('.glb', '.gltf', '.stl', '.obj', '.fbx', '.3mf')
-$ThumbnailExtensions    = @('.glb', '.stl', '.obj', '.fbx', '.3mf')
+$ContextMenuExtensions  = @('.glb', '.gltf', '.stl', '.obj', '.3mf')
+$ThumbnailExtensions    = @('.glb', '.stl', '.obj', '.3mf')
 
 # Warn if this is not Windows 10
 $osBuild = [System.Environment]::OSVersion.Version.Build
@@ -239,6 +239,29 @@ function Test-Extension {
     Write-Host "To apply the fix, run this script without any parameters (as Administrator)." -ForegroundColor Cyan
 }
 
+function Show-DiagnosticLogInfo {
+    $modelShellLogPath = Join-Path $env:TEMP "ModelShellExtension.log"
+    $open3dDebugLogPath = Join-Path $env:TEMP "Open3D_GLB_Debug.log"
+    $desktopPath = Join-Path $env:USERPROFILE "Desktop"
+
+    Write-Host "`nDiagnostic logs (share these with support):" -ForegroundColor Cyan
+    foreach ($logPath in @($modelShellLogPath, $open3dDebugLogPath)) {
+        if (Test-Path $logPath) {
+            $logInfo = Get-Item $logPath -ErrorAction SilentlyContinue
+            if ($logInfo) {
+                Write-Host ("- {0} (exists, {1} bytes, updated {2})" -f $logPath, $logInfo.Length, $logInfo.LastWriteTime) -ForegroundColor Green
+            } else {
+                Write-Host ("- {0} (exists)" -f $logPath) -ForegroundColor Green
+            }
+        } else {
+            Write-Host ("- {0} (not present yet)" -f $logPath) -ForegroundColor DarkYellow
+        }
+    }
+
+    Write-Host "Copy any existing log file from the paths above and send it to support." -ForegroundColor Yellow
+    Write-Host ("Example: Copy-Item -Path ""{0}"" -Destination ""{1}"" -Force" -f $modelShellLogPath, $desktopPath) -ForegroundColor Yellow
+}
+
 # ---------------------------------------------------------------------------
 # Elevation: prompt for admin rights unless running -Test (read-only)
 # ---------------------------------------------------------------------------
@@ -279,6 +302,8 @@ if ($Unregister) {
 } else {
     Register-Extension
 }
+
+Show-DiagnosticLogInfo
 
 Write-Host ""
 Write-Host "Press any key to exit..." -ForegroundColor Cyan
