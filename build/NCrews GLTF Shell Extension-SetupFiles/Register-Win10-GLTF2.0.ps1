@@ -19,12 +19,24 @@ param(
 
 $ErrorActionPreference = "Continue"
 
-$InstalledDllPath       = "C:\Program Files\NCrews Software\NCrews GLTF Shell Extension\ModelShellExtension.dll"
+$InstalledDllCandidates = @(
+    "C:\Program Files\NCrews Software\NCrews GLTF Shell Extension 2.0\ModelShellExtension.dll",
+    "C:\Program Files\NCrews Software\NCrews GLTF Shell Extension\ModelShellExtension.dll"
+)
 $MenuGUID               = "{CB7B16EE-63F0-498A-AD7E-857BD1B560C6}"
 $ThumbnailGUID          = "{0C6D56CF-1C57-4BE1-8736-5A3D02A68187}"
-$ThumbProviderKey       = "{E357FCCD-A995-4576-B01F-234630154E96}"
+$ThumbProviderKeys      = @(
+    "{E357FCCD-A995-4576-B01F-234630154E96}",
+    "{BB2E617C-0920-11D1-9A0B-00C04FC2D6C1}"
+)
 $ContextMenuExtensions  = @('.glb', '.gltf', '.stl', '.obj', '.3mf')
 $ThumbnailExtensions    = @('.glb', '.stl', '.obj', '.3mf')
+$ThumbnailAutoFileClasses = @{
+    '.glb' = 'glb_auto_file'
+    '.stl' = 'stl_auto_file'
+    '.obj' = 'obj_auto_file'
+    '.3mf' = '3mf_auto_file'
+}
 
 # Warn if this is not Windows 10
 $osBuild = [System.Environment]::OSVersion.Version.Build
@@ -33,17 +45,60 @@ if ($osBuild -ge 22000) {
     Write-Warning "Use Register-Win11-GLTF.ps1 for Windows 11 instead."
 }
 
+function Resolve-InstalledDllPath {
+    foreach ($candidate in $InstalledDllCandidates) {
+        if (Test-Path $candidate) {
+            return $candidate
+        }
+    }
+
+    $installedRoot = Join-Path $env:ProgramFiles "NCrews Software"
+    if (Test-Path $installedRoot) {
+        $dllCandidate = Get-ChildItem -Path $installedRoot -Filter "ModelShellExtension.dll" -Recurse -File -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+        if ($dllCandidate) {
+            return $dllCandidate.FullName
+        }
+    }
+
+    return $null
+}
+
+$ActualDllPath = Resolve-InstalledDllPath
+if ($ActualDllPath) {
+    Write-Host "Resolved shell extension DLL: $ActualDllPath" -ForegroundColor Green
+} else {
+    Write-Warning "Could not resolve ModelShellExtension.dll in expected install locations."
+}
+
 function Register-ThumbnailAssociations {
     param([string]$Ext)
 
     foreach ($root in @('HKCU:', 'HKLM:')) {
-        $regPath = "$root\Software\Classes\$Ext\ShellEx\$ThumbProviderKey"
-        try {
-            if (-not (Test-Path $regPath)) { New-Item -Path $regPath -Force | Out-Null }
-            Set-ItemProperty -Path $regPath -Name "(default)" -Value $ThumbnailGUID -ErrorAction Stop
-            Write-Host "    Registered thumbnail provider for $Ext under $root" -ForegroundColor Green
-        } catch {
-            Write-Host "    Skipped thumbnail key under $root (no write access - expected without admin): $_" -ForegroundColor Yellow
+        foreach ($thumbProviderKey in $ThumbProviderKeys) {
+            $regPath = "$root\Software\Classes\$Ext\ShellEx\$thumbProviderKey"
+            try {
+                if (-not (Test-Path $regPath)) { New-Item -Path $regPath -Force | Out-Null }
+                Set-ItemProperty -Path $regPath -Name "(default)" -Value $ThumbnailGUID -ErrorAction Stop
+                Write-Host "    Registered thumbnail provider $thumbProviderKey for $Ext under $root" -ForegroundColor Green
+            } catch {
+                Write-Host "    Skipped thumbnail key under $root (no write access - expected without admin): $_" -ForegroundColor Yellow
+            }
+        }
+
+        if ($ThumbnailAutoFileClasses.ContainsKey($Ext)) {
+            $autoClass = $ThumbnailAutoFileClasses[$Ext]
+            foreach ($thumbProviderKey in $ThumbProviderKeys) {
+                $autoRegPath = "$root\Software\Classes\$autoClass\ShellEx\$thumbProviderKey"
+                try {
+                    if (-not (Test-Path $autoRegPath)) { New-Item -Path $autoRegPath -Force | Out-Null }
+                    Set-ItemProperty -Path $autoRegPath -Name "(default)" -Value $ThumbnailGUID -ErrorAction Stop
+                    Write-Host "    Registered thumbnail provider $thumbProviderKey for $autoClass under $root" -ForegroundColor Green
+                } catch {
+                    Write-Host "    Skipped thumbnail key under $root (no write access - expected without admin): $_" -ForegroundColor Yellow
+                }
+            }
         }
     }
 }
@@ -120,13 +175,13 @@ function Register-SystemFileAssociations {
 # Main registration flow
 # ---------------------------------------------------------------------------
 function Register-Extension {
-    if (-not (Test-Path $InstalledDllPath)) {
-        Write-Error "ModelShellExtension.dll not found at:`n  $InstalledDllPath`nPlease install the NCrews GLTF Shell Extension first."
+    if (-not $ActualDllPath) {
+        Write-Error "ModelShellExtension.dll could not be found. Please install the NCrews GLTF Shell Extension first."
         exit 1
     }
 
     Write-Host "Re-registering shell extension DLL..." -ForegroundColor Yellow
-    & "$env:WINDIR\System32\regsvr32.exe" /s $InstalledDllPath
+    & "$env:WINDIR\System32\regsvr32.exe" /s $ActualDllPath
     Write-Host "  DLL registered." -ForegroundColor Green
 
     foreach ($ext in $ContextMenuExtensions) {
@@ -162,10 +217,23 @@ function Unregister-Extension {
                 Remove-Item -Path $regPath -Recurse -Force -ErrorAction SilentlyContinue
                 Write-Host "  Removed: $regPath" -ForegroundColor Green
             }
-            $thumbPath = "$root\Software\Classes\$ext\ShellEx\$ThumbProviderKey"
-            if (Test-Path $thumbPath) {
-                Remove-Item -Path $thumbPath -Recurse -Force -ErrorAction SilentlyContinue
-                Write-Host "  Removed: $thumbPath" -ForegroundColor Green
+            foreach ($thumbProviderKey in $ThumbProviderKeys) {
+                $thumbPath = "$root\Software\Classes\$ext\ShellEx\$thumbProviderKey"
+                if (Test-Path $thumbPath) {
+                    Remove-Item -Path $thumbPath -Recurse -Force -ErrorAction SilentlyContinue
+                    Write-Host "  Removed: $thumbPath" -ForegroundColor Green
+                }
+            }
+
+            if ($ThumbnailAutoFileClasses.ContainsKey($ext)) {
+                $autoClass = $ThumbnailAutoFileClasses[$ext]
+                foreach ($thumbProviderKey in $ThumbProviderKeys) {
+                    $autoThumbPath = "$root\Software\Classes\$autoClass\ShellEx\$thumbProviderKey"
+                    if (Test-Path $autoThumbPath) {
+                        Remove-Item -Path $autoThumbPath -Recurse -Force -ErrorAction SilentlyContinue
+                        Write-Host "  Removed: $autoThumbPath" -ForegroundColor Green
+                    }
+                }
             }
         }
     }
@@ -180,6 +248,11 @@ function Unregister-Extension {
 function Test-Extension {
     Write-Host ""
     Write-Host "Diagnosing registry state for context menu handlers..." -ForegroundColor Yellow
+    if ($ActualDllPath) {
+        Write-Host "Resolved DLL location: $ActualDllPath" -ForegroundColor Green
+    } else {
+        Write-Host "Resolved DLL location: NOT FOUND" -ForegroundColor Red
+    }
 
     foreach ($ext in $ContextMenuExtensions) {
         Write-Host ""
@@ -222,16 +295,45 @@ function Test-Extension {
         # Thumbnail association
         if ($ThumbnailExtensions -contains $ext) {
             foreach ($root in @('HKCU:', 'HKLM:')) {
-                $thumbPath = "$root\Software\Classes\$ext\ShellEx\$ThumbProviderKey"
-                if (Test-Path $thumbPath) {
-                    $val = (Get-ItemProperty -Path $thumbPath -ErrorAction SilentlyContinue)."(default)"
-                    Write-Host "  ThumbnailAssoc ($root): $val" -ForegroundColor Green
-                } else {
-                    Write-Host "  ThumbnailAssoc ($root): missing - run script without -Test to fix" -ForegroundColor Red
+                foreach ($thumbProviderKey in $ThumbProviderKeys) {
+                    $thumbPath = "$root\Software\Classes\$ext\ShellEx\$thumbProviderKey"
+                    if (Test-Path $thumbPath) {
+                        $val = (Get-ItemProperty -Path $thumbPath -ErrorAction SilentlyContinue)."(default)"
+                        Write-Host "  ThumbnailAssoc ($root, $thumbProviderKey): $val" -ForegroundColor Green
+                    } else {
+                        Write-Host "  ThumbnailAssoc ($root, $thumbProviderKey): missing - run script without -Test to fix" -ForegroundColor Red
+                    }
+                }
+
+                if ($ThumbnailAutoFileClasses.ContainsKey($ext)) {
+                    $autoClass = $ThumbnailAutoFileClasses[$ext]
+                    foreach ($thumbProviderKey in $ThumbProviderKeys) {
+                        $autoThumbPath = "$root\Software\Classes\$autoClass\ShellEx\$thumbProviderKey"
+                        if (Test-Path $autoThumbPath) {
+                            $autoVal = (Get-ItemProperty -Path $autoThumbPath -ErrorAction SilentlyContinue)."(default)"
+                            Write-Host "  ThumbnailAssoc ($root, $autoClass, $thumbProviderKey): $autoVal" -ForegroundColor Green
+                        } else {
+                            Write-Host "  ThumbnailAssoc ($root, $autoClass, $thumbProviderKey): missing - run script without -Test to fix" -ForegroundColor Red
+                        }
+                    }
                 }
             }
         } else {
             Write-Host "  ThumbnailAssoc      : intentionally unsupported for $ext" -ForegroundColor Yellow
+        }
+    }
+
+    Write-Host ""
+    foreach ($root in @('HKCU:', 'HKLM:')) {
+        foreach ($guid in @($ThumbnailGUID, $MenuGUID)) {
+            $clsidPath = "$root\Software\Classes\CLSID\$guid\InprocServer32"
+            if (Test-Path $clsidPath) {
+                $dll = (Get-ItemProperty -Path $clsidPath -ErrorAction SilentlyContinue)."(default)"
+                $threading = (Get-ItemProperty -Path $clsidPath -ErrorAction SilentlyContinue)."ThreadingModel"
+                Write-Host "  CLSID ($root, $guid): dll=$dll threading=$threading" -ForegroundColor Green
+            } else {
+                Write-Host "  CLSID ($root, $guid): missing" -ForegroundColor Red
+            }
         }
     }
 
@@ -306,5 +408,7 @@ if ($Unregister) {
 Show-DiagnosticLogInfo
 
 Write-Host ""
-Write-Host "Press any key to exit..." -ForegroundColor Cyan
-$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+if ($Host.Name -eq "ConsoleHost" -and -not $Test) {
+    Write-Host "Press any key to exit..." -ForegroundColor Cyan
+    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+}

@@ -79,6 +79,12 @@ public:
             this->AddRef();
             return S_OK;
         }
+        else if (IsEqualIID(riid, IID_IInitializeWithStream))
+        {
+            *ppvObject = static_cast<IInitializeWithStream*>(this);
+            this->AddRef();
+            return S_OK;
+        }
         else if (IsEqualIID(riid, IID_IInitializeWithFile))
         {
             *ppvObject = static_cast<IInitializeWithFile*>(this);

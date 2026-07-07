@@ -9,7 +9,7 @@
     <ROW Property="ProductCode" Value="1033:{2832B5D7-2F61-42FB-A2DB-F2B6BB562FC0} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="NCrews GLTF Shell Extension 2.0"/>
-    <ROW Property="ProductVersion" Value="2.0" Options="32"/>
+    <ROW Property="ProductVersion" Value="2.0.1" Options="32"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{B06B7F66-286F-4F7B-9071-CF658B42940D}"/>
     <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
@@ -379,6 +379,11 @@
     <ROW Registry="ContextMenuHandlers_22" Root="1" Key="Software\Classes\AppXmgw6pxxs62rbgfp9petmdyb4fx7rnd4k\ShellEx\ContextMenuHandlers" Name="\"/>
     <ROW Registry="ContextMenuHandlers_23" Root="2" Key="Software\Classes\AppXvhc4p7vz4b485xfp46hhk3fq3grkdgjg\ShellEx\ContextMenuHandlers" Name="\"/>
     <ROW Registry="ContextMenuHandlers_24" Root="2" Key="Software\Classes\AppXmgw6pxxs62rbgfp9petmdyb4fx7rnd4k\ShellEx\ContextMenuHandlers" Name="\"/>
+    <ROW Registry="ContextMenuHandlers_25" Root="2" Key="Software\Classes\.glb\ShellEx\ContextMenuHandlers" Name="\"/>
+    <ROW Registry="ContextMenuHandlers_26" Root="2" Key="Software\Classes\.gltf\ShellEx\ContextMenuHandlers" Name="\"/>
+    <ROW Registry="ContextMenuHandlers_27" Root="2" Key="Software\Classes\.stl\ShellEx\ContextMenuHandlers" Name="\"/>
+    <ROW Registry="ContextMenuHandlers_28" Root="2" Key="Software\Classes\.obj\ShellEx\ContextMenuHandlers" Name="\"/>
+    <ROW Registry="ContextMenuHandlers_29" Root="2" Key="Software\Classes\.3mf\ShellEx\ContextMenuHandlers" Name="\"/>
     <ROW Registry="ContextMenuHandlers_3" Root="1" Key="Software\Classes\SystemFileAssociations\.gltf\ShellEx\ContextMenuHandlers" Name="\"/>
     <ROW Registry="ContextMenuHandlers_4" Root="1" Key="Software\Classes\SystemFileAssociations\.stl\ShellEx\ContextMenuHandlers" Name="\"/>
     <ROW Registry="ContextMenuHandlers_5" Root="1" Key="Software\Classes\SystemFileAssociations\.obj\ShellEx\ContextMenuHandlers" Name="\"/>
@@ -391,18 +396,27 @@
     <ROW Registry="Directory_1" Root="1" Key="Software\Classes\Directory" Name="\"/>
     <ROW Registry="E357FCCDA9954576B01F234630154E96" Root="1" Key="Software\Classes\glb_auto_file\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Name="\"/>
     <ROW Registry="E357FCCDA9954576B01F234630154E96_1" Root="1" Key="Software\Classes\.glb\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Name="\"/>
+    <ROW Registry="E357FCCDA9954576B01F234630154E96_10" Root="2" Key="Software\Classes\.obj\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Name="\"/>
+    <ROW Registry="E357FCCDA9954576B01F234630154E96_11" Root="2" Key="Software\Classes\.stl\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Name="\"/>
     <ROW Registry="E357FCCDA9954576B01F234630154E96_2" Root="1" Key="Software\Classes\stl_auto_file\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Name="\"/>
     <ROW Registry="E357FCCDA9954576B01F234630154E96_3" Root="1" Key="Software\Classes\.stl\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Name="\"/>
     <ROW Registry="E357FCCDA9954576B01F234630154E96_4" Root="1" Key="Software\Classes\obj_auto_file\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Name="\"/>
     <ROW Registry="E357FCCDA9954576B01F234630154E96_5" Root="1" Key="Software\Classes\.obj\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Name="\"/>
     <ROW Registry="E357FCCDA9954576B01F234630154E96_6" Root="1" Key="Software\Classes\3mf_auto_file\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Name="\"/>
     <ROW Registry="E357FCCDA9954576B01F234630154E96_7" Root="1" Key="Software\Classes\.3mf\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Name="\"/>
+    <ROW Registry="E357FCCDA9954576B01F234630154E96_8" Root="2" Key="Software\Classes\.glb\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Name="\"/>
+    <ROW Registry="E357FCCDA9954576B01F234630154E96_9" Root="2" Key="Software\Classes\.3mf\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Name="\"/>
     <ROW Registry="EditFlags_1" Root="1" Key="Software\Classes\Directory" Name="EditFlags" Value="#xd2010000" Component_="EditFlags_1" VirtualValue="#x"/>
     <ROW Registry="FriendlyTypeName_1" Root="1" Key="Software\Classes\Directory" Name="FriendlyTypeName" Value="#%@%SystemRoot%\system32\windows.storage.dll,-10152" Component_="FriendlyTypeName_1" VirtualValue="#%"/>
     <ROW Registry="FullDetails_1" Root="1" Key="Software\Classes\Directory" Name="FullDetails" Value="prop:System.PropGroup.Description;System.DateCreated;System.FileCount;System.TotalFileSize" Component_="FullDetails_1"/>
+    <ROW Registry="GLB_CTX_HKLM" Root="2" Key="Software\Classes\.glb\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
+    <ROW Registry="GLB_THUMB_HKLM" Root="2" Key="Software\Classes\.glb\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="C6D56CF1C574BE187365A3D02A68187_2"/>
+    <ROW Registry="GLTF_CTX_HKLM" Root="2" Key="Software\Classes\.gltf\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
     <ROW Registry="InProcServer32" Root="1" Key="Software\Classes\CLSID\{CB7B16EE-63F0-498A-AD7E-857BD1B560C6}\InProcServer32" Name="*" Component_="InProcServer32_1"/>
     <ROW Registry="InProcServer32_1" Root="1" Key="Software\Classes\CLSID\{0C6D56CF-1C57-4BE1-8736-5A3D02A68187}\InProcServer32" Name="*" Component_="InProcServer32"/>
     <ROW Registry="InfoTip_1" Root="1" Key="Software\Classes\Directory" Name="InfoTip" Value="prop:System.Comment;System.DateCreated" Component_="InfoTip_1"/>
+    <ROW Registry="MF3_CTX_HKLM" Root="2" Key="Software\Classes\.3mf\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
+    <ROW Registry="MF3_THUMB_HKLM" Root="2" Key="Software\Classes\.3mf\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="C6D56CF1C574BE187365A3D02A68187_2"/>
     <ROW Registry="Manufacturer" Root="-1" Key="Software\[Manufacturer]" Name="\"/>
     <ROW Registry="Manufacturer_1" Root="1" Key="Software\[Manufacturer]" Name="\"/>
     <ROW Registry="Microsoft" Root="2" Key="Software\Microsoft" Name="+" Component_="Microsoft"/>
@@ -424,6 +438,11 @@
     <ROW Registry="ModelShellExtension_22" Root="1" Key="Software\Classes\AppXmgw6pxxs62rbgfp9petmdyb4fx7rnd4k\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
     <ROW Registry="ModelShellExtension_23" Root="2" Key="Software\Classes\AppXvhc4p7vz4b485xfp46hhk3fq3grkdgjg\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
     <ROW Registry="ModelShellExtension_24" Root="2" Key="Software\Classes\AppXmgw6pxxs62rbgfp9petmdyb4fx7rnd4k\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
+    <ROW Registry="ModelShellExtension_25" Root="2" Key="Software\Classes\.glb\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
+    <ROW Registry="ModelShellExtension_26" Root="2" Key="Software\Classes\.gltf\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
+    <ROW Registry="ModelShellExtension_27" Root="2" Key="Software\Classes\.stl\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
+    <ROW Registry="ModelShellExtension_28" Root="2" Key="Software\Classes\.obj\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
+    <ROW Registry="ModelShellExtension_29" Root="2" Key="Software\Classes\.3mf\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
     <ROW Registry="ModelShellExtension_3" Root="1" Key="Software\Classes\SystemFileAssociations\.gltf\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
     <ROW Registry="ModelShellExtension_4" Root="1" Key="Software\Classes\SystemFileAssociations\.stl\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
     <ROW Registry="ModelShellExtension_5" Root="1" Key="Software\Classes\SystemFileAssociations\.obj\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
@@ -431,17 +450,14 @@
     <ROW Registry="ModelShellExtension_7" Root="1" Key="Software\Classes\.gltf\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
     <ROW Registry="ModelShellExtension_8" Root="1" Key="Software\Classes\gltf_auto_file\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
     <ROW Registry="ModelShellExtension_9" Root="1" Key="Software\Classes\.stl\ShellEx\ContextMenuHandlers\ModelShellExtension" Name="\"/>
+    <ROW Registry="OBJ_CTX_HKLM" Root="2" Key="Software\Classes\.obj\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
+    <ROW Registry="OBJ_THUMB_HKLM" Root="2" Key="Software\Classes\.obj\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="C6D56CF1C574BE187365A3D02A68187_2"/>
     <ROW Registry="Path" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Path" Value="[APPDIR]" Component_="ProductInformation"/>
     <ROW Registry="Path_1" Root="1" Key="Software\[Manufacturer]\[ProductName]" Name="Path" Value="[APPDIR]" Component_="Path"/>
     <ROW Registry="PreviewDetails_1" Root="1" Key="Software\Classes\Directory" Name="PreviewDetails" Value="prop:System.DateModified;*System.SharedWith;*System.StorageProviderState;*System.OfflineAvailability;*System.OfflineStatus" Component_="PreviewDetails_1"/>
     <ROW Registry="PreviewTitle_1" Root="1" Key="Software\Classes\Directory" Name="PreviewTitle" Value="prop:System.ItemNameDisplay;System.ItemTypeText" Component_="PreviewTitle_1"/>
     <ROW Registry="ProductName" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="\"/>
     <ROW Registry="ProductName_1" Root="1" Key="Software\[Manufacturer]\[ProductName]" Name="\"/>
-    <ROW Registry="GLB_CTX_HKLM" Root="2" Key="Software\Classes\.glb\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
-    <ROW Registry="GLTF_CTX_HKLM" Root="2" Key="Software\Classes\.gltf\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
-    <ROW Registry="STL_CTX_HKLM" Root="2" Key="Software\Classes\.stl\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
-    <ROW Registry="OBJ_CTX_HKLM" Root="2" Key="Software\Classes\.obj\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
-    <ROW Registry="MF3_CTX_HKLM" Root="2" Key="Software\Classes\.3mf\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
     <ROW Registry="SFA_3MF_CTX_HKCU" Root="1" Key="Software\Classes\SystemFileAssociations\.3mf\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__2"/>
     <ROW Registry="SFA_3MF_CTX_HKLM" Root="2" Key="Software\Classes\SystemFileAssociations\.3mf\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
     <ROW Registry="SFA_GLB_CTX_HKCU" Root="1" Key="Software\Classes\SystemFileAssociations\.glb\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__2"/>
@@ -452,6 +468,8 @@
     <ROW Registry="SFA_OBJ_CTX_HKLM" Root="2" Key="Software\Classes\SystemFileAssociations\.obj\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
     <ROW Registry="SFA_STL_CTX_HKCU" Root="1" Key="Software\Classes\SystemFileAssociations\.stl\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__2"/>
     <ROW Registry="SFA_STL_CTX_HKLM" Root="2" Key="Software\Classes\SystemFileAssociations\.stl\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
+    <ROW Registry="STL_CTX_HKLM" Root="2" Key="Software\Classes\.stl\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="CB7B16EE63F0498AAD7E857BD1B560C6_2"/>
+    <ROW Registry="STL_THUMB_HKLM" Root="2" Key="Software\Classes\.stl\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="C6D56CF1C574BE187365A3D02A68187_2"/>
     <ROW Registry="ShellEx" Root="1" Key="Software\Classes\glb_auto_file\ShellEx" Name="\"/>
     <ROW Registry="ShellEx_1" Root="1" Key="Software\Classes\SystemFileAssociations\.glb\ShellEx" Name="\"/>
     <ROW Registry="ShellEx_10" Root="1" Key="Software\Classes\.3mf\ShellEx" Name="\"/>
@@ -470,6 +488,11 @@
     <ROW Registry="ShellEx_22" Root="1" Key="Software\Classes\AppXmgw6pxxs62rbgfp9petmdyb4fx7rnd4k\ShellEx" Name="\"/>
     <ROW Registry="ShellEx_23" Root="2" Key="Software\Classes\AppXvhc4p7vz4b485xfp46hhk3fq3grkdgjg\ShellEx" Name="\"/>
     <ROW Registry="ShellEx_24" Root="2" Key="Software\Classes\AppXmgw6pxxs62rbgfp9petmdyb4fx7rnd4k\ShellEx" Name="\"/>
+    <ROW Registry="ShellEx_25" Root="2" Key="Software\Classes\.glb\ShellEx" Name="\"/>
+    <ROW Registry="ShellEx_26" Root="2" Key="Software\Classes\.gltf\ShellEx" Name="\"/>
+    <ROW Registry="ShellEx_27" Root="2" Key="Software\Classes\.stl\ShellEx" Name="\"/>
+    <ROW Registry="ShellEx_28" Root="2" Key="Software\Classes\.obj\ShellEx" Name="\"/>
+    <ROW Registry="ShellEx_29" Root="2" Key="Software\Classes\.3mf\ShellEx" Name="\"/>
     <ROW Registry="ShellEx_3" Root="1" Key="Software\Classes\.glb\ShellEx" Name="\"/>
     <ROW Registry="ShellEx_4" Root="1" Key="Software\Classes\.gltf\ShellEx" Name="\"/>
     <ROW Registry="ShellEx_5" Root="1" Key="Software\Classes\gltf_auto_file\ShellEx" Name="\"/>
@@ -497,7 +520,6 @@
     <ROW Registry="__2" Root="1" Key="Software\Classes\.glb\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__2"/>
     <ROW Registry="__3" Root="1" Key="Software\[Manufacturer]\[ProductName]" Value="[#ModelShellExtension.dll]" Component_="__3"/>
     <ROW Registry="__4" Root="1" Key="Software\Classes\.glb\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="__4"/>
-    <ROW Registry="GLB_THUMB_HKLM" Root="2" Key="Software\Classes\.glb\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="C6D56CF1C574BE187365A3D02A68187_2"/>
     <ROW Registry="__5" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Value="[#ModelShellExtension.dll]" Component_="__5"/>
     <ROW Registry="__7" Root="1" Key="Software\Classes\Directory" Value="File Folder" Component_="__7"/>
     <ROW Registry="glb" Root="1" Key="Software\Classes\SystemFileAssociations\.glb" Name="\"/>
@@ -519,7 +541,6 @@
     <ROW Registry="mf3_context_handler_value_2" Root="1" Key="Software\Classes\3mf_auto_file\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__2"/>
     <ROW Registry="mf3_thumbnail_handler_value_1" Root="1" Key="Software\Classes\.3mf\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="__4"/>
     <ROW Registry="mf3_thumbnail_handler_value_2" Root="1" Key="Software\Classes\3mf_auto_file\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="__4"/>
-    <ROW Registry="MF3_THUMB_HKLM" Root="2" Key="Software\Classes\.3mf\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="C6D56CF1C574BE187365A3D02A68187_2"/>
     <ROW Registry="mf_1" Root="2" Key="Software\Classes\SystemFileAssociations\.3mf" Name="\"/>
     <ROW Registry="mf_2" Root="2" Key="Software\Classes\.3mf" Name="\"/>
     <ROW Registry="mf_auto_file" Root="2" Key="Software\Classes\3mf_auto_file" Name="\"/>
@@ -533,43 +554,6 @@
     <ROW Registry="obj_context_handler_value_2" Root="1" Key="Software\Classes\obj_auto_file\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__2"/>
     <ROW Registry="obj_thumbnail_handler_value_1" Root="1" Key="Software\Classes\.obj\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="__4"/>
     <ROW Registry="obj_thumbnail_handler_value_2" Root="1" Key="Software\Classes\obj_auto_file\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="__4"/>
-    <ROW Registry="OBJ_THUMB_HKLM" Root="2" Key="Software\Classes\.obj\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="C6D56CF1C574BE187365A3D02A68187_2"/>
-    <ROW Registry="shell" Root="1" Key="Software\Classes\.glb\shell" Name="\"/>
-    <ROW Registry="shell_1" Root="1" Key="Software\Classes\glb_auto_file\shell" Name="\"/>
-    <ROW Registry="shell_10" Root="1" Key="Software\Classes\Directory\shell" Name="\"/>
-    <ROW Registry="shell_11" Root="1" Key="Software\Classes\SystemFileAssociations\.glb\shell" Name="\"/>
-    <ROW Registry="shell_12" Root="1" Key="Software\Classes\SystemFileAssociations\.gltf\shell" Name="\"/>
-    <ROW Registry="shell_13" Root="1" Key="Software\Classes\SystemFileAssociations\.stl\shell" Name="\"/>
-    <ROW Registry="shell_14" Root="1" Key="Software\Classes\SystemFileAssociations\.obj\shell" Name="\"/>
-    <ROW Registry="shell_15" Root="1" Key="Software\Classes\SystemFileAssociations\.3mf\shell" Name="\"/>
-    <ROW Registry="shell_16" Root="1" Key="Software\Classes\AppXvhc4p7vz4b485xfp46hhk3grkdgjg\shell" Name="\"/>
-    <ROW Registry="shell_17" Root="1" Key="Software\Classes\AppXmgw6pxxs62rbgfp9petmdyb4fx7rnd4k\shell" Name="\"/>
-    <ROW Registry="shell_18" Root="2" Key="Software\Classes\.glb\shell" Name="\"/>
-    <ROW Registry="shell_19" Root="2" Key="Software\Classes\glb_auto_file\shell" Name="\"/>
-    <ROW Registry="shell_2" Root="1" Key="Software\Classes\.gltf\shell" Name="\"/>
-    <ROW Registry="shell_20" Root="2" Key="Software\Classes\.gltf\shell" Name="\"/>
-    <ROW Registry="shell_21" Root="2" Key="Software\Classes\gltf_auto_file\shell" Name="\"/>
-    <ROW Registry="shell_22" Root="2" Key="Software\Classes\.stl\shell" Name="\"/>
-    <ROW Registry="shell_23" Root="2" Key="Software\Classes\stl_auto_file\shell" Name="\"/>
-    <ROW Registry="shell_24" Root="2" Key="Software\Classes\.obj\shell" Name="\"/>
-    <ROW Registry="shell_25" Root="2" Key="Software\Classes\obj_auto_file\shell" Name="\"/>
-    <ROW Registry="shell_26" Root="2" Key="Software\Classes\.3mf\shell" Name="\"/>
-    <ROW Registry="shell_27" Root="2" Key="Software\Classes\3mf_auto_file\shell" Name="\"/>
-    <ROW Registry="shell_28" Root="2" Key="Software\Classes\Directory\shell" Name="\"/>
-    <ROW Registry="shell_29" Root="2" Key="Software\Classes\SystemFileAssociations\.glb\shell" Name="\"/>
-    <ROW Registry="shell_3" Root="1" Key="Software\Classes\gltf_auto_file\shell" Name="\"/>
-    <ROW Registry="shell_30" Root="2" Key="Software\Classes\SystemFileAssociations\.gltf\shell" Name="\"/>
-    <ROW Registry="shell_31" Root="2" Key="Software\Classes\SystemFileAssociations\.stl\shell" Name="\"/>
-    <ROW Registry="shell_32" Root="2" Key="Software\Classes\SystemFileAssociations\.obj\shell" Name="\"/>
-    <ROW Registry="shell_33" Root="2" Key="Software\Classes\SystemFileAssociations\.3mf\shell" Name="\"/>
-    <ROW Registry="shell_34" Root="2" Key="Software\Classes\AppXvhc4p7vz4b485xfp46hhk3grkdgjg\shell" Name="\"/>
-    <ROW Registry="shell_35" Root="2" Key="Software\Classes\AppXmgw6pxxs62rbgfp9petmdyb4fx7rnd4k\shell" Name="\"/>
-    <ROW Registry="shell_4" Root="1" Key="Software\Classes\.stl\shell" Name="\"/>
-    <ROW Registry="shell_5" Root="1" Key="Software\Classes\stl_auto_file\shell" Name="\"/>
-    <ROW Registry="shell_6" Root="1" Key="Software\Classes\.obj\shell" Name="\"/>
-    <ROW Registry="shell_7" Root="1" Key="Software\Classes\obj_auto_file\shell" Name="\"/>
-    <ROW Registry="shell_8" Root="1" Key="Software\Classes\.3mf\shell" Name="\"/>
-    <ROW Registry="shell_9" Root="1" Key="Software\Classes\3mf_auto_file\shell" Name="\"/>
     <ROW Registry="shellex_3" Root="1" Key="Software\Classes\Directory\shellex" Name="\"/>
     <ROW Registry="stl" Root="1" Key="Software\Classes\SystemFileAssociations\.stl" Name="\"/>
     <ROW Registry="stl_1" Root="1" Key="Software\Classes\.stl" Name="\"/>
@@ -581,7 +565,6 @@
     <ROW Registry="stl_context_handler_value_2" Root="1" Key="Software\Classes\stl_auto_file\ShellEx\ContextMenuHandlers\ModelShellExtension" Value="[\{]CB7B16EE-63F0-498A-AD7E-857BD1B560C6[\}]" Component_="__2"/>
     <ROW Registry="stl_thumbnail_handler_value_1" Root="1" Key="Software\Classes\.stl\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="__4"/>
     <ROW Registry="stl_thumbnail_handler_value_2" Root="1" Key="Software\Classes\stl_auto_file\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="__4"/>
-    <ROW Registry="STL_THUMB_HKLM" Root="2" Key="Software\Classes\.stl\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" Value="[\{]0C6D56CF-1C57-4BE1-8736-5A3D02A68187[\}]" Component_="C6D56CF1C574BE187365A3D02A68187_2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
     <ROW Shortcut="GLTFExtensionOptions" Directory_="NCraftSoftware_2_Dir" Name="GLTFEX~1|GLTFExtensionOptions" Component_="GLTFExtensionOptions.exe" Target="[#GLTFExtensionOptions.exe]" Hotkey="0" Icon_="samples_Dir.exe" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
@@ -591,7 +574,7 @@
     <ATTRIBUTE name="UsedTheme" value="classic"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiUpgradeComponent">
-    <ROW UpgradeCode="[|UpgradeCode]" VersionMin="0.0.1" VersionMax="[|ProductVersion]" Attributes="257" ActionProperty="OLDPRODUCTS"/>
-    <ROW UpgradeCode="[|UpgradeCode]" VersionMin="[|ProductVersion]" Attributes="2" ActionProperty="AI_NEWERPRODUCTFOUND"/>
+    <ROW UpgradeCode="[|UpgradeCode]" VersionMin="0.0.1" VersionMax="255.255.6555.6555" Attributes="257" ActionProperty="OLDPRODUCTS"/>
+    <ROW UpgradeCode="[|UpgradeCode]" VersionMin="255.255.6555.6555" Attributes="2" ActionProperty="AI_NEWERPRODUCTFOUND"/>
   </COMPONENT>
 </DOCUMENT>

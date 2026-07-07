@@ -11,15 +11,48 @@ param(
 $ErrorActionPreference = "Continue"
 
 # Paths
-$InstalledDllPath = "C:\Program Files\NCrews Software\NCrews GLTF Shell Extension\ModelShellExtension.dll"
-
-# Verify the installed DLL exists
-if (-not (Test-Path $InstalledDllPath)) {
-    Write-Error "ModelShellExtension.dll not found at $InstalledDllPath`nPlease ensure the NCrews GLTF Shell Extension is installed."
-    exit 1
+$InstalledDllCandidates = @(
+    "C:\Program Files\NCrews Software\NCrews GLTF Shell Extension 2.0\ModelShellExtension.dll",
+    "C:\Program Files\NCrews Software\NCrews GLTF Shell Extension\ModelShellExtension.dll"
+)
+$ThumbnailProviderKeys = @(
+    "{E357FCCD-A995-4576-B01F-234630154E96}",
+    "{BB2E617C-0920-11D1-9A0B-00C04FC2D6C1}"
+)
+$ThumbnailExtensions = @('.glb', '.stl', '.obj', '.3mf')
+$ThumbnailAutoFileClasses = @{
+    '.glb' = 'glb_auto_file'
+    '.stl' = 'stl_auto_file'
+    '.obj' = 'obj_auto_file'
+    '.3mf' = '3mf_auto_file'
 }
 
-$ActualDllPath = $InstalledDllPath
+function Resolve-InstalledDllPath {
+    foreach ($candidate in $InstalledDllCandidates) {
+        if (Test-Path $candidate) {
+            return $candidate
+        }
+    }
+
+    $installedRoot = Join-Path $env:ProgramFiles "NCrews Software"
+    if (Test-Path $installedRoot) {
+        $dllCandidate = Get-ChildItem -Path $installedRoot -Filter "ModelShellExtension.dll" -Recurse -File -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+        if ($dllCandidate) {
+            return $dllCandidate.FullName
+        }
+    }
+
+    return $null
+}
+
+$ActualDllPath = Resolve-InstalledDllPath
+if ($ActualDllPath) {
+    Write-Host "Resolved shell extension DLL: $ActualDllPath" -ForegroundColor Green
+} else {
+    Write-Warning "Could not resolve ModelShellExtension.dll in expected install locations."
+}
 
 function Clear-ThumbnailCache {
     Write-Host "Clearing Windows thumbnail cache..." -ForegroundColor Yellow
@@ -88,6 +121,10 @@ function Add-HandlerToProgId {
 }
 
 function Register-Extension {
+    if (-not $ActualDllPath) {
+        Write-Error "ModelShellExtension.dll could not be found. Please install the NCrews GLTF Shell Extension first."
+        exit 1
+    }
     # Register the DLL (regsvr32 shows its own success dialog)
     & "$env:WINDIR\System32\regsvr32.exe" /s $ActualDllPath *>$null
     
@@ -148,6 +185,23 @@ function Register-Extension {
                 if (-not (Test-Path $regPath)) { New-Item -Path $regPath -Force | Out-Null }
                 Set-ItemProperty -Path $regPath -Name "(default)" -Value $ThumbnailGUID
             }
+
+            foreach ($thumbExt in $ThumbnailExtensions) {
+                foreach ($providerKey in $ThumbnailProviderKeys) {
+                    $thumbRegPath = "$root\Software\Classes\$thumbExt\ShellEx\$providerKey"
+                    if (-not (Test-Path $thumbRegPath)) { New-Item -Path $thumbRegPath -Force | Out-Null }
+                    Set-ItemProperty -Path $thumbRegPath -Name "(default)" -Value $ThumbnailGUID
+                }
+
+                if ($ThumbnailAutoFileClasses.ContainsKey($thumbExt)) {
+                    $autoClass = $ThumbnailAutoFileClasses[$thumbExt]
+                    foreach ($providerKey in $ThumbnailProviderKeys) {
+                        $autoThumbRegPath = "$root\Software\Classes\$autoClass\ShellEx\$providerKey"
+                        if (-not (Test-Path $autoThumbRegPath)) { New-Item -Path $autoThumbRegPath -Force | Out-Null }
+                        Set-ItemProperty -Path $autoThumbRegPath -Name "(default)" -Value $ThumbnailGUID
+                    }
+                }
+            }
         }
 
         # Also bind to current ProgID
@@ -161,6 +215,7 @@ function Register-Extension {
         $approved = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved"
         if (-not (Test-Path $approved)) { New-Item -Path $approved -Force | Out-Null }
         New-ItemProperty -Path $approved -Name $MenuGUID -PropertyType String -Value "Model Shell Extension" -Force | Out-Null
+        New-ItemProperty -Path $approved -Name $ThumbnailGUID -PropertyType String -Value "Model Shell Extension Thumbnail" -Force | Out-Null
         
         Write-Host "Registry configured successfully." -ForegroundColor Green
         
@@ -188,11 +243,15 @@ function Unregister-Extension {
     Write-Host "Unregistering GLTF Shell Extension..." -ForegroundColor Yellow
     
     # Unregister the DLL
-    $result = & "$env:WINDIR\System32\regsvr32.exe" "/u" $ActualDllPath 2>&1
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "DLL unregistered successfully." -ForegroundColor Green
+    if ($ActualDllPath -and (Test-Path $ActualDllPath)) {
+        $result = & "$env:WINDIR\System32\regsvr32.exe" "/u" $ActualDllPath 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "DLL unregistered successfully." -ForegroundColor Green
+        } else {
+            Write-Warning "Failed to unregister DLL. Error code: $LASTEXITCODE`nOutput: $result"
+        }
     } else {
-        Write-Warning "Failed to unregister DLL. Error code: $LASTEXITCODE`nOutput: $result"
+        Write-Warning "Skipping regsvr32 /u because ModelShellExtension.dll could not be resolved."
     }
     
     # Remove registry entries
@@ -212,6 +271,17 @@ function Unregister-Extension {
             Remove-Item -Path "$root\Software\Classes\SystemFileAssociations\.3mf\ShellEx\ContextMenuHandlers\ModelShellExtension" -Recurse -Force -ErrorAction SilentlyContinue
             Remove-Item -Path "$root\Software\Classes\.obj\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" -Recurse -Force -ErrorAction SilentlyContinue
             Remove-Item -Path "$root\Software\Classes\.3mf\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}" -Recurse -Force -ErrorAction SilentlyContinue
+            foreach ($thumbExt in $ThumbnailExtensions) {
+                foreach ($providerKey in $ThumbnailProviderKeys) {
+                    Remove-Item -Path "$root\Software\Classes\$thumbExt\ShellEx\$providerKey" -Recurse -Force -ErrorAction SilentlyContinue
+                }
+                if ($ThumbnailAutoFileClasses.ContainsKey($thumbExt)) {
+                    $autoClass = $ThumbnailAutoFileClasses[$thumbExt]
+                    foreach ($providerKey in $ThumbnailProviderKeys) {
+                        Remove-Item -Path "$root\Software\Classes\$autoClass\ShellEx\$providerKey" -Recurse -Force -ErrorAction SilentlyContinue
+                    }
+                }
+            }
             foreach($ext in '.glb','.gltf','.stl','.obj','.3mf'){
                 $hkcrDefault = (Get-ItemProperty -Path ("Registry::HKEY_CLASSES_ROOT\\$ext") -ErrorAction SilentlyContinue)."(default)"
                 $userChoice = (Get-ItemProperty -Path ("HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\$ext\\UserChoice") -ErrorAction SilentlyContinue).ProgId
@@ -239,55 +309,71 @@ function Reset-OpenWithList {
 
 function Test-Extension {
     Write-Host "Testing GLTF Shell Extension..." -ForegroundColor Yellow
-    
-    Write-Host "DLL location: $ActualDllPath" -ForegroundColor Green
-    
-    # Check registry entries
-    $regPaths = @(
-        "HKCU:\Software\Classes\.glb\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}",
-        "HKCU:\Software\Classes\.glb\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKCU:\Software\Classes\SystemFileAssociations\.glb\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKCU:\Software\Classes\.gltf\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKCU:\Software\Classes\SystemFileAssociations\.gltf\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKCU:\Software\Classes\.stl\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}",
-        "HKCU:\Software\Classes\.stl\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKCU:\Software\Classes\SystemFileAssociations\.stl\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKCU:\Software\Classes\.obj\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}",
-        "HKCU:\Software\Classes\.obj\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKCU:\Software\Classes\SystemFileAssociations\.obj\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKCU:\Software\Classes\.3mf\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}",
-        "HKCU:\Software\Classes\.3mf\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKCU:\Software\Classes\SystemFileAssociations\.3mf\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKLM:\Software\Classes\.glb\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}",
-        "HKLM:\Software\Classes\.glb\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKLM:\Software\Classes\SystemFileAssociations\.glb\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKLM:\Software\Classes\.gltf\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKLM:\Software\Classes\SystemFileAssociations\.gltf\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKLM:\Software\Classes\.stl\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}",
-        "HKLM:\Software\Classes\.stl\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKLM:\Software\Classes\SystemFileAssociations\.stl\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKLM:\Software\Classes\.obj\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}",
-        "HKLM:\Software\Classes\.obj\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKLM:\Software\Classes\SystemFileAssociations\.obj\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKLM:\Software\Classes\.3mf\ShellEx\{E357FCCD-A995-4576-B01F-234630154E96}",
-        "HKLM:\Software\Classes\.3mf\ShellEx\ContextMenuHandlers\ModelShellExtension",
-        "HKLM:\Software\Classes\SystemFileAssociations\.3mf\ShellEx\ContextMenuHandlers\ModelShellExtension"
-    )
-    
-    foreach ($regPath in $regPaths) {
-        if (Test-Path $regPath) {
-            $value = (Get-ItemProperty -Path $regPath -Name "(default)" -ErrorAction SilentlyContinue)."(default)"
-            Write-Host "Registry entry found: $regPath = $value" -ForegroundColor Green
-        } else {
-            Write-Host "Missing registry entry: $regPath" -ForegroundColor Red
+
+    if ($ActualDllPath) {
+        Write-Host "DLL location: $ActualDllPath" -ForegroundColor Green
+    } else {
+        Write-Host "DLL location: NOT FOUND" -ForegroundColor Red
+    }
+
+    foreach ($root in @('HKCU:', 'HKLM:')) {
+        Write-Host ""
+        Write-Host "[$root] Registry verification" -ForegroundColor Cyan
+
+        foreach ($guid in @("{0C6D56CF-1C57-4BE1-8736-5A3D02A68187}", "{CB7B16EE-63F0-498A-AD7E-857BD1B560C6}")) {
+            $clsidPath = "$root\Software\Classes\CLSID\$guid\InprocServer32"
+            if (Test-Path $clsidPath) {
+                $dll = (Get-ItemProperty -Path $clsidPath -ErrorAction SilentlyContinue)."(default)"
+                $threading = (Get-ItemProperty -Path $clsidPath -ErrorAction SilentlyContinue)."ThreadingModel"
+                Write-Host "CLSID $guid => dll=$dll threading=$threading" -ForegroundColor Green
+            } else {
+                Write-Host "Missing CLSID registration: $clsidPath" -ForegroundColor Red
+            }
+        }
+
+        foreach ($ext in @('.glb', '.gltf', '.stl', '.obj', '.3mf')) {
+            $ctxPath = "$root\Software\Classes\$ext\ShellEx\ContextMenuHandlers\ModelShellExtension"
+            if (Test-Path $ctxPath) {
+                $ctxVal = (Get-ItemProperty -Path $ctxPath -ErrorAction SilentlyContinue)."(default)"
+                Write-Host "ContextMenu $ext => $ctxVal" -ForegroundColor Green
+            } else {
+                Write-Host "Missing context menu handler: $ctxPath" -ForegroundColor Red
+            }
+
+            $sfaPath = "$root\Software\Classes\SystemFileAssociations\$ext\ShellEx\ContextMenuHandlers\ModelShellExtension"
+            if (Test-Path $sfaPath) {
+                $sfaVal = (Get-ItemProperty -Path $sfaPath -ErrorAction SilentlyContinue)."(default)"
+                Write-Host "SystemFileAssociations $ext => $sfaVal" -ForegroundColor Green
+            } else {
+                Write-Host "Missing SystemFileAssociations handler: $sfaPath" -ForegroundColor Red
+            }
+
+            if ($ThumbnailExtensions -contains $ext) {
+                foreach ($providerKey in $ThumbnailProviderKeys) {
+                    $thumbPath = "$root\Software\Classes\$ext\ShellEx\$providerKey"
+                    if (Test-Path $thumbPath) {
+                        $thumbVal = (Get-ItemProperty -Path $thumbPath -ErrorAction SilentlyContinue)."(default)"
+                        Write-Host "Thumbnail $ext ($providerKey) => $thumbVal" -ForegroundColor Green
+                    } else {
+                        Write-Host "Missing thumbnail provider: $thumbPath" -ForegroundColor Red
+                    }
+                }
+
+                if ($ThumbnailAutoFileClasses.ContainsKey($ext)) {
+                    $autoClass = $ThumbnailAutoFileClasses[$ext]
+                    foreach ($providerKey in $ThumbnailProviderKeys) {
+                        $autoThumbPath = "$root\Software\Classes\$autoClass\ShellEx\$providerKey"
+                        if (Test-Path $autoThumbPath) {
+                            $autoThumbVal = (Get-ItemProperty -Path $autoThumbPath -ErrorAction SilentlyContinue)."(default)"
+                            Write-Host "Thumbnail $autoClass ($providerKey) => $autoThumbVal" -ForegroundColor Green
+                        } else {
+                            Write-Host "Missing thumbnail provider: $autoThumbPath" -ForegroundColor Red
+                        }
+                    }
+                }
+            }
         }
     }
-    
-    Write-Host "`nTo test thumbnails:" -ForegroundColor Cyan
-    Write-Host "1. Create or copy a .glb file to your desktop" -ForegroundColor Cyan
-    Write-Host "2. Switch to thumbnail view in File Explorer" -ForegroundColor Cyan
-    Write-Host "3. Check if custom thumbnail appears" -ForegroundColor Cyan
-    Write-Host "4. Right-click the file to see context menu" -ForegroundColor Cyan
 }
 
 # Main execution
@@ -330,7 +416,7 @@ if ($Unregister) {
     Clear-ThumbnailCache
     Write-Host "`nRecommended next steps:" -ForegroundColor Yellow
     Write-Host "1. Refresh File Explorer or open a new window" -ForegroundColor Yellow
-    Write-Host "2. Run: .\Register-Win11-GLTF.ps1 -Test" -ForegroundColor Yellow
+    Write-Host "2. Run: .\Register-Win11-GLTF-2.0.ps1 -Test" -ForegroundColor Yellow
     Write-Host "3. Test with actual .glb/.gltf/.stl/.obj/.3mf files" -ForegroundColor Yellow
 }
 
@@ -341,5 +427,8 @@ if ($ClearCache) {
 Show-DiagnosticLogInfo
 
 Write-Host "`nDone!" -ForegroundColor Green
-Write-Host "`nPress any key to exit..." -ForegroundColor Cyan
-$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+if ($Host.Name -eq "ConsoleHost" -and -not $Test)
+{
+    Write-Host "`nPress any key to exit..." -ForegroundColor Cyan
+    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+}
