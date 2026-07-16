@@ -5,8 +5,7 @@ The NCrews 3MF/GLB/STL/OBJ/GLTF Shell Extension 2.0  — Now Supports 5 Formats.
 
 ## Key Features:
 ### Automatic Thumbnail Generation - For 3MF/STL/OBJ/GLB file displays a rendered 3D thumbnail in Windows Explorer.
-### Supports both .gltf (JSON format) and .glb (binary format) files with full material, texture, and geometry visualization.
-### Right-Click Context Menu - Generate custom preview images on demand with configurable settings.
+### Right-Click Context Menu - Generate custom 3MF/STL/OBJ/GLB/GLTF preview images on demand with configurable settings.
 ### Seamless Integration - Works natively with Windows File Explorer - no other viewer needed.
 ### Windows 10 and 11 Compatible.
 ### Lightning Fast - Optimized rendering powered by Open3D delivers crisp previews.
